@@ -135,7 +135,7 @@ export default function Home() {
                 </ul>
                 <div className="flex justify-between items-center">
                   <Link
-                    href="/metrology"
+                    href="/metro-page"
                     className="text-blue-600 font-medium flex items-center hover:text-blue-700"
                   >
                     Learn More

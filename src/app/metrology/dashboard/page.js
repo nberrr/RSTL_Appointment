@@ -1,3 +1,5 @@
+"use client";
+
 export default function MetrologyDashboard() {
   return (
     <div className="p-6">

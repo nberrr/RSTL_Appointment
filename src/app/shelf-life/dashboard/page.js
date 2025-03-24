@@ -1,3 +1,5 @@
+"use client";
+
 export default function ShelfLifeDashboard() {
   return (
     <div className="p-6">

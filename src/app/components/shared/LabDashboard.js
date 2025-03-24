@@ -1,3 +1,5 @@
+"use client";
+
 export default function LabDashboard({ department }) {
   return (
     <div className="p-6">

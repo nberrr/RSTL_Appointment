@@ -66,7 +66,7 @@ export default function Navbar() {
               href="/consultancy"
               className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
             >
-              Request Consultancy
+              Research Consultancy
             </Link>
           </div>
         </div>

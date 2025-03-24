@@ -1,10 +1,23 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardSidebar() {
-  const [activeItem, setActiveItem] = useState('calendar');
+  const pathname = usePathname();
+  const [activeItem, setActiveItem] = useState('dashboard');
+  
+  // Set the active item based on the current path
+  useEffect(() => {
+    if (pathname.includes('/dashboard')) {
+      setActiveItem('dashboard');
+    } else if (pathname.includes('/calendar')) {
+      setActiveItem('calendar');
+    } else if (pathname.includes('/reports')) {
+      setActiveItem('reports');
+    }
+  }, [pathname]);
 
   const navItems = [
     {
@@ -37,21 +50,25 @@ export default function DashboardSidebar() {
   ];
 
   return (
-    <aside className="bg-white w-16 min-h-screen flex flex-col items-center py-6 border-r">
-      {navItems.map((item) => (
-        <Link 
-          key={item.id}
-          href={item.href}
-          className={`mb-6 p-2 rounded-lg transition-colors duration-200 ${
-            activeItem === item.id 
-              ? 'bg-blue-500 text-white' 
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-          onClick={() => setActiveItem(item.id)}
-        >
-          {item.icon}
-        </Link>
-      ))}
+    <aside className="bg-white w-16 shadow-md h-full flex-shrink-0 overflow-y-auto">
+      <div className="p-4 flex flex-col items-center">
+        {navItems.map((item) => (
+          <Link 
+            key={item.id}
+            href={item.href}
+            className={`mb-6 p-2 rounded-lg transition-colors duration-200 ${
+              activeItem === item.id 
+                ? 'bg-blue-500 text-white' 
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+            onClick={(e) => {
+              setActiveItem(item.id);
+            }}
+          >
+            {item.icon}
+          </Link>
+        ))}
+      </div>
     </aside>
   );
 } 

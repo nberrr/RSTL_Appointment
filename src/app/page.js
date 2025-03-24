@@ -52,6 +52,8 @@ export default function Home() {
         </div>
       </div>
 
+
+
       {/* Services Section */}
       <div className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -477,7 +479,127 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {/* OneLab Information Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* OneLab Member Badge */}
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/onelab-logo.png"
+                alt="OneLab Logo"
+                width={200}
+                height={80}
+                className="object-contain"
+              />
+            </div>
+            <p className="text-sm font-semibold text-blue-600 mb-2 flex items-center justify-center">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              DOST V is a member of OneLab
+            </p>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+            {/* What is OneLab Section */}
+            <div>
+              <div className="flex items-center mb-6">
+                <svg className="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-xl font-semibold text-gray-900">What is OneLab?</h3>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <p className="text-gray-600 mb-6">
+                  Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas.
+                </p>
+                <p className="text-gray-600">
+                  Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas.
+                </p>
+              </div>
+            </div>
+
+            {/* OneLab Benefits */}
+            <div>
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-8 rounded-xl shadow-lg text-white h-full">
+                <div className="flex items-center mb-6">
+                  <Image
+                    src="/onelab-white.jpg"
+                    alt="OneLab Logo"
+                    width={120}
+                    height={40}
+                    className="object-contain"
+                  />
+                </div>
+                <p className="mb-6">
+                  Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
+                </p>
+                <h4 className="text-lg font-semibold mb-4">OneLab Member Benefits</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* How does it work Section */}
+          <div className="mb-16">
+            <div className="flex items-center mb-6">
+              <svg className="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-900">How does it work?</h3>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <p className="text-gray-600 mb-6">
+                Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas.
+              </p>
+              <p className="text-gray-600">
+                Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas.
+              </p>
+              <div className="mt-8">
+                <Image
+                  src="/onelab-banner.jpg"
+                  alt="OneLab Banner"
+                  width={800}
+                  height={200}
+                  className="object-contain w-full rounded-lg"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* RSTL Services Procedure Section */}
       <div className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -152,9 +152,7 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
-                  <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium">
-                    I'm a Manager
-                  </button>
+
                 </div>
               </div>
             </div>
@@ -200,9 +198,7 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
-                  <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium">
-                    I'm a Manager
-                  </button>
+
                 </div>
               </div>
             </div>

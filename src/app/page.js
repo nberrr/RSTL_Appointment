@@ -64,7 +64,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Metrology Card */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
                   src="/metrology-test.jpg"
@@ -72,25 +72,43 @@ export default function Home() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
                   Metrology Tests
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-4">
-                  Lorem ipsum dolor sit amet. Ab ullam dolorem non internos dolore quis nostrum ullus.
+                <h3 className="text-gray-600 mb-4">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem eos internos dolore quo nostrum nihil.Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
                 </p>
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                 </ul>
@@ -100,11 +118,11 @@ export default function Home() {
                     className="text-blue-600 font-medium flex items-center hover:text-blue-700"
                   >
                     Learn More
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
-                  <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md text-sm font-medium">
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                     I'm a Manager
                   </button>
                 </div>
@@ -112,7 +130,7 @@ export default function Home() {
             </div>
 
             {/* Chemical Card */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
                   src="/chemical-test.jpg"
@@ -120,25 +138,43 @@ export default function Home() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
                   Chemical Tests
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-4">
-                  Lorem ipsum dolor sit amet. Ab ullam dolorem non internos dolore quis nostrum ullus.
+                <h3 className="text-gray-600 mb-4">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem eos internos dolore quo nostrum nihil.Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
                 </p>
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                 </ul>
@@ -148,17 +184,19 @@ export default function Home() {
                     className="text-blue-600 font-medium flex items-center hover:text-blue-700"
                   >
                     Learn More
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
-
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                    I'm a Manager
+                  </button>
                 </div>
               </div>
             </div>
 
             {/* Microbiological Card */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
                   src="/microbiology-test.jpg"
@@ -166,25 +204,43 @@ export default function Home() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
                   Microbiological Tests
                 </div>
               </div>
               <div className="p-6">
-                <p className="text-gray-600 mb-4">
-                  Lorem ipsum dolor sit amet. Ab ullam dolorem non internos dolore quis nostrum ullus.
+                <h3 className="text-gray-600 mb-4">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem eos internos dolore quo nostrum nihil.Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
                 </p>
-                <ul className="space-y-2 mb-6">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                     Lorem ipsum dolor sit amet
                   </li>
                 </ul>
@@ -194,11 +250,13 @@ export default function Home() {
                     className="text-blue-600 font-medium flex items-center hover:text-blue-700"
                   >
                     Learn More
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
-
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                    I'm a Manager
+                  </button>
                 </div>
               </div>
             </div>

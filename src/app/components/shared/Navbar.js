@@ -1,81 +1,72 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const pathname = usePathname();
   
   const isActive = (path) => {
-    return pathname.startsWith(path) ? 'bg-gray-100' : '';
+    return pathname === path ? 'text-blue-600' : 'text-gray-700';
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            {/* Logo/Home Link */}
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-gray-800">RSTL</span>
+        <div className="flex justify-between h-16 items-center">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/dost-logo.png"
+                alt="DOST Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+              />
+              <div className="text-sm">
+                <div>Department of Science and Technology V</div>
+                <div className="text-gray-600">Regional Standard and Testing Laboratories</div>
+              </div>
             </Link>
-
-            {/* Navigation Links */}
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                href="/metrology"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/metrology')
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Metrology
-              </Link>
-              <Link
-                href="/microbiology"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/microbiology')
-                    ? 'border-green-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Microbiology
-              </Link>
-              <Link
-                href="/chemistry"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/chemistry')
-                    ? 'border-purple-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Chemistry
-              </Link>
-              <Link
-                href="/shelf-life"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/shelf-life')
-                    ? 'border-orange-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                }`}
-              >
-                Shelf Life
-              </Link>
-            </div>
           </div>
 
-          {/* Right side items */}
-          <div className="flex items-center">
+          <div className="hidden md:flex items-center space-x-8">
             <Link
-              href="/admin"
-              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                isActive('/admin')
-                  ? 'border-gray-500 text-gray-900'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              }`}
+              href="/"
+              className={`${isActive('/')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
             >
-              Admin
+              Home
+            </Link>
+            <Link
+              href="/metrology"
+              className={`${isActive('/metrology')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
+              Metrology
+            </Link>
+            <Link
+              href="/microbiology"
+              className={`${isActive('/microbiology')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
+              Microbiology
+            </Link>
+            <Link
+              href="/chemistry"
+              className={`${isActive('/chemistry')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
+              Chemical
+            </Link>
+            <Link
+              href="/shelf-life"
+              className={`${isActive('/shelf-life')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
+              Shelf Life
+            </Link>
+            <Link
+              href="/consultancy"
+              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Request Consultancy
             </Link>
           </div>
         </div>

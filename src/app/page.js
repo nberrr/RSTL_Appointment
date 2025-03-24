@@ -7,52 +7,71 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative h-[600px] bg-blue-900">
+      <div className="relative h-[650px] bg-gradient-to-r from-blue-900 to-blue-800">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
             src="/hero-bg.jpg"
             alt="Laboratory Background"
             fill
-            className="object-cover opacity-50"
+            className="object-cover opacity-30"
             priority
           />
         </div>
         
         {/* Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
-          <div className="max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-2">DOST-V</h1>
-            <h2 className="text-3xl font-semibold text-white mb-2">Appointment Portal</h2>
-            <p className="text-xl text-white mb-4">Regional Standards & Testing Laboratories</p>
-            <p className="text-gray-200 mb-8">
-              Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem natus neque qui illum natum non beatae voluptas sed temporibus quibusdam est nemo.
-            </p>
-            <div className="flex space-x-4">
-              <Link
-                href="/schedule"
-                className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium flex items-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Get Scheduled
-              </Link>
-              <Link
-                href="/manager"
-                className="bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                I'm a Manager
-              </Link>
+        <div className="relative h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              {/* Left side - Logo and Title */}
+              <div className="mb-8 md:mb-0">
+                <div className="flex items-center mb-4">
+                  <Image
+                    src="/dost-logo.png"
+                    alt="DOST Logo"
+                    width={60}
+                    height={60}
+                    className="mr-4"
+                  />
+                  <h1 className="text-5xl font-bold text-white">DOST-V</h1>
+                </div>
+                <h2 className="text-2xl font-semibold text-white mb-2">Appointment Portal</h2>
+                <p className="text-lg text-white">Regional Standards & Testing Laboratories</p>
+              </div>
+
+              {/* Right side - Text and Buttons */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 max-w-lg">
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Lorem ipsum dolor sit amet, Et quasi veniam et dicta
+                </h3>
+                <p className="text-gray-200 mb-8">
+                  Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/schedule"
+                    className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-gray-100 transition-colors"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Get Scheduled
+                  </Link>
+                  <Link
+                    href="/manager"
+                    className="bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    I'm a Manager
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-
 
       {/* Services Section */}
       <div className="py-16 bg-gray-50">

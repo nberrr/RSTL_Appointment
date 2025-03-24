@@ -63,36 +63,36 @@ export default function MetrologyPage() {
     <div>
       <div className="max-w-full mx-auto pt-12">
         <div className="max-w-[100rem] mx-auto bg-[#F2F7FF] flex flex-col md:flex-row items-center justify-between gap-8">
-          {/* Left side - Text content */}
+        {/* Left side - Text content */}
           <div className="max-w-2xl p-8 md:p-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">Metrology Laboratory Services</h1>
-            <p className="text-gray-600 text-lg mb-8">
-              Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
-            </p>
-            <div className="flex gap-4">
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-700 transition-colors">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Get Scheduled
-              </button>
-              <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors">
-                Register as Manager
-              </button>
-            </div>
-          </div>
-
-          {/* Right side - Image */}
-          <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
-            <img
-              src="/metrology-test.jpg"
-              alt="Metrology Laboratory"
-              className="w-full h-full object-cover"
-            />
-            {/* Decorative overlay */}
-            <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent"></div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">Metrology Laboratory Services</h1>
+          <p className="text-gray-600 text-lg mb-8">
+            Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
+          </p>
+          <div className="flex gap-4">
+            <button className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-700 transition-colors">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Get Scheduled
+            </button>
+            <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors">
+              Register as Manager
+            </button>
           </div>
         </div>
+
+        {/* Right side - Image */}
+        <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+          <img
+            src="/metrology-test.jpg"
+            alt="Metrology Laboratory"
+            className="w-full h-full object-cover"
+          />
+          {/* Decorative overlay */}
+          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent"></div>
+        </div>
+      </div>
 
         {/* How It Works Section */}
         <div className="max-w-[76rem] mx-auto mt-24">
@@ -279,9 +279,9 @@ export default function MetrologyPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-full transition-colors ${
+                className={`px-2 py-2 rounded-full transition-colors ${
                   activeTab === tab
-                    ? 'bg-black text-white'
+                    ? 'bg-blue-800 text-white'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -424,10 +424,10 @@ export default function MetrologyPage() {
             <div className="mt-16 pt-8 border-t border-gray-700 text-center text-sm text-gray-400">
               © 2025 Department of Science and Technology V. All right reserved.
             </div>
-          </div>
+          </div>  
         </footer>
       </div>
-    </div>
+  </div>
   );
 } 
 

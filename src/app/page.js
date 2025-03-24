@@ -75,7 +75,7 @@ export default function Home() {
 
       {/* Services Section */}
       <div className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-blue-900 mb-2">
             Regional Standards & Testing Laboratories
           </h2>
@@ -83,7 +83,7 @@ export default function Home() {
             Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Metrology Card */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
@@ -275,6 +275,69 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Shelf Life Card */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="h-48 relative">
+                <Image
+                  src="/shelf-life.jpg"
+                  alt="Shelf Life Testing"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Shelf Life Tests
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-gray-600 mb-4">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Lorem ipsum dolor sit amet. Ab ullam dolorem eos internos dolore quo nostrum nihil.Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
+                </p>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    Lorem ipsum dolor sit amet
+                  </li>
+                </ul>
+                <div className="flex justify-between items-center">
+                  <Link
+                    href="/shelf-life"
+                    className="text-blue-600 font-medium flex items-center hover:text-blue-700"
+                  >
+                    Learn More
+                    <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -408,7 +471,6 @@ export default function Home() {
                         <option value="">Select type</option>
                         <option value="chemical">Chemical</option>
                         <option value="microbiological">Microbiological</option>
-                        <option value="metrology">Metrology</option>
                       </select>
                     </div>
                     <div>

@@ -10,12 +10,12 @@ export default function DashboardSidebar() {
   
   // Set the active item based on the current path
   useEffect(() => {
-    if (pathname.includes('/dashboard')) {
-      setActiveItem('dashboard');
-    } else if (pathname.includes('/calendar')) {
+    if (pathname.includes('/dashboard/calendar')) {
       setActiveItem('calendar');
-    } else if (pathname.includes('/reports')) {
+    } else if (pathname.includes('/dashboard/reports')) {
       setActiveItem('reports');
+    } else if (pathname.includes('/dashboard')) {
+      setActiveItem('dashboard');
     }
   }, [pathname]);
 
@@ -36,7 +36,7 @@ export default function DashboardSidebar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
-      href: '/metrology/calendar'
+      href: '/metrology/dashboard/calendar'
     },
     {
       id: 'reports',

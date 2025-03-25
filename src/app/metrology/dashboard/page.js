@@ -5,7 +5,6 @@ import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 import Link from "next/link";
-import "@/app/styles/metro-dash.css";
 
 export default function MetrologyDashboard() {
   // Get the current date information
@@ -129,186 +128,203 @@ export default function MetrologyDashboard() {
 
   return (
     <AdminLayout>
-      <div className="dashboard-container">
+      <div className="h-screen flex flex-col">
         <DashboardNav />
-        <div className="dashboard-content">
+        <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
-          <div className="dashboard-main">
-         
-            
-            <div className="dashboard-grid">
+          <main className="flex-1 bg-gray-50 p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-[45%,1fr] gap-4 h-full">
               {/* Left Section - Calendar and Info */}
-              <div>
-                {/* Combined Calendar and Info Container */}
-                <div className="unified-calendar-container">
-                  {/* Calendar */}
-                  <div className="calendar-section">
-                    <div className="calendar-header">
-                      <h2 className="calendar-title">{currentMonth}</h2>
-                      <div className="calendar-nav">
-                        <button className="calendar-nav-button" onClick={goToPreviousMonth}>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button className="calendar-nav-button" onClick={goToNextMonth}>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
+              <div className="h-full">
+                <div className="bg-white rounded-xl shadow-sm p-4 h-full flex flex-col">
+                  {/* Calendar Header */}
+                  <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-lg font-semibold text-gray-900">{currentMonth}</h2>
+                    <div className="flex gap-2">
+                      <button 
+                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                        onClick={goToPreviousMonth}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button 
+                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                        onClick={goToNextMonth}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
                     </div>
-                    
-                    {/* Weekdays header */}
-                    <div className="calendar-weekdays">
+                  </div>
+                  
+                  {/* Calendar Grid */}
+                  <div className="flex-1 flex flex-col min-h-0">
+                    <div className="grid grid-cols-7 mb-1">
                       {weekdays.map(day => (
-                        <div key={day} className="calendar-weekday">{day}</div>
+                        <div key={day} className="text-xs text-gray-500 font-medium text-center py-1">
+                          {day}
+                        </div>
                       ))}
                     </div>
                     
-                    {/* Calendar days */}
-                    <div className="calendar-days">
+                    <div className="grid grid-cols-7 gap-px bg-gray-200 flex-1">
                       {calendarDays.map((dayObj, index) => (
                         dayObj.isCurrentMonth ? (
                           <button
                             key={index}
-                            className={`calendar-day ${isCurrentDay(dayObj.day) ? 'calendar-day-current' : ''}`}
+                            className={`
+                              relative text-sm flex items-center justify-center bg-white hover:bg-gray-50
+                              ${isCurrentDay(dayObj.day) ? 'font-bold text-blue-600' : 'text-gray-900'}
+                              ${isSelectedDay(dayObj.day) ? 'ring-2 ring-blue-500' : ''}
+                            `}
                             onClick={() => setSelectedDay(dayObj.day)}
                           >
                             {dayObj.day}
                           </button>
                         ) : (
-                          <div key={index} className="calendar-day calendar-day-outside"></div>
+                          <div key={index} className="bg-gray-50" />
                         )
                       ))}
                     </div>
                   </div>
                   
                   {/* Day Info */}
-                  <div className="info-section">
-                    <div className="info-header">
-                      <h2 className="info-title">Infos in this Day:</h2>
-                      <span className="info-date">{formattedSelectedDate()}</span>
+                  <div className="border-t pt-3 mt-3">
+                    <div className="mb-2">
+                      <h2 className="text-sm font-semibold text-gray-900">Infos in this Day:</h2>
+                      <span className="text-xs text-gray-600">{formattedSelectedDate()}</span>
                     </div>
                     
-                    <div className="info-content">
-                      <div className="info-item">
-                        <div className="info-label">
-                          <div className="info-icon-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                           </div>
-                          <span>Liters Available</span>
+                          <span className="text-xs text-gray-600">Liters Available</span>
                         </div>
-                        <span className="info-value">3,000</span>
+                        <span className="text-sm font-semibold">3,000</span>
                       </div>
                       
-                      <div className="info-item">
-                        <div className="info-label">
-                          <div className="info-icon-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
-                          <span>Appointments</span>
+                          <span className="text-xs text-gray-600">Appointments</span>
                         </div>
-                        <span className="info-value">2</span>
+                        <span className="text-sm font-semibold">2</span>
                       </div>
                       
-                      <div className="info-item">
-                        <div className="info-label">
-                          <div className="info-icon-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="info-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
-                          <span>Available Slots</span>
+                          <span className="text-xs text-gray-600">Available Slots</span>
                         </div>
-                        <span className="info-value">0</span>
+                        <span className="text-sm font-semibold">0</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Right Section - Statistics and Table */}
-              <div className="space-y-6">
-                {/* Statistics Cards */}
-                <div className="stats-grid">
+              {/* Right Section */}
+              <div className="space-y-4">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-3 gap-4">
                   {/* Registered Managers */}
-                  <div className="stat-card stat-card-blue">
-                    <div className="stat-header">
-                      <div>
-                        <h3 className="stat-title stat-title-blue">Registered Managers</h3>
-                        <p className="stat-value">0</p>
+                  <div className="bg-white rounded-xl shadow-sm p-3">
+                    <div className="flex flex-col">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-xs font-medium text-gray-600">Registered Managers</h3>
+                          <p className="text-lg font-semibold mt-0.5">0</p>
+                        </div>
+                        <div className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
                       </div>
-                      <div className="stat-icon-container stat-icon-container-blue">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stat-icon stat-icon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                      </div>
+                      <p className="text-xs text-gray-500">New registered managers has been added. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
                     </div>
-                    <p className="stat-footer">New registered managers has been added. <Link href="#" className="stat-link">View info</Link></p>
                   </div>
                   
                   {/* Scheduled Appointments */}
-                  <div className="stat-card stat-card-green">
-                    <div className="stat-header">
-                      <div>
-                        <h3 className="stat-title stat-title-green">Scheduled Appointments</h3>
-                        <p className="stat-value">0</p>
+                  <div className="bg-white rounded-xl shadow-sm p-3">
+                    <div className="flex flex-col">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-xs font-medium text-gray-600">Scheduled Appointments</h3>
+                          <p className="text-lg font-semibold mt-0.5">0</p>
+                        </div>
+                        <div className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
                       </div>
-                      <div className="stat-icon-container stat-icon-container-green">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stat-icon stat-icon-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
+                      <p className="text-xs text-gray-500">New appointments has been added. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
                     </div>
-                    <p className="stat-footer">New appointments has been added. <Link href="#" className="stat-link">View info</Link></p>
                   </div>
                   
                   {/* Appointments Today */}
-                  <div className="stat-card stat-card-cyan">
-                    <div className="stat-header">
-                      <div>
-                        <h3 className="stat-title stat-title-cyan">Appointments Today</h3>
-                        <p className="stat-value">0</p>
+                  <div className="bg-white rounded-xl shadow-sm p-3">
+                    <div className="flex flex-col">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-xs font-medium text-gray-600">Appointments Today</h3>
+                          <p className="text-lg font-semibold mt-0.5">0</p>
+                        </div>
+                        <div className="w-8 h-8 flex items-center justify-center bg-cyan-100 text-cyan-600 rounded-lg">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
                       </div>
-                      <div className="stat-icon-container stat-icon-container-cyan">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stat-icon stat-icon-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
+                      <p className="text-xs text-gray-500">Confirmed Appointments. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
                     </div>
-                    <p className="stat-footer">Confirmed Appointments. <Link href="#" className="stat-link">View info</Link></p>
                   </div>
                 </div>
                 
                 {/* Chart Section */}
-                <div className="chart-container">
-                  <h3 className="chart-title">Daily Liquid Volume (Last 7 Days)</h3>
-                  <div className="chart-placeholder">
-                    <p>Chart will be displayed here</p>
+                <div className="bg-white rounded-xl shadow-sm p-3">
+                  <h3 className="text-sm font-semibold mb-2">Daily Liquid Volume (Last 7 Days)</h3>
+                  <div className="h-[200px] flex items-center justify-center border border-gray-200 rounded-lg">
+                    <p className="text-xs text-gray-500">Chart will be displayed here</p>
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">Data updates every 3 hours</p>
                 </div>
                 
                 {/* Appointments Table */}
-                <div className="table-container">
-                  <h3 className="table-title">Daily Appointments This Month</h3>
-                  <div className="table-scroll">
-                    <table className="data-table">
-                      <thead>
-                        <tr className="table-header">
-                          <th className="table-header-cell">Name</th>
-                          <th className="table-header-cell">Email</th>
-                          <th className="table-header-cell">Date</th>
-                          <th className="table-header-cell">Status</th>
+                <div className="bg-white rounded-xl shadow-sm p-3">
+                  <h3 className="text-sm font-semibold mb-2">Daily Appointments This Month</h3>
+                  <div className="overflow-hidden rounded-lg border border-gray-200">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                          <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                          <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                          <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr className="table-empty">
-                          <td colSpan="4">No appointments found</td>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td colSpan="4" className="px-3 py-2 text-center text-xs text-gray-500">
+                            No appointments found
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -316,7 +332,7 @@ export default function MetrologyDashboard() {
                 </div>
               </div>
             </div>
-          </div>
+          </main>
         </div>
       </div>
     </AdminLayout>

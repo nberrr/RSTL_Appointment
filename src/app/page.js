@@ -49,7 +49,7 @@ export default function Home() {
             </p>
                 <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/schedule"
+                href="/metrology/appointment"
                     className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-gray-100 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ export default function Home() {
                 Get Scheduled
               </Link>
               <Link
-                href="/manager"
+                href="/metrology/manager-registration"
                     className="bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,9 +143,12 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-                    I'm a Manager
-                  </button>
+                  <Link
+                href="/metrology/manager-registration"
+                    className="bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
+              >
+                I'm a Manager
+              </Link>
                 </div>
               </div>
             </div>

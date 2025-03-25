@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from "next/link";
 
 export default function MetrologyPage() {
   const [openQuestion, setOpenQuestion] = useState(null);
@@ -70,16 +71,25 @@ export default function MetrologyPage() {
             Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
           </p>
           <div className="flex gap-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-700 transition-colors">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Get Scheduled
-            </button>
-            <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors">
-              Register as Manager
-            </button>
-          </div>
+                {/* Button with Link */}
+                <Link href="/metrology/appointment">
+                  <button className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-700 transition-colors">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Get Scheduled
+                  </button>
+                </Link>
+
+                <Link href="/metrology/manager-registration">
+                  <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors">
+                    Register as Manager
+                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </button>
+                </Link>
+              </div>
         </div>
 
         {/* Right side - Image */}
@@ -162,13 +172,15 @@ export default function MetrologyPage() {
           </div>
 
           <div className="flex justify-center mt-12">
-            <button className="bg-[#2563EB] text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-[#395490] transition-colors">
-              Schedule Your Test Now
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </button>
-          </div>
+              <Link href="/metrology/appointment">
+                <button className="bg-[#2563EB] text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-[#395490] transition-colors">
+                  Schedule Your Test Now
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </button>
+              </Link>
+            </div>
         </div>
 
         {/* Why Choose Our Laboratory Services Section */}

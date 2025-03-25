@@ -72,7 +72,7 @@ export default function ManagerRegistration() {
       <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Company Registration</h1>
+          <h1 className="text-2xl font-semibold text-[#2243B0]">Company Registration</h1>
           <p className="mt-2 text-sm text-gray-600">
             Please provide your company details to complete the registration
           </p>

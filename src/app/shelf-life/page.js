@@ -66,7 +66,7 @@ export default function ShelfLifePage() {
         <div className="max-w-[100rem] mx-auto bg-[#F2F7FF] flex flex-col md:flex-row items-center justify-between gap-8">
         {/* Left side - Text content */}
           <div className="max-w-2xl p-8 md:p-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">Shelf Life  Laboratory</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">Shelf Life  Testing Services</h1>
           <p className="text-gray-600 text-lg mb-8">
             Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
           </p>
@@ -86,7 +86,7 @@ export default function ShelfLifePage() {
         {/* Right side - Image */}
         <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
           <img
-            src="/microbiology-test.jpg"
+            src="/chem1.jpg"
             alt="Microbiology Testing Laboratory"
             className="w-full h-full object-cover"
           />
@@ -254,7 +254,7 @@ export default function ShelfLifePage() {
               <div className="w-full lg:w-1/2">
                 <div className="relative h-[500px] rounded-lg overflow-hidden">
                   <img
-                    src="/microbiology-test.jpg"
+                    src="/shelf-life.jpg"
                     alt="Laboratory Equipment"
                     className="w-full h-full object-cover"
                   />

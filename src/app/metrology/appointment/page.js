@@ -171,21 +171,7 @@ export default function MetrologyAppointment() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Sex</label>
-                        <select
-                        name="sex"
-                        value={formData.sex}
-                        onChange={handleChange}
-                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm
-                            focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        required
-                        >
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        </select>
-                    </div>
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Plate Number</label>
@@ -204,7 +190,7 @@ export default function MetrologyAppointment() {
 
                     <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        Company / School / University
+                        Company / Organization
                     </label>
                     <input
                         type="text"

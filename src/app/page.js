@@ -40,7 +40,7 @@ export default function Home() {
               </div>
 
               {/* Right side - Text and Buttons */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 max-w-lg">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 max-w-[40rem]">
                 <h3 className="text-2xl font-bold text-white mb-4">
                   Lorem ipsum dolor sit amet, Et quasi veniam et dicta
                 </h3>

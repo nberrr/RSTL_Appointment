@@ -2,22 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [activeItem, setActiveItem] = useState('dashboard');
   
-  // Set the active item based on the current path
+  // Set the active item based on the current path and handle refresh redirect
   useEffect(() => {
     if (pathname.includes('/dashboard/calendar')) {
       setActiveItem('calendar');
-    } else if (pathname.includes('/dashboard/reports')) {
+    } else if (pathname.includes('/reports')) {
       setActiveItem('reports');
     } else if (pathname.includes('/dashboard')) {
       setActiveItem('dashboard');
     }
-  }, [pathname]);
+
+    // Add event listener for page refresh
+    const handleBeforeUnload = () => {
+      router.push('/metrology/dashboard');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pathname, router]);
 
   const navItems = [
     {
@@ -45,7 +57,7 @@ export default function DashboardSidebar() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      href: '/metrology/reports'
+      href: '/metrology/dashboard/reports'
     }
   ];
 
@@ -61,7 +73,7 @@ export default function DashboardSidebar() {
                 ? 'bg-blue-500 text-white' 
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
-            onClick={(e) => {
+            onClick={() => {
               setActiveItem(item.id);
             }}
           >

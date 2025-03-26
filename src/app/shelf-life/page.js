@@ -266,74 +266,57 @@ export default function ShelfLifePage() {
           </div>
         </div>
 
-        {/* FAQ Section */}
-        <div className="max-w-[96rem] mx-auto mt-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently asked questions</h2>
-            <p className="text-gray-600">
-              Common questions about our metrology services.
-              Can't find what you're looking for? <a href="#" className="text-blue-600 hover:underline"></a>
-            </p>
-          </div>
+         {/* FAQ Section */}
+         <div className="max-w-[96rem] mx-auto mt-24">
+                    <div className="text-center mb-12">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently asked questions</h2>
+                      <p className="text-gray-600">
+                        Common questions about our metrology services.
+                        Can't find what you're looking for? <a href="#" className="text-blue-600 hover:underline"></a>
+                      </p>
+                    </div>
 
-          {/* FAQ Tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-2 py-2 rounded-full transition-colors ${
-                  activeTab === tab
-                    ? 'bg-blue-800 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* FAQ Questions */}
-          <div className="max-w-3xl mx-auto space-y-4">
-            {filteredQuestions.map((faq, index) => (
-              <div key={index} className="border rounded-lg hover:bg-gray-50">
-                <button
-                  onClick={() => toggleQuestion(index)}
-                  className="w-full px-6 py-4 text-left flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-4">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {faq.icon}
-                    </svg>
-                    <span className="text-gray-900">{faq.question}</span>
+                    {/* FAQ Questions */}
+                    <div className="max-w-[80rem] mx-auto space-y-4">
+                      {faqQuestions.map((faq, index) => (
+                        <div key={index} className="border rounded-lg hover:bg-gray-50">
+                          <button
+                            onClick={() => toggleQuestion(index)}
+                            className="w-full px-6 py-4 text-left flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-4">
+                              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {faq.icon}
+                              </svg>
+                              <span className="text-gray-900">{faq.question}</span>
+                            </div>
+                            <svg
+                              className={`w-5 h-5 text-gray-500 transform transition-transform duration-200 ${
+                                openQuestion === index ? 'rotate-180' : ''
+                              }`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          <div
+                            className={`px-6 overflow-hidden transition-all duration-200 ease-in-out ${
+                              openQuestion === index ? 'max-h-40 pb-4' : 'max-h-0'
+                            }`}
+                          >
+                            <p className="text-gray-600">{faq.answer}</p>
+                          </div>
+                        </div>
+                      ))}
+                      {faqQuestions.length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">No questions available for this category.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <svg
-                    className={`w-5 h-5 text-gray-500 transform transition-transform duration-200 ${
-                      openQuestion === index ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div
-                  className={`px-6 overflow-hidden transition-all duration-200 ease-in-out ${
-                    openQuestion === index ? 'max-h-40 pb-4' : 'max-h-0'
-                  }`}
-                >
-                  <p className="text-gray-600">{faq.answer}</p>
-                </div>
-              </div>
-            ))}
-            {filteredQuestions.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No questions available for this category.</p>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Footer */}
         <footer className="bg-[#1e3a8a] text-white mt-24">

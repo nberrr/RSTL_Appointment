@@ -4,7 +4,8 @@ import Link from "next/link";
 
 export default function MetrologyPage() {
   const [openQuestion, setOpenQuestion] = useState(null);
-  const [activeTab, setActiveTab] = useState('Services');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   const toggleQuestion = (index) => {
     if (openQuestion === index) {
@@ -56,10 +57,7 @@ export default function MetrologyPage() {
       )
     }
   ];
-
-  const tabs = ['Services', 'Process', 'Certification', 'Support'];
-  const filteredQuestions = faqQuestions.filter(faq => faq.category === activeTab);
-
+  
   return (
     <div>
       <div className="max-w-full mx-auto pt-12">
@@ -93,7 +91,7 @@ export default function MetrologyPage() {
         </div>
 
         {/* Right side - Image */}
-        <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+        <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-tr-lg rounded-br-lg overflow-hidden">
           <img
             src="/metrology-test.jpg"
             alt="Metrology Laboratory"
@@ -105,86 +103,332 @@ export default function MetrologyPage() {
       </div>
 
         {/* How It Works Section */}
-        <div className="max-w-[76rem] mx-auto mt-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Our streamlined process makes laboratory testing simple and efficient
+        <div className="bg-white py-24 mt-12 pt-12">
+          <div className="max-w-[76rem] mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-blue-900 mb-4">How It Works</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Our streamlined process makes laboratory testing simple and efficient
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {/* Step 1 */}
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="text-gray-400 text-sm mb-2">01</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Schedule</h3>
+                <p className="text-gray-600 text-sm">
+                  Book your appointment online or by phone
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <div className="text-gray-400 text-sm mb-2">02</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Sample Submission</h3>
+                <p className="text-gray-600 text-sm">
+                  Drop off or ship your samples to our lab
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
+                </div>
+                <div className="text-gray-400 text-sm mb-2">03</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Testing</h3>
+                <p className="text-gray-600 text-sm">
+                  Our experts analyze your samples with precision
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="text-gray-400 text-sm mb-2">04</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Results</h3>
+                <p className="text-gray-600 text-sm">
+                  Receive detailed reports and analysis
+                </p>
+                
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center mt-12">
+          <Link href="/metrology/appointment">
+            <button className="bg-[#2563EB] text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-[#395490] transition-colors">
+              Schedule Your Test Now
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+          </Link>
+        </div>
+
+        </div>
+
+        {/* Laboratory Testing Services Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Title and Description */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Laboratory Testing Services</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              Our state-of-the-art laboratory offers comprehensive testing services across metrology, chemical analysis, and microbiological testing to meet your research and compliance needs.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Remove the tab section and directly show the content */}
+          <div className="bg-blue-50 rounded-xl p-8 mb-12">
+            {/* Existing Metrology content */}
+            <div className="flex items-center mb-6">
+              <svg className="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <h2 className="text-2xl font-bold text-gray-900">Metrology Laboratory Services</h2>
+            </div>
+            <p className="text-gray-600 mb-8">
+              Our metrology laboratory provides precise calibration and measurement services for a wide range of instruments and equipment, ensuring accuracy and reliability in your measurements.
+            </p>
+
+            {/* Service Categories */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Weight Calibration
+              </button>
+              <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Thermometry
+              </button>
+              <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Pressure Standards
+              </button>
+              <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Volume Standards
+              </button>
+              <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                Length Standards
+              </button>
+            </div>
+
+            {/* Service Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Test Weight Calibration */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Test Weight Calibration</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Precision calibration of test weights for various materials and ranges</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Test Weight (stainless steel)</span>
+                    <span className="text-gray-900 font-medium">₱500.00 - ₱1,000.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Test Weight (other materials)</span>
+                    <span className="text-gray-900 font-medium">₱400.00 - ₱700.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Non-Automatic Weighing Instrument (NAWI)</span>
+                    <span className="text-gray-900 font-medium">₱1,000.00 - ₱1,200.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+
+              {/* Thermometry Standards */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Thermometry Standards</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Calibration of temperature measurement devices across various ranges</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Thermometer -30°C to 250°C (five test points)</span>
+                    <span className="text-gray-900 font-medium">₱1,700.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Freezer -30°C to -5°C (one test point)</span>
+                    <span className="text-gray-900 font-medium">₱1,100.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">IR Thermometer 50°C to 250°C</span>
+                    <span className="text-gray-900 font-medium">₱1,700.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+
+              {/* Pressure Standards */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Pressure Standards</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Calibration of pressure measurement instruments for accurate readings</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Hydraulic Pressure Gauge (Oil)</span>
+                    <span className="text-gray-900 font-medium">₱900.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Sphygmomanometer</span>
+                    <span className="text-gray-900 font-medium">₱700.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+
+              {/* Volume Standards */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Volume Standards</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Calibration of volume measurement devices for precise liquid measurements</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Test Measure (Volumetric Method)</span>
+                    <span className="text-gray-900 font-medium">₱500.00 - ₱1,000.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Tank Truck</span>
+                    <span className="text-gray-900 font-medium">₱1,000.00 - ₱6,000.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Fuel Dispensing Pump (2 nozzles)</span>
+                    <span className="text-gray-900 font-medium">₱1,400.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+
+              {/* Length Standards */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Length Standards</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Calibration of length measurement tools for dimensional accuracy</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Caliper (&gt; to 200 mm)</span>
+                    <span className="text-gray-900 font-medium">₱1,225.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Steel Rule</span>
+                    <span className="text-gray-900 font-medium">₱600.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Micrometer</span>
+                    <span className="text-gray-900 font-medium">₱700.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+
+              {/* Electrical Standards */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Electrical Standards</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Instruments for accurate readings</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Voltmeter</span>
+                    <span className="text-gray-900 font-medium">₱2,250.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Multimeter</span>
+                    <span className="text-gray-900 font-medium">₱2,000.00</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Ohmmeter</span>
+                    <span className="text-gray-900 font-medium">₱700.00</span>
+                  </div>
+                </div>
+                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Request Service
+                </button>
+              </div>
+            </div>
+
+            {/* Testing Schedule Info */}
+            <div className="mt-12 bg-white rounded-lg p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
+                <h3 className="text-lg font-semibold text-gray-900">Testing Schedule</h3>
               </div>
-              <div className="text-gray-400 text-sm mb-2">01</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Schedule</h3>
-              <p className="text-gray-600 text-sm">
-                Book your appointment online or by phone
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <div className="text-gray-400 text-sm mb-2">02</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sample Submission</h3>
-              <p className="text-gray-600 text-sm">
-                Drop off or ship your samples to our lab
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                </svg>
-              </div>
-              <div className="text-gray-400 text-sm mb-2">03</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Testing</h3>
-              <p className="text-gray-600 text-sm">
-                Our experts analyze your samples with precision
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="text-gray-400 text-sm mb-2">04</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Results</h3>
-              <p className="text-gray-600 text-sm">
-                Receive detailed reports and analysis
-              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center text-sm text-gray-600">
+                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Calibration/Testing: MON-FRI, 8AM-5PM
+                </li>
+                <li className="flex items-center text-sm text-gray-600">
+                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Results available within 3-5 business days
+                </li>
+                <li className="flex items-center text-sm text-gray-600">
+                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Bring engine and chassis number (stencil)
+                </li>
+              </ul>
             </div>
           </div>
-
-          <div className="flex justify-center mt-12">
-              <Link href="/metrology/appointment">
-                <button className="bg-[#2563EB] text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-[#395490] transition-colors">
-                  Schedule Your Test Now
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
-              </Link>
-            </div>
         </div>
-
+      </div>
+        
         {/* Why Choose Our Laboratory Services Section */}
-        <div className="bg-white py-24">
+        <div className="bg-blue-50 py-24">
           <div className="max-w-[96rem] mx-auto">
             <div className="flex flex-col lg:flex-row items-center gap-12 px-6">
               {/* Left side content */}
@@ -285,26 +529,9 @@ export default function MetrologyPage() {
             </p>
           </div>
 
-          {/* FAQ Tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-2 py-2 rounded-full transition-colors ${
-                  activeTab === tab
-                    ? 'bg-blue-800 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           {/* FAQ Questions */}
-          <div className="max-w-3xl mx-auto space-y-4">
-            {filteredQuestions.map((faq, index) => (
+          <div className="max-w-[80rem] mx-auto space-y-4">
+            {faqQuestions.map((faq, index) => (
               <div key={index} className="border rounded-lg hover:bg-gray-50">
                 <button
                   onClick={() => toggleQuestion(index)}
@@ -336,7 +563,7 @@ export default function MetrologyPage() {
                 </div>
               </div>
             ))}
-            {filteredQuestions.length === 0 && (
+            {faqQuestions.length === 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500">No questions available for this category.</p>
               </div>

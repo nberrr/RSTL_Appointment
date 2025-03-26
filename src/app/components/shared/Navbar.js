@@ -64,7 +64,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/consultancy"
-              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+              className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors"
             >
               Research Consultancy
             </Link>

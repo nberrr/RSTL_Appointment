@@ -63,7 +63,7 @@ export default function MicrobiologyPage() {
   return (
     <div>
       <div className="max-w-full mx-auto pt-12">
-        <div className="max-w-[100rem] mx-auto bg-[#F2F7FF] flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="max-w-[100rem] mx-auto bg-purple-50 flex flex-col md:flex-row items-center justify-between gap-8">
         {/* Left side - Text content */}
           <div className="max-w-2xl p-8 md:p-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-6">Microbiology Testing Laboratory</h1>
@@ -73,7 +73,7 @@ export default function MicrobiologyPage() {
           <div className="flex gap-4">
                 {/* Button with Link */}
                 <Link href="/microbiology/appointment">
-                  <button className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-blue-700 transition-colors">
+                  <button className="bg-purple-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-purple-700 transition-colors">
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -84,21 +84,21 @@ export default function MicrobiologyPage() {
         </div>
 
         {/* Right side - Image */}
-        <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+        <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-tr-lg rounded-br-lg overflow-hidden">
           <img
             src="/microbiology-test.jpg"
             alt="Microbiology Testing Laboratory"
             className="w-full h-full object-cover"
           />
           {/* Decorative overlay */}
-          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-[blue]-900/20 to-transparent"></div>
         </div>
       </div>
 
         {/* How It Works Section */}
         <div className="max-w-[76rem] mx-auto mt-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <h2 className="text-3xl font-bold text-purple-900 mb-4">How It Works</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Our streamlined process makes laboratory testing simple and efficient
             </p>
@@ -108,7 +108,7 @@ export default function MicrobiologyPage() {
             {/* Step 1 */}
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -122,7 +122,7 @@ export default function MicrobiologyPage() {
             {/* Step 2 */}
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
@@ -136,7 +136,7 @@ export default function MicrobiologyPage() {
             {/* Step 3 */}
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
               </div>
@@ -150,7 +150,7 @@ export default function MicrobiologyPage() {
             {/* Step 4 */}
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -164,7 +164,7 @@ export default function MicrobiologyPage() {
 
           <div className="flex justify-center mt-12">
               <Link href="/metrology/appointment">
-                <button className="bg-[#2563EB] text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-[#395490] transition-colors">
+                <button className="bg-purple-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-purple-500 transition-colors">
                   Schedule Your Test Now
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -173,9 +173,134 @@ export default function MicrobiologyPage() {
               </Link>
             </div>
         </div>
+      <div className="py-16 bg-white">
+        <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Title and Description */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Laboratory Testing Services</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              Our state-of-the-art laboratory offers comprehensive testing services across metrology, chemical analysis, and microbiological testing to meet your research and compliance needs.
+            </p>
+          </div>
+
+          {/* Remove the tab section and directly show the content */}
+          <div className="bg-purple-50 rounded-xl p-8 mb-12">
+              {/* Existing Microbiological content */}
+              <div className="flex items-center mb-6">
+                <svg className="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <h2 className="text-2xl font-bold text-gray-900">Microbiological Testing Services</h2>
+              </div>
+              <p className="text-gray-600 mb-8">
+                Our microbiology laboratory provides testing services to identify and quantify microorganisms in various samples, ensuring product safety and regulatory compliance.
+              </p>
+
+              {/* Service Categories */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Food Safety
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Water Analysis
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Pathogen Detection
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Sterility Testing
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Shelf-life Studies
+                </button>
+              </div>
+
+              {/* Tests Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Food Microbiological Tests */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Food Microbiological Tests</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Aerobic Plate Count, Conventional</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Coliform Count, Conventional</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Commercial Sterility Test</span>
+                      <span className="text-gray-900 font-medium">₱2,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Salmonella Detection, PetriFilm</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                    Request Food Testing
+                  </button>
+                </div>
+
+                {/* Water Microbiological Tests */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Water Microbiological Tests</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Heterotrophic Plate Count</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">MPN of Total Coliform</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Confirmed test for E. coli</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                    Request Water Testing
+                  </button>
+                </div>
+              </div>
+
+              {/* Testing Schedule Info */}
+              <div className="mt-8 bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Testing Schedule</h3>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Microbiological Tests: MON-WED, before 2PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Salmonella Detection: MON-TUE, before 2PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Yeast and Mold Count: WED, before 2PM
+                  </li>
+                </ul>
+              </div>
+            </div>
+        </div>
+      </div>
 
         {/* Why Choose Our Laboratory Services Section */}
-        <div className="bg-white py-24">
+        <div className="bg-purple-50 py-24">
           <div className="max-w-[96rem] mx-auto">
             <div className="flex flex-col lg:flex-row items-center gap-12 px-6">
               {/* Left side content */}
@@ -191,8 +316,8 @@ export default function MicrobiologyPage() {
                   {/* Fast Turnaround Times */}
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
@@ -206,8 +331,8 @@ export default function MicrobiologyPage() {
                   {/* Accredited Facilities */}
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                         </svg>
                       </div>
@@ -221,8 +346,8 @@ export default function MicrobiologyPage() {
                   {/* Precision & Accuracy */}
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
@@ -236,8 +361,8 @@ export default function MicrobiologyPage() {
                   {/* Expert Consultation */}
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                       </div>
@@ -276,26 +401,9 @@ export default function MicrobiologyPage() {
             </p>
           </div>
 
-          {/* FAQ Tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-2 py-2 rounded-full transition-colors ${
-                  activeTab === tab
-                    ? 'bg-blue-800 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           {/* FAQ Questions */}
-          <div className="max-w-3xl mx-auto space-y-4">
-            {filteredQuestions.map((faq, index) => (
+          <div className="max-w-[80rem] mx-auto space-y-4">
+            {faqQuestions.map((faq, index) => (
               <div key={index} className="border rounded-lg hover:bg-gray-50">
                 <button
                   onClick={() => toggleQuestion(index)}
@@ -327,13 +435,15 @@ export default function MicrobiologyPage() {
                 </div>
               </div>
             ))}
-            {filteredQuestions.length === 0 && (
+            {faqQuestions.length === 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500">No questions available for this category.</p>
               </div>
             )}
           </div>
         </div>
+
+        
 
         {/* Footer */}
         <footer className="bg-[#1e3a8a] text-white mt-24">

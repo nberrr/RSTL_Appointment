@@ -2,8 +2,18 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState('metrology');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedCategory, setExpandedCategory] = useState(null);
+
+  // Function to handle tab changes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -66,10 +76,692 @@ export default function Home() {
                 </svg>
                 I'm a Manager
               </Link>
-                </div>
-              </div>
             </div>
           </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Laboratory Testing Services Section */}
+      <div className="py-16 bg-white">
+        <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Title and Description */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Laboratory Testing Services</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              Our state-of-the-art laboratory offers comprehensive testing services across metrology, chemical analysis, and microbiological testing to meet your research and compliance needs.
+            </p>
+          </div>
+
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search for tests..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <svg
+                className="absolute left-4 top-3.5 h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Service Type Tabs */}
+          <div className="flex justify-center mb-12">
+          <div className="inline-flex rounded-lg">
+              <button
+                onClick={() => handleTabChange('metrology')}
+                className={`px-6 py-3 font-medium rounded-l-lg flex items-center transition-colors ${
+                  activeTab === 'metrology'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Metrology
+              </button>
+              <button
+                onClick={() => handleTabChange('chemical')}
+                className={`px-6 py-3 font-medium flex items-center transition-colors ${
+                  activeTab === 'chemical'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Chemical
+              </button>
+              <button
+                onClick={() => handleTabChange('microbiological')}
+                className={`px-6 py-3 font-medium rounded-r-lg flex items-center transition-colors ${
+                  activeTab === 'microbiological'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Microbiological
+              </button>
+            </div>
+          </div>
+
+          {/* Content Sections */}
+          {activeTab === 'metrology' && (
+            <div className="bg-blue-50 rounded-xl p-8 mb-12">
+              {/* Existing Metrology content */}
+              <div className="flex items-center mb-6">
+                <svg className="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h2 className="text-2xl font-bold text-gray-900">Metrology Laboratory Services</h2>
+              </div>
+              <p className="text-gray-600 mb-8">
+                Our metrology laboratory provides precise calibration and measurement services for a wide range of instruments and equipment, ensuring accuracy and reliability in your measurements.
+              </p>
+
+              {/* Service Categories */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                  Weight Calibration
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                  Thermometry
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                  Pressure Standards
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                  Volume Standards
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                  Length Standards
+                </button>
+              </div>
+
+              {/* Service Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Test Weight Calibration */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Test Weight Calibration</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Precision calibration of test weights for various materials and ranges</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Test Weight (stainless steel)</span>
+                      <span className="text-gray-900 font-medium">₱500.00 - ₱1,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Test Weight (other materials)</span>
+                      <span className="text-gray-900 font-medium">₱400.00 - ₱700.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Non-Automatic Weighing Instrument (NAWI)</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00 - ₱1,200.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+
+                {/* Thermometry Standards */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Thermometry Standards</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Calibration of temperature measurement devices across various ranges</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Thermometer -30°C to 250°C (five test points)</span>
+                      <span className="text-gray-900 font-medium">₱1,700.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Freezer -30°C to -5°C (one test point)</span>
+                      <span className="text-gray-900 font-medium">₱1,100.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">IR Thermometer 50°C to 250°C</span>
+                      <span className="text-gray-900 font-medium">₱1,700.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+
+                {/* Pressure Standards */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Pressure Standards</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Calibration of pressure measurement instruments for accurate readings</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Hydraulic Pressure Gauge (Oil)</span>
+                      <span className="text-gray-900 font-medium">₱900.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Sphygmomanometer</span>
+                      <span className="text-gray-900 font-medium">₱700.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+
+                {/* Volume Standards */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Volume Standards</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Calibration of volume measurement devices for precise liquid measurements</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Test Measure (Volumetric Method)</span>
+                      <span className="text-gray-900 font-medium">₱500.00 - ₱1,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tank Truck</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00 - ₱6,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Fuel Dispensing Pump (2 nozzles)</span>
+                      <span className="text-gray-900 font-medium">₱1,400.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+
+                {/* Length Standards */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Length Standards</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Calibration of length measurement tools for dimensional accuracy</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Caliper (&gt; to 200 mm)</span>
+                      <span className="text-gray-900 font-medium">₱1,225.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Steel Rule</span>
+                      <span className="text-gray-900 font-medium">₱600.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Micrometer</span>
+                      <span className="text-gray-900 font-medium">₱700.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+
+                {/* Electrical Standards */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <h3 className="text-lg font-semibold text-gray-900">Electrical Standards</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">Instruments for accurate readings</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Voltmeter</span>
+                      <span className="text-gray-900 font-medium">₱2,250.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Multimeter</span>
+                      <span className="text-gray-900 font-medium">₱2,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Ohmmeter</span>
+                      <span className="text-gray-900 font-medium">₱700.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Request Service
+                  </button>
+                </div>
+              </div>
+
+              {/* Testing Schedule Info */}
+              <div className="mt-12 bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Testing Schedule</h3>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Calibration/Testing: MON-FRI, 8AM-5PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Results available within 3-5 business days
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Bring engine and chassis number (stencil)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'chemical' && (
+            <div className="bg-green-50 rounded-xl p-8 mb-12">
+              <div className="flex items-center mb-6">
+                <svg className="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <h2 className="text-2xl font-bold text-gray-900">Chemical Testing Services</h2>
+              </div>
+              <p className="text-gray-600 mb-8">
+                Our chemical laboratory offers comprehensive analytical services for food, water, and environmental samples, providing accurate and reliable results for research and regulatory compliance.
+              </p>
+
+              {/* Service Categories with Dropdowns */}
+              <div className="space-y-4">
+                {/* Food Analysis */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button 
+                    onClick={() => setExpandedCategory(expandedCategory === 'food' ? null : 'food')}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-green-50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Food Analysis</h3>
+                        <p className="text-sm text-gray-600">Comprehensive testing of food samples for various parameters</p>
+                      </div>
+                    </div>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${expandedCategory === 'food' ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {expandedCategory === 'food' && (
+                    <div className="px-6 py-4 border-t border-gray-100">
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Alcohol (by volume or ethanol liquor)</span>
+                          <span className="text-gray-900 font-medium">₱900.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Ash</span>
+                          <span className="text-gray-900 font-medium">₱500.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Brix Reading</span>
+                          <span className="text-gray-900 font-medium">₱300.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Crude Fiber</span>
+                          <span className="text-gray-900 font-medium">₱1,380.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Dietary Fiber</span>
+                          <span className="text-gray-900 font-medium">₱5,000.00</span>
+                        </div>
+                      </div>
+                      <button className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        Request Test
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Water and Wastewater Analysis */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button 
+                    onClick={() => setExpandedCategory(expandedCategory === 'water' ? null : 'water')}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-green-50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Water and Wastewater Analysis</h3>
+                        <p className="text-sm text-gray-600">Testing of water samples for various chemical parameters</p>
+                      </div>
+                    </div>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${expandedCategory === 'water' ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {expandedCategory === 'water' && (
+                    <div className="px-6 py-4 border-t border-gray-100">
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">BOD (Biochemical Oxygen Demand)</span>
+                          <span className="text-gray-900 font-medium">₱1,200.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">COD (Chemical Oxygen Demand)</span>
+                          <span className="text-gray-900 font-medium">₱900.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">pH Level</span>
+                          <span className="text-gray-900 font-medium">₱300.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Total Dissolved Solids</span>
+                          <span className="text-gray-900 font-medium">₱500.00</span>
+                        </div>
+                      </div>
+                      <button className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        Request Test
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Nutrition Facts Analysis */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button 
+                    onClick={() => setExpandedCategory(expandedCategory === 'nutrition' ? null : 'nutrition')}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-green-50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Nutrition Facts Analysis</h3>
+                        <p className="text-sm text-gray-600">Comprehensive nutritional analysis for food products</p>
+                      </div>
+                    </div>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${expandedCategory === 'nutrition' ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {expandedCategory === 'nutrition' && (
+                    <div className="px-6 py-4 border-t border-gray-100">
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Protein Content</span>
+                          <span className="text-gray-900 font-medium">₱1,500.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Total Fat</span>
+                          <span className="text-gray-900 font-medium">₱1,200.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Carbohydrates</span>
+                          <span className="text-gray-900 font-medium">₱1,200.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Calories</span>
+                          <span className="text-gray-900 font-medium">₱800.00</span>
+                        </div>
+                      </div>
+                      <button className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        Request Test
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Plant and Plant Extracts */}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <button 
+                    onClick={() => setExpandedCategory(expandedCategory === 'plant' ? null : 'plant')}
+                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-green-50 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Plant and Plant Extracts</h3>
+                        <p className="text-sm text-gray-600">Analysis of plant materials and extracts</p>
+                      </div>
+                    </div>
+                    <svg 
+                      className={`w-5 h-5 text-gray-400 transform transition-transform ${expandedCategory === 'plant' ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {expandedCategory === 'plant' && (
+                    <div className="px-6 py-4 border-t border-gray-100">
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Essential Oil Content</span>
+                          <span className="text-gray-900 font-medium">₱2,000.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Alkaloid Analysis</span>
+                          <span className="text-gray-900 font-medium">₱2,500.00</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Moisture Content</span>
+                          <span className="text-gray-900 font-medium">₱500.00</span>
+                        </div>
+                      </div>
+                      <button className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        Request Test
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Testing Schedule Info */}
+              <div className="mt-8 bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Testing Schedule</h3>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Chemical Tests: MON-WED, before 2PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Water samples for BOD: WED only, before 10AM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Samples accepted on confirmed dates only
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'microbiological' && (
+            <div className="bg-purple-50 rounded-xl p-8 mb-12">
+              {/* Existing Microbiological content */}
+              <div className="flex items-center mb-6">
+                <svg className="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <h2 className="text-2xl font-bold text-gray-900">Microbiological Testing Services</h2>
+              </div>
+              <p className="text-gray-600 mb-8">
+                Our microbiology laboratory provides testing services to identify and quantify microorganisms in various samples, ensuring product safety and regulatory compliance.
+              </p>
+
+              {/* Service Categories */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Food Safety
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Water Analysis
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Pathogen Detection
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Sterility Testing
+                </button>
+                <button className="bg-white px-4 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-colors">
+                  Shelf-life Studies
+                </button>
+              </div>
+
+              {/* Tests Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Food Microbiological Tests */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Food Microbiological Tests</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Aerobic Plate Count, Conventional</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Coliform Count, Conventional</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Commercial Sterility Test</span>
+                      <span className="text-gray-900 font-medium">₱2,000.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Salmonella Detection, PetriFilm</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                    Request Food Testing
+                  </button>
+                </div>
+
+                {/* Water Microbiological Tests */}
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Water Microbiological Tests</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Heterotrophic Plate Count</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">MPN of Total Coliform</span>
+                      <span className="text-gray-900 font-medium">₱550.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Confirmed test for E. coli</span>
+                      <span className="text-gray-900 font-medium">₱1,000.00</span>
+                    </div>
+                  </div>
+                  <button className="mt-6 w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors">
+                    Request Water Testing
+                  </button>
+                </div>
+              </div>
+
+              {/* Testing Schedule Info */}
+              <div className="mt-8 bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <svg className="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-900">Testing Schedule</h3>
+                </div>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Microbiological Tests: MON-WED, before 2PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Salmonella Detection: MON-TUE, before 2PM
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Yeast and Mold Count: WED, before 2PM
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -147,7 +839,7 @@ export default function Home() {
                 href="/metrology/manager-registration"
                     className="bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
               >
-                I'm a Manager
+                    I'm a Manager
               </Link>
                 </div>
               </div>
@@ -163,7 +855,7 @@ export default function Home() {
                   className="object-cover"
                 />
                 <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                   </svg>
                   Chemical Tests
@@ -226,7 +918,7 @@ export default function Home() {
                   className="object-cover"
                 />
                 <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                   </svg>
                   Microbiological Tests
@@ -289,7 +981,7 @@ export default function Home() {
                   className="object-cover"
                 />
                 <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Shelf Life Tests

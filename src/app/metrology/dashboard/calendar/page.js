@@ -54,14 +54,14 @@ export default function CalendarPage() {
 
   return (
     <AdminLayout>
-      <div className="h-screen flex flex-col">
+      <div className="h-screen flex flex-col col">
         <DashboardNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-50 p-6">
+          <main className="flex-1 bg-gray-100 p-5">
             <div className="flex gap-6">
               {/* Left Side - Calendar */}
-              <div className="bg-white rounded-xl shadow-sm p-6 w-[600px]">
+              <div className="bg-white rounded-xl shadow-sm p-4 w-[600px]">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">{currentMonth}</h2>
                   <div className="flex gap-2">
@@ -140,8 +140,8 @@ export default function CalendarPage() {
               {/* Right Side - Info and Table */}
               <div className="flex-1 space-y-6">
                 {/* Date and Stats */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h2 className="text-xl font-semibold mb-6">
+                <div className="bg-gray-700 rounded-xl shadow-sm p-6">  
+                  <h2 className="text-xl text-white font-semibold mb-6">
                     {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </h2>
                   <div className="grid grid-cols-3 gap-6">
@@ -173,7 +173,7 @@ export default function CalendarPage() {
                           <FaClock className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Appointments Today</p>
+                          <p className="text-sm text-gray-600">Appointments this day</p>
                           <p className="text-xl font-semibold">2</p>
                         </div>
                       </div>
@@ -182,79 +182,62 @@ export default function CalendarPage() {
                 </div>
 
                 {/* Appointments Table */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-semibold">Appointments</h3>
-                    <div className="flex gap-4">
-                      {/* Search Bar */}
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FaSearch className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          className="block w-64 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Search by name, company, or plate no..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                <div class="rounded-xl shadow-sm">
+                {/* Header */}
+                <div class="bg-green-500 text-white p-4 rounded-t-xl flex justify-between items-center">
+                  <h3 class="text-xl font-semibold">Appointments</h3>
+                  <div class="flex gap-4">
+                    {/* Search Bar */}
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaSearch className="h-4 w-4 text-gray-400"/>
                       </div>
-
-                      {/* Time Filter */}
-                      <select
-                        className="block w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={filterTime}
-                        onChange={(e) => setFilterTime(e.target.value)}
-                      >
-                        <option value="all">All Appointments</option>
-                        <option value="recent">Recent (Last 7 days)</option>
-                        <option value="upcoming">Upcoming (Next 7 days)</option>
-                        <option value="today">Today</option>
-                        <option value="tomorrow">Tomorrow</option>
-                        <option value="thisWeek">This Week</option>
-                        <option value="nextWeek">Next Week</option>
-                      </select>
+                      <input
+                        type="text"
+                        class="block w-64 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-xs placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                        placeholder="Search by name, company, or plate no..."
+                      />
                     </div>
-                  </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                      <thead>
-                        <tr className="bg-gray-100">
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-l-lg">
-                            Date
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name & Company
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Plate No.
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-r-lg">
-                            Request (L)
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 bg-white">
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 bg-gray-50 rounded-lg">
-                            Mar 25, 2025
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">Pedro Reyes</div>
-                            <div className="text-sm text-gray-500">123 Petroleum</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 bg-gray-50 rounded-lg">
-                            PQR-789
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            100 L
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    {/* Filter */}
+                    <select
+                      class="block w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                    >
+                      <option value="all">All Appointments</option>
+                      <option value="recent">Recent (Last 7 days)</option>
+                      <option value="upcoming">Upcoming (Next 7 days)</option>
+                      <option value="today">Today</option>
+                      <option value="tomorrow">Tomorrow</option>
+                      <option value="thisWeek">This Week</option>
+                    </select>
                   </div>
                 </div>
+
+              {/* Table */}
+                <div class="overflow-x-auto">
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="bg-green-100">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Name & Company</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Plate No.</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Request (L)</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                      <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 bg-gray-50">Mar 25, 2025</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="text-sm text-gray-900">Pedro Reyes</div>
+                          <div class="text-sm text-gray-500">123 Petroleum</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 bg-gray-50">PQR-789</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">100 L</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>  
               </div>
             </div>
           </main>

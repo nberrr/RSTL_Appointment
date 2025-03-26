@@ -5,6 +5,7 @@ import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 import Link from "next/link";
+import { FaUsers, FaCalendar, FaClock } from 'react-icons/fa';
 
 export default function MetrologyDashboard() {
   // Get the current date information
@@ -132,7 +133,7 @@ export default function MetrologyDashboard() {
         <DashboardNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-50 p-4">
+          <main className="flex-1 bg-gray-100 p-5">
             <div className="grid grid-cols-1 lg:grid-cols-[45%,1fr] gap-4 h-full">
               {/* Left Section - Calendar and Info */}
               <div className="h-full">
@@ -193,16 +194,16 @@ export default function MetrologyDashboard() {
                   
                   {/* Day Info */}
                   <div className="border-t pt-3 mt-3">
-                    <div className="mb-2">
-                      <h2 className="text-sm font-semibold text-gray-900">Infos in this Day:</h2>
-                      <span className="text-xs text-gray-600">{formattedSelectedDate()}</span>
+                    <div className="mb-2 flex justify-between">
+                      <h2 className="text-sm font-semibold text-gray-900 inline-block">Infos in this Day:</h2>
+                      <span className="text-sm font-semibold text-orange-600 inline-block">{currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="red">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                           </div>
@@ -244,58 +245,72 @@ export default function MetrologyDashboard() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-3 gap-4">
                   {/* Registered Managers */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-blue-500 rounded-xl p-4 min-h-[150px] flex flex-col justify-between">
                     <div className="flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xs font-medium text-gray-600">Registered Managers</h3>
-                          <p className="text-lg font-semibold mt-0.5">0</p>
+                          <h3 className="text-sm  text-white">Registered Managers</h3>
+                       
                         </div>
-                        <div className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
+                        <div className="w-8 h-8 flex items-center justify-center  bg-blue-100 bg-opacity-70 text-blue-600 rounded-lg">
+                        <FaUsers className="h-5 w-5" />
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">New registered managers has been added. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
+                      <div className="flex-grow flex items-center justify-center mt-2">
+                        <p className="text-4xl text-white font-semibold">12</p>
+                      </div>
                     </div>
+                    <p className="text-[10px] text-gray-300">
+                        New managers have been added.
+                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        </p>
                   </div>
                   
                   {/* Scheduled Appointments */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-green-500 rounded-xl p-4 min-h-[150px] flex flex-col justify-between">
                     <div className="flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xs font-medium text-gray-600">Scheduled Appointments</h3>
-                          <p className="text-lg font-semibold mt-0.5">0</p>
+                          <h3 className="text-sm text-white">Scheduled Appointments</h3>
+                       
                         </div>
-                        <div className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
+                        <div className="w-8 h-8 flex items-center justify-center  bg-white bg-opacity-70 text-green-600 rounded-lg">
+                        <FaCalendar className="h-4 w-5" />
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">New appointments has been added. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
+                      <div className="flex-grow flex items-center justify-center mt-2">
+                        <p className="text-4xl text-white font-semibold">20</p>
+                      </div>
                     </div>
+                    <p className="text-[10px] text-gray-200">
+                        New Appointments added. 
+                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        </p>
                   </div>
                   
+                  
                   {/* Appointments Today */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-violet-500 rounded-xl p-4 min-h-[150px] flex flex-col justify-between">
                     <div className="flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xs font-medium text-gray-600">Appointments Today</h3>
-                          <p className="text-lg font-semibold mt-0.5">0</p>
+                          <h3 className="text-sm font-medium text-white">Appointments Today</h3>
+                       
                         </div>
-                        <div className="w-8 h-8 flex items-center justify-center bg-cyan-100 text-cyan-600 rounded-lg">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                        <div className="w-8 h-8 flex items-center justify-center  bg-blue-100 bg-opacity-70 text-violet-600 rounded-lg">
+                        <FaClock className="h-4 w-4" />
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">Confirmed Appointments. <Link href="#" className="text-blue-600 hover:underline">View info</Link></p>
+                      <div className="flex-grow flex items-center justify-center mt-2">
+                        <p className="text-4xl text-white font-semibold">2</p>
+                      </div>
                     </div>
+                    <p className="text-[10px] text-gray-300">
+                        Appointments Today. 
+                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        </p>
                   </div>
+                  
                 </div>
                 
                 {/* Chart Section */}
@@ -309,7 +324,7 @@ export default function MetrologyDashboard() {
                 
                 {/* Appointments Table */}
                 <div className="bg-white rounded-xl shadow-sm p-3">
-                  <h3 className="text-sm font-semibold mb-2">Daily Appointments This Month</h3>
+                  <h3 className="text-sm font-semibold mb-2">Upcoming Appointments</h3>
                   <div className="overflow-hidden rounded-lg border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">

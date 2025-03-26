@@ -6,6 +6,7 @@ import { FaSearch, FaChartLine, FaUsers, FaTruck, FaEllipsisH, FaCalendar, FaTin
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
+import { FaDownload } from "react-icons/fa"; 
 import Link from 'next/link';
 
 export default function ReportsPage() {
@@ -32,10 +33,10 @@ export default function ReportsPage() {
         <DashboardNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-50 p-4">
+          <main className="flex-1  bg-gray-100 p-5">
             <div className="h-full flex flex-col space-y-5">
               {/* Top Section - Chart and Stats */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 justify-between ">
                 {/* Average Liters Chart Section - Left Side */}
                 <div className="bg-white rounded-xl shadow-sm p-4 w-[45%]">
                   <div className="flex justify-between items-center mb-3">
@@ -65,83 +66,67 @@ export default function ReportsPage() {
                 {/* Stats Cards - Right Side */}
                 <div className="flex-1 grid grid-cols-2 gap-4">
                   {/* Total Liters Card */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-cyan-600 rounded-xl shadow-sm p-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <FaTint className="w-4 h-4 text-blue-500" />
-                          <h3 className="text-xs text-gray-500">Total Liters this month</h3>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-[10px]">
+                          <FaTint className="w-4 h-4 text-cyan-600" />
                         </div>
-                        <p className="text-2xl font-semibold mt-1">8</p>
-                        <p className="text-xs text-gray-500">
-                          New appointments has been added. 
-                          <Link href="#" className="text-blue-500 hover:underline ml-1">View info</Link>
-                        </p>
+                        <h3 className="text-sm text-white">Total Liters this month</h3>
+                      </div>  
                       </div>
-                      <button className="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors">
-                        <FaEllipsisH className="w-3 h-3" />
-                      </button>
                     </div>
+                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">100,000 L</p></div>
+
                   </div>
 
                   {/* Total Appointments Card */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-green-500 rounded-xl shadow-sm p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
-                          <FaCalendar className="w-4 h-4 text-blue-500" />
-                          <h3 className="text-xs text-gray-500">Total Appointments this month</h3>
+                           <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-[10px]">
+                          <FaCalendar className="w-4 h-4 text-green-500" />
+                          </div>
+                          <h3 className="text-sm text-white">Total Appointments this month</h3>
                         </div>
-                        <p className="text-2xl font-semibold mt-1">20</p>
-                        <p className="text-xs text-gray-500">
-                          Confirmed Appointments. 
-                          <Link href="#" className="text-blue-500 hover:underline ml-1">View info</Link>
-                        </p>
                       </div>
-                      <button className="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors">
-                        <FaEllipsisH className="w-3 h-3" />
-                      </button>
                     </div>
+                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">20</p></div>
                   </div>
 
                   {/* Registered Managers Card */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-blue-500 rounded-xl shadow-sm p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
-                          <FaUsers className="w-4 h-4 text-blue-500" />
-                          <h3 className="text-xs text-gray-500">Registered Managers</h3>
+                        <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-[10px]">  
+                          <FaUsers className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <h3 className="text-sm text-white">Registered Managers</h3>
                         </div>
-                        <p className="text-2xl font-semibold mt-1">8</p>
-                        <p className="text-xs text-gray-500">
-                          Complete list of registered managers. 
-                          <Link href="#" className="text-blue-500 hover:underline ml-1">View info</Link>
-                        </p>
                       </div>
-                      <button className="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors">
-                        <FaEllipsisH className="w-3 h-3" />
-                      </button>
                     </div>
+                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">13</p></div>
+
                   </div>
 
                   {/* Registered Trucks Card */}
-                  <div className="bg-white rounded-xl shadow-sm p-3">
+                  <div className="bg-orange-400 rounded-xl shadow-sm p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
-                          <FaTruck className="w-4 h-4 text-blue-500" />
-                          <h3 className="text-xs text-gray-500">Registered Trucks</h3>
+                        <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-70 rounded-[10px]">  
+                          <FaTruck className="w-5 h-5 text-orange-500" />
+                          </div>
+                          <h3 className="text-sm text-white">Registered Trucks</h3>
                         </div>
-                        <p className="text-2xl font-semibold mt-1">25</p>
-                        <p className="text-xs text-gray-500">
-                          Complete Data of Registered Trucks. 
-                          <Link href="#" className="text-blue-500 hover:underline ml-1">View info</Link>
-                        </p>
                       </div>
-                      <button className="text-blue-500 hover:bg-blue-50 p-1.5 rounded-lg transition-colors">
-                        <FaEllipsisH className="w-3 h-3" />
-                      </button>
+                    
                     </div>
+                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">25</p></div>
+
                   </div>
                 </div>
               </div>
@@ -167,14 +152,18 @@ export default function ReportsPage() {
                     onChange={(e) => setFilterTime(e.target.value)}
                     className="w-40 text-xs border border-gray-200 rounded-lg py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="all">All Appointments</option>
-                    <option value="recent">Recent (Last 7 days)</option>
-                    <option value="upcoming">Upcoming (Next 7 days)</option>
-                    <option value="today">Today</option>
-                    <option value="tomorrow">Tomorrow</option>
-                    <option value="this-week">This Week</option>
-                    <option value="next-week">Next Week</option>
+                    <option value="all">All Managers</option>
+                    <option value="newest">Recent</option>
+                    <option value="oldest">Oldest</option>
                   </select>
+                  
+                  {/* Export Button */}
+                  <div className="ml-auto">
+                    <button id="exportBtn" className="bg-gray-200 text-black text-xs px-4 py-1.5 flex items-center gap-2 hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <FaDownload className="w-3 h-3 text-gray-600" />
+                      Export
+                    </button>
+                  </div>
                 </div>
 
                 {/* Table */}

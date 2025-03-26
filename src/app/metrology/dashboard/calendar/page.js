@@ -61,7 +61,7 @@ export default function CalendarPage() {
           <main className="flex-1 bg-gray-100 p-5">
             <div className="flex gap-6">
               {/* Left Side - Calendar */}
-              <div className="bg-white rounded-xl shadow-sm p-4 w-[600px]">
+              <div className="bg-white rounded-xl drop-shadow-md p-4 w-[600px]">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">{currentMonth}</h2>
                   <div className="flex gap-2">
@@ -140,7 +140,7 @@ export default function CalendarPage() {
               {/* Right Side - Info and Table */}
               <div className="flex-1 space-y-6">
                 {/* Date and Stats */}
-                <div className="bg-gray-700 rounded-xl shadow-sm p-6">  
+                <div className="bg-gradient-to-br from-gray-600 to-gray-500 rounded-xl drop-shadow-md p-6">  
                   <h2 className="text-xl text-white font-semibold mb-6">
                     {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </h2>
@@ -182,9 +182,9 @@ export default function CalendarPage() {
                 </div>
 
                 {/* Appointments Table */}
-                <div class="rounded-xl shadow-sm">
+                <div class="rounded-xl drop-shadow-md">
                 {/* Header */}
-                <div class="bg-green-500 text-white p-4 rounded-t-xl flex justify-between items-center">
+                <div class="bg-gradient-to-br from-green-700 to-green-500 text-white p-4 rounded-t-xl flex justify-between items-center drop-shadow-md">
                   <h3 class="text-xl font-semibold">Appointments</h3>
                   <div class="flex gap-4">
                     {/* Search Bar */}

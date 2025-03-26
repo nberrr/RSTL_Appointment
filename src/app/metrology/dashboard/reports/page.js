@@ -38,7 +38,7 @@ export default function ReportsPage() {
               {/* Top Section - Chart and Stats */}
               <div className="flex gap-4 justify-between ">
                 {/* Average Liters Chart Section - Left Side */}
-                <div className="bg-white rounded-xl shadow-sm p-4 w-[45%]">
+                <div className="bg-white rounded-xl drop-shadow-md p-4 w-[45%]">
                   <div className="flex justify-between items-center mb-3">
                     <div>
                       <h2 className="text-lg font-semibold">Average Liters Accumulated</h2>
@@ -66,7 +66,7 @@ export default function ReportsPage() {
                 {/* Stats Cards - Right Side */}
                 <div className="flex-1 grid grid-cols-2 gap-4">
                   {/* Total Liters Card */}
-                  <div className="bg-cyan-600 rounded-xl shadow-sm p-3">
+                  <div className="bg-gradient-to-br from-cyan-700 to-cyan-500 rounded-xl drop-shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                       <div className="flex items-center gap-2">
@@ -77,12 +77,12 @@ export default function ReportsPage() {
                       </div>  
                       </div>
                     </div>
-                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">100,000 L</p></div>
+                    <div className='flex justify-center'><p className="text-3xl font-bold mt-1 text-white">100,000 L</p></div>
 
                   </div>
 
                   {/* Total Appointments Card */}
-                  <div className="bg-green-500 rounded-xl shadow-sm p-3">
+                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl drop-shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -93,11 +93,11 @@ export default function ReportsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">20</p></div>
+                    <div className='flex justify-center'><p className="text-3xl font-bold mt-1 text-white">20</p></div>
                   </div>
 
                   {/* Registered Managers Card */}
-                  <div className="bg-blue-500 rounded-xl shadow-sm p-3">
+                  <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl drop-shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -108,12 +108,12 @@ export default function ReportsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">13</p></div>
+                    <div className='flex justify-center'><p className="text-3xl font-bold mt-1 text-white">13</p></div>
 
                   </div>
 
                   {/* Registered Trucks Card */}
-                  <div className="bg-orange-400 rounded-xl shadow-sm p-3">
+                  <div className="bg-gradient-to-br from-orange-700 to-orange-500 rounded-xl drop-shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -125,14 +125,14 @@ export default function ReportsPage() {
                       </div>
                     
                     </div>
-                    <div className='flex justify-center'><p className="text-2xl   font-bold mt-1 text-white">25</p></div>
+                    <div className='flex justify-center'><p className="text-3xl font-bold mt-1 text-white">25</p></div>
 
                   </div>
                 </div>
               </div>
 
               {/* Table Section */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex-1">
+              <div className="bg-white rounded-xl drop-shadow-md p-4 flex-1">
                 {/* Search and Filter */}
                 <div className="flex items-center gap-4 mb-3">
                   <div className="relative w-64">

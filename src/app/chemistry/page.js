@@ -92,7 +92,8 @@ export default function ChemistryPage() {
             className="w-full h-full object-cover"
           />
           {/* Decorative overlay */}
-          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent">
+          </div>
         </div>
       </div>
 
@@ -165,7 +166,7 @@ export default function ChemistryPage() {
           </div>
           <div className="flex justify-center mt-12">
               <Link href="/metrology/appointment">
-                <button className="bg-green-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-purple-500 transition-colors">
+                <button className="bg-green-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-green-800 transition-colors">
                   Schedule Your Test Now
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -406,7 +407,7 @@ export default function ChemistryPage() {
                     </div>
                   )}
                 </div>
-              </div>
+              </div>  
 
               {/* Testing Schedule Info */}
               <div className="mt-8 bg-white rounded-lg p-6 shadow-sm">

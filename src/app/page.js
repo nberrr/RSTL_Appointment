@@ -99,7 +99,7 @@ export default function Home() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search for tests..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -223,9 +223,6 @@ export default function Home() {
                       <span className="text-gray-900 font-medium">₱1,000.00 - ₱1,200.00</span>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Request Service
-                  </button>
                 </div>
 
                 {/* Thermometry Standards */}
@@ -251,9 +248,6 @@ export default function Home() {
                       <span className="text-gray-900 font-medium">₱1,700.00</span>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Request Service
-                  </button>
                 </div>
 
                 {/* Pressure Standards */}
@@ -275,9 +269,6 @@ export default function Home() {
                       <span className="text-gray-900 font-medium">₱700.00</span>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Request Service
-                  </button>
                 </div>
 
                 {/* Volume Standards */}
@@ -331,9 +322,6 @@ export default function Home() {
                       <span className="text-gray-900 font-medium">₱700.00</span>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Request Service
-                  </button>
                 </div>
 
                 {/* Electrical Standards */}
@@ -359,9 +347,6 @@ export default function Home() {
                       <span className="text-gray-900 font-medium">₱700.00</span>
                     </div>
                   </div>
-                  <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    Request Service
-                  </button>
                 </div>
               </div>
 
@@ -812,7 +797,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -820,7 +805,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -881,7 +866,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -889,7 +874,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -944,7 +929,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -952,7 +937,7 @@ export default function Home() {
                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                       <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                      </svg>
                     </div>
                     Lorem ipsum dolor sit amet
                   </li>
@@ -1027,8 +1012,8 @@ export default function Home() {
                   >
                     Learn More
                     <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />    
+                    </svg>  
                   </Link>
                 </div>
               </div>
@@ -1089,13 +1074,156 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Research Consultancy section */}
-    
+      {/* Research Consultation Section */}
+      <div className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Header with Research Excellence Badge */}
+              <div className="text-center mb-12">
+                  <div className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 rounded-full mb-4">
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                      <span className="text-blue-600 text-sm font-medium">Research Excellence</span>
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900">Expert Research Consultation</h2>
+                  <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                      Get personalized guidance from our team of experienced researchers and scientists
+                  </p>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                  {/* Left Column - Image and Description */}
+                  <div className="relative">
+                      <div className="bg-gradient-to-br from-blue-600/20 to-blue-400/20 rounded-2xl overflow-hidden">
+                          <div className="relative aspect-[4/3] bg-gradient-to-br from-blue-600 to-blue-800">
+                              <div className="absolute inset-0 flex flex-col justify-center text-white p-8">
+                                  <h3 className="text-2xl font-semibold mb-4">Advancing Research Together</h3>
+                                  <p className="text-white/90 mb-6">
+                                      Our consultation services bridge the gap between academic knowledge and practical application, helping you achieve breakthrough results in your research.
+                                  </p>
+                                  <div className="flex flex-wrap gap-2">
+                                      <span className="px-3 py-1 bg-white/10 rounded-full text-sm">Academic Research</span>
+                                      <span className="px-3 py-1 bg-white/10 rounded-full text-sm">Industry R&D</span>
+                                      <span className="px-3 py-1 bg-white/10 rounded-full text-sm">Method Development</span>
+                                      <span className="px-3 py-1 bg-white/10 rounded-full text-sm">Data Analysis</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div className="bg-white border-2 border-blue-500 py-10 px-10 rounded-2xl shadow-md mt-6">
+                          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                            How Our Consultation Helps You
+                          </h3>
+                          <p className="text-gray-700">
+                            Our research consultation services provide expert guidance tailored to your specific needs, whether you're a student working on a thesis, a researcher developing new methodologies, or an industry professional seeking innovation.
+                          </p>
+                        </div>
+
+
+                  </div>
+
+                  {/* Right Column - Features */}
+                  <div className="space-y-8">
+                      <div className="grid sm:grid-cols-2 gap-6">
+                          {/* Academic Excellence */}
+                          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                  </svg>
+                              </div>
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">Academic Excellence</h4>
+                              <p className="text-gray-600 text-sm mb-3">Specialized guidance for thesis, dissertation, and academic research projects.</p>
+                              <div className="flex items-center text-sm text-blue-600">
+                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Expert methodology review
+                              </div>
+                          </div>
+
+                          {/* Technical Expertise */}
+                          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                  </svg>
+                              </div>
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">Technical Expertise</h4>
+                              <p className="text-gray-600 text-sm mb-3">Access to specialized knowledge in chemical, physical, and biological sciences.</p>
+                              <div className="flex items-center text-sm text-blue-600">
+                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Advanced analytical techniques
+                              </div>
+                          </div>
+
+                          {/* Publication Support */}
+                          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                  </svg>
+                              </div>
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">Publication Support</h4>
+                              <p className="text-gray-600 text-sm mb-3">Guidance on preparing research for publication in peer-reviewed journals.</p>
+                              <div className="flex items-center text-sm text-blue-600">
+                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Manuscript review and feedback
+                              </div>
+                          </div>
+
+                          {/* Customized Solutions */}
+                          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                                  </svg>
+                              </div>
+                              <h4 className="text-lg font-medium text-gray-900 mb-2">Customized Solutions</h4>
+                              <p className="text-gray-600 text-sm mb-3">Tailored research approaches designed to address your specific challenges.</p>
+                              <div className="flex items-center text-sm text-blue-600">
+                                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Personalized research plans
+                              </div>
+                          </div>
+                      </div>
+
+                      {/* CTA Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                          <a href="/research-consultation" className="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                              Schedule a Consultation
+                              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                              </svg>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       {/* OneLab Information Section */}
       <div className="py-16 bg-white">
-        <div className="max-w-[98rem] bg-blue mx-auto px-4 sm:px-6 lg:px-8">
-          {/* OneLab Member Badge */}
-          <div className="w-100% bg-[#DBEAFE] h-[55px] flex items-center justify-center">
+          <div className="w-full h-[200px] flex items-center bg-[#00ADF1] px-10">
+              {/* Image on the left */}
+              <div className="relative w-[300px] h-[150px] rounded-lg overflow-hidden">
+                <img
+                  src="/onelab-white.jpg"
+                  alt="Onelabbanner"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+
+      <div className="w-100% bg-[#DBEAFE] h-[55px] flex items-center justify-center">
             <p className="text-sm font-semibold text-blue-600 flex items-center">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1103,6 +1231,9 @@ export default function Home() {
               DOST V is a member of OneLab
             </p>
           </div>
+      </div>
+      <div className="bg-white">
+        <div className="max-w-[98rem] bg-blue mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
             {/* What is OneLab Card */}
@@ -1219,6 +1350,16 @@ export default function Home() {
       {/* RSTL Services Procedure Section */}
       <div className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
+              How to Avail Our Services
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Follow these simple steps to access our laboratory testing and calibration services. We're here to make the process as smooth as possible for you.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Industrial/Commercial Testing */}
             <div className="bg-white p-8 rounded-xl shadow-lg">

@@ -252,9 +252,6 @@ export default function MetrologyPage() {
                     <span className="text-gray-900 font-medium">₱1,000.00 - ₱1,200.00</span>
                   </div>
                 </div>
-                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Request Service
-                </button>
               </div>
 
               {/* Thermometry Standards */}
@@ -280,9 +277,7 @@ export default function MetrologyPage() {
                     <span className="text-gray-900 font-medium">₱1,700.00</span>
                   </div>
                 </div>
-                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Request Service
-                </button>
+
               </div>
 
               {/* Pressure Standards */}
@@ -304,9 +299,7 @@ export default function MetrologyPage() {
                     <span className="text-gray-900 font-medium">₱700.00</span>
                   </div>
                 </div>
-                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Request Service
-                </button>
+             
               </div>
 
               {/* Volume Standards */}
@@ -360,9 +353,7 @@ export default function MetrologyPage() {
                     <span className="text-gray-900 font-medium">₱700.00</span>
                   </div>
                 </div>
-                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Request Service
-                </button>
+              
               </div>
 
               {/* Electrical Standards */}
@@ -388,9 +379,7 @@ export default function MetrologyPage() {
                     <span className="text-gray-900 font-medium">₱700.00</span>
                   </div>
                 </div>
-                <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Request Service
-                </button>
+              
               </div>
             </div>
 

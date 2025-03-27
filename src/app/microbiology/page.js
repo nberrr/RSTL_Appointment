@@ -164,7 +164,7 @@ export default function MicrobiologyPage() {
 
           <div className="flex justify-center mt-12">
               <Link href="/metrology/appointment">
-                <button className="bg-purple-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-purple-500 transition-colors">
+                <button className="bg-purple-600 text-white px-6 py-3 rounded-md font-medium flex items-center hover:bg-purple-800 transition-colors">
                   Schedule Your Test Now
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -2,12 +2,81 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('metrology');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Add useEffect to handle body scroll
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
+  const appointmentTypes = [
+    {
+      id: 'metrology',
+      title: 'Metrology Appointment',
+      description: 'Schedule calibration and measurement services for your instruments and equipment to ensure accuracy and reliability.',
+      icon: (
+        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      ),
+      services: [
+        'Weight Calibration',
+        'Temperature Calibration',
+        'Volume Standards',
+        'Length Standards'
+      ],
+      href: '/metrology/appointment'
+    },
+    {
+      id: 'laboratory',
+      title: 'Laboratory Testing Appointment',
+      description: 'Schedule comprehensive testing services across our specialized laboratories for chemical, microbiological, and shelf life analysis.',
+      icon: (
+        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+      ),
+      services: [
+        'Chemical Laboratory: Compositional analysis, contaminant testing, and material characterization',
+        'Microbiology Laboratory: Pathogen detection, sterility testing, and microbial identification',
+        'Shelf Life Laboratory: Stability testing, packaging evaluation, and product longevity studies'
+      ],
+      href: '/laboratory/appointment'
+    },
+    {
+      id: 'research',
+      title: 'Research Consultation',
+      description: 'Schedule a consultation with our research experts to discuss your project needs and receive specialized guidance.',
+      icon: (
+        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      services: [
+        'Research Methodology',
+        'Publication Guidance',
+        'Data Analysis Support',
+        'Project Development'
+      ],
+      href: '/research-consultation'
+    }
+  ];
+
+  const [selectedType, setSelectedType] = useState(appointmentTypes[0].id);
 
   // Function to handle tab changes
   const handleTabChange = (tab) => {
@@ -58,15 +127,14 @@ export default function Home() {
                   Lorem ipsum dolor sit amet. Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod. Eum ipsum quidem rem rerum neque qui enim molestiae non illum harum non beatae voluptas sed temporibus quisquam est nemo.
             </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/metrology/appointment"
-                    className="bg-white text-blue-600 px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Get Scheduled
-              </Link>
+              
+      {/* Add a button to open the modal */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="px-5 py-2 bg-white text-blue-600 text-sm font-medium rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600"
+      >
+        Schedule an Appointment
+              </button>
               <Link
                 href="/metrology/manager-registration"
                     className="bg-blue-700 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
@@ -1515,7 +1583,7 @@ export default function Home() {
                 <li>Microbiology Testing</li>
                 <li>Chemical Testing</li>
                 <li>Shelf Life</li>
-                <li>Research Consultancy</li>
+                <li>Research Consultancy</li> 
               </ul>
             </div>
 
@@ -1574,6 +1642,101 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Appointment Type Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start sm:items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-[88rem] mx-4 my-4 sm:my-8 max-h-[90vh] sm:max-h-[85vh] overflow-auto">
+            <div className="sticky top-0 bg-white z-10 px-6 py-4 border-b">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <h2 className="text-lg font-semibold text-gray-900">Select Appointment Type</h2>
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">Choose the service you need assistance with</p>
+            </div>
+
+            <div className="px-6 py-6">
+              {/* Appointment Types - Now in Row Format */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {appointmentTypes.map((type) => (
+                  <div
+                    key={type.id}
+                    onClick={() => setSelectedType(type.id)}
+                    className={`relative flex flex-col p-6 cursor-pointer rounded-lg border-2 transition-colors h-full ${
+                      selectedType === type.id
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="flex-shrink-0">{type.icon}</div>
+                        <div className="flex-1">
+                          <h3 className="text-sm font-medium text-gray-900">{type.title}</h3>
+                          <p className="mt-1 text-sm text-gray-500">{type.description}</p>
+                        </div>
+                        {selectedType === type.id && (
+                          <div className="absolute top-4 right-4">
+                            <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-white"></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2 mt-auto">
+                        {type.services.map((service, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                            <svg className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            <span>{service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t px-6 py-4">
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
+                >
+                  Cancel
+                </button>
+                <Link
+                  href={appointmentTypes.find(type => type.id === selectedType)?.href || '#'}
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Continue
+                  <svg className="inline-block w-4 h-4 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

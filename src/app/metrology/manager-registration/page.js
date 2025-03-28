@@ -10,12 +10,41 @@ export default function ManagerRegistration() {
     companyAddress: '',
     truckLicensePlates: [''],
     businessPermit: null,
-    orCrDocuments: [],
+    orCrDocuments: {},
     additionalNotes: '',
     terms: false
   });
 
+  const [errors, setErrors] = useState({});
   const [licensePlates, setLicensePlates] = useState(['']);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Company Information validation
+    if (!formData.companyName) newErrors.companyName = 'Please enter company name';
+    if (!formData.contactPerson) newErrors.contactPerson = 'Please enter contact person name';
+    if (!formData.contactNumber) newErrors.contactNumber = 'Please enter contact number';
+    if (!formData.contactEmail) newErrors.contactEmail = 'Please enter contact email';
+    if (!formData.companyAddress) newErrors.companyAddress = 'Please enter company address';
+    
+    // Business Permit validation
+    if (!formData.businessPermit) newErrors.businessPermit = 'Please upload business permit document';
+
+    // License Plates validation
+    const plateErrors = {};
+    licensePlates.forEach((plate, index) => {
+      if (!plate) plateErrors[index] = 'Please enter plate number';
+      if (!formData.orCrDocuments[index]) plateErrors[`document-${index}`] = 'Please upload OR/CR document';
+    });
+    if (Object.keys(plateErrors).length > 0) newErrors.licensePlates = plateErrors;
+
+    // Terms validation
+    if (!formData.terms) newErrors.terms = 'Please agree to the Terms of Service and Privacy Policy';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,17 +56,41 @@ export default function ManagerRegistration() {
 
   const handleFileChange = (e, fieldName) => {
     const file = e.target.files[0];
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: file
-    }));
+    if (fieldName === 'businessPermit') {
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: file
+      }));
+    } else {
+      // For OR/CR documents
+      const truckIndex = fieldName.split('-')[1];
+      setFormData(prev => ({
+        ...prev,
+        orCrDocuments: {
+          ...prev.orCrDocuments,
+          [truckIndex]: file
+        }
+      }));
+    }
   };
 
-  const removeOrCrDocument = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      orCrDocuments: prev.orCrDocuments.filter((_, i) => i !== index)
-    }));
+  const removeFile = (fieldName) => {
+    if (fieldName === 'businessPermit') {
+      setFormData(prev => ({
+        ...prev,
+        businessPermit: null
+      }));
+    } else {
+      // For OR/CR documents
+      const truckIndex = fieldName.split('-')[1];
+      setFormData(prev => ({
+        ...prev,
+        orCrDocuments: {
+          ...prev.orCrDocuments,
+          [truckIndex]: null
+        }
+      }));
+    }
   };
 
   const addLicensePlate = () => {
@@ -56,7 +109,9 @@ export default function ManagerRegistration() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', { ...formData, truckLicensePlates: licensePlates });
+    if (validateForm()) {
+      console.log('Form submitted:', { ...formData, truckLicensePlates: licensePlates });
+    }
   };
 
   return (
@@ -110,8 +165,11 @@ export default function ManagerRegistration() {
                       value={formData.companyName}
                       onChange={handleChange}
                       placeholder="Enter company name"
-                      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                     />
+                    {errors.companyName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                    )}
                   </div>
 
                   <div>
@@ -122,8 +180,11 @@ export default function ManagerRegistration() {
                       value={formData.contactPerson}
                       onChange={handleChange}
                       placeholder="Enter contact person name"
-                      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.contactPerson ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                     />
+                    {errors.contactPerson && (
+                      <p className="mt-1 text-sm text-red-600">{errors.contactPerson}</p>
+                    )}
                   </div>
 
                   <div>
@@ -134,8 +195,11 @@ export default function ManagerRegistration() {
                       value={formData.contactNumber}
                       onChange={handleChange}
                       placeholder="09-XXX-XXXX-XXX"
-                      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                     />
+                    {errors.contactNumber && (
+                      <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>
+                    )}
                   </div>
 
                   <div>
@@ -146,8 +210,11 @@ export default function ManagerRegistration() {
                       value={formData.contactEmail}
                       onChange={handleChange}
                       placeholder="Enter contact email"
-                      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.contactEmail ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                     />
+                    {errors.contactEmail && (
+                      <p className="mt-1 text-sm text-red-600">{errors.contactEmail}</p>
+                    )}
                   </div>
 
                   <div>
@@ -158,8 +225,11 @@ export default function ManagerRegistration() {
                       value={formData.companyAddress}
                       onChange={handleChange}
                       placeholder="Enter company address"
-                      className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.companyAddress ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                     />
+                    {errors.companyAddress && (
+                      <p className="mt-1 text-sm text-red-600">{errors.companyAddress}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -176,21 +246,45 @@ export default function ManagerRegistration() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm text-gray-700">Business Permit Document</label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 ${errors.businessPermit ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-md`}>
                       <div className="space-y-1 text-center">
                         <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="flex text-sm text-gray-600">
-                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#2243B0] hover:text-blue-500">
+                          <label htmlFor="business-permit-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#2243B0] hover:text-blue-500">
                             <span>Upload files</span>
-                            <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={(e) => handleFileChange(e, 'businessPermit')} />
+                            <input id="business-permit-upload" name="business-permit-upload" type="file" className="sr-only" onChange={(e) => handleFileChange(e, 'businessPermit')} accept=".pdf,.doc,.docx" />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
                         <p className="text-xs text-gray-500">PDF or Word up to 5MB</p>
                       </div>
                     </div>
+                    {errors.businessPermit && (
+                      <p className="mt-1 text-sm text-red-600">{errors.businessPermit}</p>
+                    )}
+                    {formData.businessPermit && (
+                      <div className="mt-2">
+                        <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-sm text-gray-600">
+                              {formData.businessPermit.name} ({formData.businessPermit.type.split('/')[1].toUpperCase()})
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeFile('businessPermit')}
+                            className="text-sm text-red-600 hover:text-red-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -254,8 +348,11 @@ export default function ManagerRegistration() {
                           value={plate}
                           onChange={(e) => handleLicensePlateChange(index, e.target.value)}
                           placeholder="Enter plate number (e.g., ABC 123)"
-                          className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className={`block w-full px-3 py-2 bg-white border ${errors.licensePlates?.[index] ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                         />
+                        {errors.licensePlates?.[index] && (
+                          <p className="mt-1 text-sm text-red-600">{errors.licensePlates[index]}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm text-gray-700 mb-1">
@@ -272,17 +369,49 @@ export default function ManagerRegistration() {
                           />
                           <label
                             htmlFor={`file-upload-${index}`}
-                            className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 group"
+                            className={`flex items-center justify-between w-full px-4 py-2 border ${errors.licensePlates?.[`document-${index}`] ? 'border-red-500' : 'border-gray-300'} rounded-md bg-white cursor-pointer hover:bg-gray-50 group`}
                           >
-                            <div className="flex items-center gap-2">
-                              <svg className="w-5 h-5 text-[#2243B0] group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                              </svg>
-                              <span className="text-sm text-gray-500 group-hover:text-gray-600">Click to upload OR/CR</span>
+                            <div className="flex items-center gap-2 flex-1">
+                              {formData.orCrDocuments[index] ? (
+                                <>
+                                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                  </svg>
+                                  <span className="text-sm text-gray-600">
+                                    {formData.orCrDocuments[index].name}
+                                  </span>
+                                  <span className="text-sm text-gray-400">
+                                    ({formData.orCrDocuments[index].type.split('/')[1].toUpperCase()})
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-5 h-5 text-[#2243B0] group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                  </svg>
+                                  <span className="text-sm text-gray-500 group-hover:text-gray-600">
+                                    PDF, Word, or Image
+                                  </span>
+                                </>
+                              )}
                             </div>
-                            <span className="text-xs text-gray-400 group-hover:text-gray-500">PDF, Word, or Image</span>
+                            {formData.orCrDocuments[index] && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  removeFile(`orCrDocument-${index}`);
+                                }}
+                                className="text-red-600 hover:text-red-700 ml-2"
+                              >
+                                Remove
+                              </button>
+                            )}
                           </label>
                         </div>
+                        {errors.licensePlates?.[`document-${index}`] && (
+                          <p className="mt-1 text-sm text-red-600">{errors.licensePlates[`document-${index}`]}</p>
+                        )}
                         <p className="mt-1 text-xs text-gray-500">Maximum file size: 5MB</p>
                       </div>
                     </div>
@@ -311,7 +440,7 @@ export default function ManagerRegistration() {
                 placeholder="Additional Infos."
               />
             </div>
-
+ 
             {/* Terms and Submit */}
             <div className="mt-6 space-y-4">
               <div className="flex items-start">
@@ -321,12 +450,15 @@ export default function ManagerRegistration() {
                   type="checkbox"
                   checked={formData.terms}
                   onChange={(e) => setFormData(prev => ({ ...prev, terms: e.target.checked }))}
-                  className="mt-1 h-4 w-4 text-[#2243B0] border-gray-300 rounded focus:ring-blue-500"
+                  className={`mt-1 h-4 w-4 text-[#2243B0] border-gray-300 rounded focus:ring-blue-500 ${errors.terms ? 'border-red-500' : ''}`}
                 />
                 <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                   I agree to the <a href="#" className="text-[#2243B0] hover:underline">Terms of Service</a> and <a href="#" className="text-[#2243B0] hover:underline">Privacy Policy</a>
                 </label>
               </div>
+              {errors.terms && (
+                <p className="text-sm text-red-600">{errors.terms}</p>
+              )}
 
               <button
                 type="submit"

@@ -16,6 +16,7 @@ export default function ResearchConsultation() {
         terms: false
     });
 
+    const [errors, setErrors] = useState({});
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
@@ -52,9 +53,34 @@ export default function ResearchConsultation() {
         setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Personal Information validation
+        if (!formData.fullName) newErrors.fullName = 'Please enter your full name';
+        if (!formData.emailAddress) newErrors.emailAddress = 'Please enter your email address';
+        if (!formData.contactNumber) newErrors.contactNumber = 'Please enter your contact number';
+        if (!formData.institution) newErrors.institution = 'Please enter your institution';
+        if (!formData.yearLevel) newErrors.yearLevel = 'Please enter your year level/position';
+        if (!formData.researchTitle) newErrors.researchTitle = 'Please enter your research title or topic';
+
+        // Schedule Appointment validation
+        if (!selectedDate) newErrors.appointmentDate = 'Please select an appointment date';
+        if (!formData.consultationDetails) newErrors.consultationDetails = 'Please describe your research and consultation needs';
+        if (selectedFiles.length === 0) newErrors.files = 'Please upload at least one research paper';
+
+        // Terms validation
+        if (!formData.terms) newErrors.terms = 'Please agree to the Terms of Service and Privacy Policy';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        if (validateForm()) {
+            console.log('Form submitted:', formData);
+        }
     };
 
     // Calendar functions
@@ -156,8 +182,11 @@ export default function ResearchConsultation() {
                                         value={formData.fullName}
                                         onChange={handleChange}
                                         placeholder="Enter your full name"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.fullName && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -168,8 +197,11 @@ export default function ResearchConsultation() {
                                         value={formData.emailAddress}
                                         onChange={handleChange}
                                         placeholder="Enter your email address"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.emailAddress ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.emailAddress && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.emailAddress}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -180,8 +212,11 @@ export default function ResearchConsultation() {
                                         value={formData.contactNumber}
                                         onChange={handleChange}
                                         placeholder="Enter your contact number"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.contactNumber && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -192,8 +227,11 @@ export default function ResearchConsultation() {
                                         value={formData.institution}
                                         onChange={handleChange}
                                         placeholder="Enter your institution"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.institution ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.institution && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.institution}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -218,8 +256,11 @@ export default function ResearchConsultation() {
                                         value={formData.yearLevel}
                                         onChange={handleChange}
                                         placeholder="e.g. Senior Graduate"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.yearLevel ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.yearLevel && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.yearLevel}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -230,8 +271,11 @@ export default function ResearchConsultation() {
                                         value={formData.researchTitle}
                                         onChange={handleChange}
                                         placeholder="Enter your research title or topic"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.researchTitle ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.researchTitle && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.researchTitle}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -248,7 +292,7 @@ export default function ResearchConsultation() {
                             <div className="space-y-3 sm:space-y-4">
                                 <div>
                                     <label className="block text-sm text-gray-700">Select Date</label>
-                                    <div className="mt-1 bg-white border border-gray-300 rounded-md overflow-hidden">
+                                    <div className={`mt-1 bg-white border ${errors.appointmentDate ? 'border-red-500' : 'border-gray-300'} rounded-md overflow-hidden`}>
                                         <div className="px-4 py-2 flex items-center justify-between bg-white">
                                             <button
                                                 type="button"
@@ -291,11 +335,14 @@ export default function ResearchConsultation() {
                                             </div>
                                         </div>
                                     </div>
+                                    {errors.appointmentDate && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.appointmentDate}</p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
                                     <label className="block text-sm text-gray-700">Upload Research Papers</label>
-                                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 ${errors.files ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-md`}>
                                         <div className="space-y-1 text-center">
                                             <svg
                                                 className="mx-auto h-12 w-12 text-gray-400"
@@ -332,24 +379,27 @@ export default function ResearchConsultation() {
                                             <p className="text-xs text-gray-500">PDF or Word up to 5MB (max 3 files)</p>
                                         </div>
                                     </div>
+                                    {errors.files && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.files}</p>
+                                    )}
                                     {selectedFiles.length > 0 && (
                                         <div className="mt-2">
                                             <h4 className="text-sm font-medium text-gray-700">Selected Files:</h4>
-                                            <ul className="mt-2 divide-y divide-gray-200">
+                                            <ul className="mt-2">
                                                 {selectedFiles.map((file, index) => (
-                                                    <li key={index} className="py-2 flex items-center justify-between">
-                                                        <div className="flex items-center">
-                                                            <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                                    <li key={index} className="py-2 flex items-center justify-between border-b border-gray-200 last:border-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                             </svg>
-                                                            <span className="ml-2 flex-1 w-0 truncate text-sm text-gray-500">
-                                                                {file.name}
+                                                            <span className="text-sm text-gray-600">
+                                                                {file.name} ({file.type.split('/')[1].toUpperCase()})
                                                             </span>
                                                         </div>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleRemoveFile(index)}
-                                                            className="ml-4 flex-shrink-0 text-sm font-medium text-red-600 hover:text-red-500"
+                                                            className="text-sm text-red-600 hover:text-red-700"
                                                         >
                                                             Remove
                                                         </button>
@@ -368,8 +418,11 @@ export default function ResearchConsultation() {
                                         onChange={handleChange}
                                         rows={4}
                                         placeholder="Briefly describe your research and what you'd like to discuss during the consultation..."
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.consultationDetails ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.consultationDetails && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.consultationDetails}</p>
+                                    )}
                                 </div>
 
                                 <div className="bg-blue-50 border border-blue-100 rounded-md p-3 sm:p-4">
@@ -398,12 +451,15 @@ export default function ResearchConsultation() {
                                     type="checkbox"
                                     checked={formData.terms}
                                     onChange={(e) => setFormData(prev => ({ ...prev, terms: e.target.checked }))}
-                                    className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className={`mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${errors.terms ? 'border-red-500' : ''}`}
                                 />
                                 <label htmlFor="terms" className="ml-2 text-xs sm:text-sm text-gray-600">
                                     I accept <a href="#" className="text-blue-600 hover:underline">Terms of Service and Privacy Policy</a>
                                 </label>
                             </div>
+                            {errors.terms && (
+                                <p className="text-sm text-red-600">{errors.terms}</p>
+                            )}
 
                             <div className="flex justify-end">
                                 <button

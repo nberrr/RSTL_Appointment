@@ -17,30 +17,56 @@ export default function MetrologyAppointment() {
         terms: false
     });
 
+    const [errors, setErrors] = useState({});
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Contact Information validation
+        if (!formData.name) newErrors.name = 'Please enter full name';
+        if (!formData.email) newErrors.email = 'Please enter email address';
+        if (!formData.contactNumber) newErrors.contactNumber = 'Please enter contact number';
+        if (!formData.plateNumber) newErrors.plateNumber = 'Please enter plate number';
+        if (!formData.companyName) newErrors.companyName = 'Please enter organization name';
+
+        // Test Details validation
+        if (!selectedDate) newErrors.appointmentDate = 'Please select an appointment date';
+        if (!formData.numberOfLiters) newErrors.numberOfLiters = 'Please enter number of liters';
+        if (!formData.nameOfSamples) newErrors.nameOfSamples = 'Please enter name of samples';
+        if (!formData.sampleDescription) newErrors.sampleDescription = 'Please enter sample description';
+
+        // Terms validation
+        if (!formData.terms) newErrors.terms = 'Please agree to the Terms of Service and Privacy Policy';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'numberOfLiters') {
-        const numValue = parseInt(value) || 0;
-        if (numValue <= 80000) {
-            setFormData(prev => ({
-            ...prev,
-            [name]: value
-            }));
-        }
+            const numValue = parseInt(value) || 0;
+            if (numValue <= 80000) {
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            }
         } else {
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        if (validateForm()) {
+            console.log('Form submitted:', formData);
+        }
     };
 
     // Calendar functions
@@ -147,8 +173,11 @@ export default function MetrologyAppointment() {
                                         value={formData.name}
                                         onChange={handleChange}
                                         placeholder="Enter full name"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.name && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -161,8 +190,11 @@ export default function MetrologyAppointment() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         placeholder="Enter email address"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.email && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -175,8 +207,11 @@ export default function MetrologyAppointment() {
                                         value={formData.contactNumber}
                                         onChange={handleChange}
                                         placeholder="Enter contact number"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.contactNumber && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -189,8 +224,11 @@ export default function MetrologyAppointment() {
                                         value={formData.plateNumber}
                                         onChange={handleChange}
                                         placeholder="XXX-000"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.plateNumber ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.plateNumber && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.plateNumber}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -203,8 +241,11 @@ export default function MetrologyAppointment() {
                                         value={formData.companyName}
                                         onChange={handleChange}
                                         placeholder="Enter organization name"
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.companyName && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                                    )}
                                 </div>
 
                                 <div className="bg-blue-50 border border-blue-100 rounded-md p-3 sm:p-4">
@@ -233,7 +274,7 @@ export default function MetrologyAppointment() {
                             <div className="space-y-3 sm:space-y-4">
                                 <div>
                                     <label className="block text-sm text-gray-700">Appointment Date</label>
-                                    <div className="mt-1 bg-white border border-gray-300 rounded-md overflow-hidden">
+                                    <div className={`mt-1 bg-white border ${errors.appointmentDate ? 'border-red-500' : 'border-gray-300'} rounded-md overflow-hidden`}>
                                         <div className="px-3 sm:px-4 py-2 flex items-center justify-between bg-white">
                                             <button
                                                 type="button"
@@ -282,6 +323,9 @@ export default function MetrologyAppointment() {
                                             </div>
                                         </div>
                                     </div>
+                                    {errors.appointmentDate && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.appointmentDate}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -307,12 +351,15 @@ export default function MetrologyAppointment() {
                                             onChange={handleChange}
                                             placeholder="Enter number of liters"
                                             max="80000"
-                                            className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 pr-8"
+                                            className={`block w-full px-3 py-2 bg-white border ${errors.numberOfLiters ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 pr-8`}
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                             <span className="text-gray-500 sm:text-sm">L</span>
                                         </div>
                                     </div>
+                                    {errors.numberOfLiters && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.numberOfLiters}</p>
+                                    )}
                                     <p className="mt-1 text-xs text-gray-500">Maximum: 80,000 liters</p>
                                 </div>
 
@@ -324,8 +371,11 @@ export default function MetrologyAppointment() {
                                         value={formData.nameOfSamples}
                                         onChange={handleChange}
                                         placeholder="Name of sample..."
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.nameOfSamples ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.nameOfSamples && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.nameOfSamples}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -336,8 +386,11 @@ export default function MetrologyAppointment() {
                                         onChange={handleChange}
                                         rows={4}
                                         placeholder="Description..."
-                                        className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.sampleDescription ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                                     />
+                                    {errors.sampleDescription && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.sampleDescription}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -351,12 +404,15 @@ export default function MetrologyAppointment() {
                                     type="checkbox"
                                     checked={formData.terms}
                                     onChange={(e) => setFormData(prev => ({ ...prev, terms: e.target.checked }))}
-                                    className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    className={`mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${errors.terms ? 'border-red-500' : ''}`}
                                 />
                                 <label htmlFor="terms" className="ml-2 text-xs sm:text-sm text-gray-600">
                                     I accept <a href="#" className="text-blue-600 hover:underline">Terms of Service and Privacy Policy</a>
                                 </label>
                             </div>
+                            {errors.terms && (
+                                <p className="text-sm text-red-600">{errors.terms}</p>
+                            )}
 
                             <div className="flex justify-end">
                                 <button

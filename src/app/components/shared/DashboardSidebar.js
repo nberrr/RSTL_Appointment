@@ -1,86 +1,76 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { FaGripHorizontal, FaRegCalendarAlt, FaRegFileAlt, FaCog } from "react-icons/fa";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState('dashboard');
-  
-  // Set the active item based on the current path and handle refresh redirect
+  const [activeItem, setActiveItem] = useState("dashboard");
+
   useEffect(() => {
-    if (pathname.includes('/dashboard/calendar')) {
-      setActiveItem('calendar');
-    } else if (pathname.includes('/reports')) {
-      setActiveItem('reports');
-    } else if (pathname.includes('/dashboard')) {
-      setActiveItem('dashboard');
+    if (pathname.includes("/calendar")) {
+      setActiveItem("calendar");
+    } else if (pathname.includes("/reports")) {
+      setActiveItem("reports");
+    } else if (pathname.includes("/services")) {
+      setActiveItem("services");
+    } else if (pathname.includes("/dashboard")) {
+      setActiveItem("dashboard");
     }
-
-    // Add event listener for page refresh
-    const handleBeforeUnload = () => {
-      router.push('/metrology/dashboard');
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [pathname, router]);
+  }, [pathname]);
 
   const navItems = [
-    {
-      id: 'dashboard',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>
-      ),
-      href: '/metrology/dashboard'
+    { 
+      id: "dashboard", 
+      label: "Overview", 
+      icon: <FaGripHorizontal className="h-7 w-7" />, 
+      href: "/metrology/dashboard" 
     },
-    {
-      id: 'calendar',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      href: '/metrology/dashboard/calendar'
+    { 
+      id: "calendar", 
+      label: "Calendar", 
+      icon: <FaRegCalendarAlt className="h-7 w-7" />, 
+      href: "/metrology/dashboard/calendar" 
     },
-    {
-      id: 'reports',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      href: '/metrology/dashboard/reports'
+    { 
+      id: "reports", 
+      label: "Reports", 
+      icon: <FaRegFileAlt className="h-7 w-7" />, 
+      href: "/metrology/dashboard/reports" 
+    },
+    { 
+      id: "services", 
+      label: "Manage Services", 
+      icon: <FaCog className="h-7 w-7" />, 
+      href: "/metrology/dashboard/services" 
     }
   ];
 
   return (
-    <aside className="bg-white w-16 shadow-md h-full flex-shrink-0 overflow-y-auto">
+    <aside className="bg-white w-16 shadow-md h-full flex-shrink-0 overflow-visible">
       <div className="p-4 flex flex-col items-center">
         {navItems.map((item) => (
-          <Link 
-            key={item.id}
-            href={item.href}
-            className={`mb-6 p-2 rounded-lg transition-colors duration-200 ${
-              activeItem === item.id 
-                ? 'bg-blue-500 text-white' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            onClick={() => {
-              setActiveItem(item.id);
-            }}
-          >
-            {item.icon}
-          </Link>
+          <div key={item.id} className="relative group w-full flex justify-center">
+            <Link
+              href={item.href}
+              className={`mb-6 p-2 rounded-lg transition-colors duration-200 flex items-center justify-center ${
+                activeItem === item.id ? "bg-blue-500 text-white" : "text-gray-600 hover:bg-blue-200"
+              }`}
+              onClick={() => setActiveItem(item.id)}
+            >
+              {item.icon}
+            </Link>
+
+            {/* Tooltip */}
+            <span className="absolute left-full ml-3 top-1/2 -translate-y-6 bg-gray-500 text-white text-xs px-3 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md z-10">
+              {item.label}
+            </span>
+          </div>
         ))}
       </div>
     </aside>
   );
-} 
+}

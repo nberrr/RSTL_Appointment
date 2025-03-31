@@ -19,7 +19,7 @@ export default function DashboardNav() {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      hour12: false
+      hour12: true
     };
     setDateTime(currentDate.toLocaleDateString('en-US', options));
     
@@ -46,7 +46,7 @@ export default function DashboardNav() {
         <div className="flex items-center space-x-6">
           <div className="text-right">
             <div className="font-semibold">Philippine Standard Time</div>
-            <div className="text-sm text-gray-600">{dateTime}</div>
+            <div className="text-sm  whitespace-nowrap font-mono text-gray-600">{dateTime}</div>
           </div>
           
           <button 

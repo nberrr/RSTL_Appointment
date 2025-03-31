@@ -12,45 +12,58 @@ import {
   isToday,
   startOfWeek,
   endOfWeek,
-  addDays
+  addDays,
+  getDay
 } from 'date-fns';
-import { FaCalendarAlt, FaFlask, FaClock, FaTint, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaFlask, FaClock, FaTint, FaSearch } from 'react-icons/fa';
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 
 export default function CalendarPage() {
-  const defaultDate = new Date(2025, 2, 25); // March 25, 2025
-  const [currentDate, setCurrentDate] = useState(defaultDate);
-  const [selectedDate, setSelectedDate] = useState(defaultDate);
+  const today = new Date(); 
+  const [currentDate, setCurrentDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState(today);
   const [calendarDays, setCalendarDays] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(format(currentDate, 'MMMM yyyy'));
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterTime, setFilterTime] = useState('all');
   
   useEffect(() => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
+    const firstDayIndex = getDay(monthStart); // Get the starting day index (0 = Sunday, 1 = Monday, etc.)
+    
     
     const days = [];
-    let day = calendarStart;
-    while (day <= calendarEnd) {
-      days.push(day);
-      day = addDays(day, 1);
-    }
-    
-    setCalendarDays(days);
-    setCurrentMonth(format(currentDate, 'MMMM yyyy'));
-  }, [currentDate]);
 
-  const getAppointmentStatus = (date) => {
-    const day = date.getDate();
-    if (day % 3 === 0) return 'booked';
-    if (day % 3 === 1) return 'limited';
-    return 'available';
-  };
+      // empty slots for days before the 1st of the month
+      for (let i = 0; i < firstDayIndex; i++) {
+        days.push(null);
+      }
+        let day = monthStart;
+        while (day <= monthEnd) {
+          days.push(day);
+          day = addDays(day, 1);
+        }
+      
+        setCalendarDays(days);
+        setCurrentMonth(format(currentDate, 'MMMM yyyy'));
+      }, [currentDate]);
+
+      const getAppointmentStatus = (date) => {
+        if (!date) return null;
+        const day = date.getDate();
+        if (day % 3 === 0) return 'booked';
+        if (day % 3 === 1) return 'limited';
+        return 'available';
+      };
+  function getAvailabilityStatus(date) {
+    // This is a placeholder function - replace with your actual logic
+    // You should implement this based on your actual availability data
+    const day = date.getDay();
+    if (day === 0 || day === 3) return 'available';
+    if (day === 1 || day === 4) return 'booked';
+    return 'limited';
+  }
 
   return (
     <AdminLayout>
@@ -63,7 +76,7 @@ export default function CalendarPage() {
               {/* Left Side - Calendar */}
               <div className="bg-white rounded-xl drop-shadow-md p-4 w-[600px]">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">{currentMonth}</h2>
+                  <h2 className="text-xl font-bold">{currentMonth}</h2>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setCurrentDate(subMonths(currentDate, 1))}
@@ -80,101 +93,112 @@ export default function CalendarPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-7 mb-2">
+                <div className="grid grid-cols-7 gap-[2px]">
+                  {/* Days of week */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                    <div key={day} className="text-sm text-gray-500 font-medium text-center py-2">
+                    <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
                       {day}
                     </div>
                   ))}
-                </div>
+                  
+                  {/* Calendar days */}
+                  {calendarDays.map((day, idx) => {
+                     if (!day) {
+                      return <div key={idx} className="p-6"></div>; // Empty slots for alignment
+                    }
 
-                <div className="grid grid-cols-7 gap-[1px] bg-gray-100">
-                  {calendarDays.map((day) => {
+                    const isSelected = isSameDay(day, selectedDate);
+                    const isCurrentDay = isSameDay(day, today);
                     const status = getAppointmentStatus(day);
-                    const isSelected = selectedDate && isSameDay(day, selectedDate);
-                    const isOutsideMonth = !isSameMonth(day, currentDate);
-                    const isTodayDate = isToday(day);
-                    
+
+                    const bgColor = {
+                      'available': 'bg-green-50',
+                      'limited': 'bg-yellow-50',
+                      'booked': 'bg-red-100',
+                    }[status] || 'bg-white';
+
+                    const dotColor = {
+                      'available': 'bg-green-500',
+                      'limited': 'bg-yellow-500',
+                      'booked': 'bg-red-500',
+                    }[status];
+
                     return (
                       <button
-                        key={day.toString()}
-                        onClick={() => !isOutsideMonth && setSelectedDate(day)}
-                        className={`
-                          relative bg-white p-6 text-sm flex flex-col items-center justify-center
-                          ${isOutsideMonth ? 'text-gray-400' : 'hover:bg-gray-50'}
-                          ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                          ${isTodayDate ? 'font-bold' : ''}
-                        `}
-                        disabled={isOutsideMonth}
-                      >
-                        {format(day, 'd')}
-                        <span 
-                          className={`
-                            w-2 h-2 rounded-full absolute bottom-2
-                            ${status === 'available' ? 'bg-green-500' : ''}
-                            ${status === 'limited' ? 'bg-yellow-500' : ''}
-                            ${status === 'booked' ? 'bg-red-500' : ''}
-                          `}
-                        />
-                      </button>
+                      key={day.toString()}
+                      onClick={() => setSelectedDate(day)}
+                      className={`
+                        relative p-6 text-sm flex flex-col items-center justify-center
+                        ${bgColor}
+                        ${isSelected ? 'ring-2 ring-blue-500' : ''}
+                        ${isCurrentDay ? 'font-extrabold text-blue-600 ring-2 ring-blue-500' : ''}
+                        hover:bg-opacity-75 transition-colors duration-200
+                      `}
+                    >
+                      {format(day, 'd')}
+                      <span className={`w-2 h-2 rounded-full absolute bottom-2 ${dotColor}`} />
+                    </button>
                     );
                   })}
+
                 </div>
 
-                <div className="flex justify-center gap-6 pt-4 mt-4 border-t">
+                {/* Status indicators */}
+                <div className="flex items-center justify-center gap-4 mt-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"/>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     <span className="text-sm text-gray-600">Available</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-yellow-500 rounded-full"/>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                     <span className="text-sm text-gray-600">Limited Slots</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-red-500 rounded-full"/>
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
                     <span className="text-sm text-gray-600">Fully Booked</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Side - Info and Table */}
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 space-y-5">
                 {/* Date and Stats */}
-                <div className="bg-gradient-to-br from-gray-600 to-gray-500 rounded-xl drop-shadow-md p-6">  
+                <div className="bg-gradient-to-br from-gray-700 to-gray-600 rounded-xl drop-shadow-md p-6">  
                   <h2 className="text-xl text-white font-semibold mb-6">
                     {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </h2>
                   <div className="grid grid-cols-3 gap-6">
-                    <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-gray-600 border border-white/40 rounded-lg p-4 shadow-md">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                        <div className="w-10 h-10 flex items-center justify-center bg-blue-700 text-white rounded-lg">
                           <FaTint className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Remaining Liters</p>
-                          <p className="text-xl font-semibold">10,000 L</p>
+                          <p className="text-sm text-gray-300">Remaining Liters</p>
+                          <p className="text-xl font-semibold text-white">10,000 L</p>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="bg-gray-600 border border-white/40 rounded-lg p-4 shadow-md">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
+                        <div className="w-10 h-10 flex items-center justify-center bg-teal-700 text-white rounded-full">
                           <FaFlask className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Total Volume this day</p>
-                          <p className="text-xl font-semibold">70,000 L</p>
+                          <p className="text-sm text-gray-300">Total Volume this day</p>
+                          <p className="text-xl font-semibold text-white">70,000 L</p>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
+
+                    <div className="bg-gray-600 border border-white/40 rounded-lg p-4 shadow-md">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
+                        <div className="w-10 h-10 flex items-center justify-center bg-purple-700 text-white rounded-lg">
                           <FaClock className="w-5 h-5" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Appointments this day</p>
-                          <p className="text-xl font-semibold">2</p>
+                          <p className="text-sm text-gray-300">Appointments this day</p>
+                          <p className="text-xl font-semibold text-white">2</p>
                         </div>
                       </div>
                     </div>

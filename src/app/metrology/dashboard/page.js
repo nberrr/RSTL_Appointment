@@ -137,7 +137,7 @@ export default function MetrologyDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-[45%,1fr] gap-4 h-full">
               {/* Left Section - Calendar and Info */}
               <div className="h-full">
-                <div className="bg-white rounded-xl drop-shadow-md p-4 h-full flex flex-col">
+                <div className="bg-white rounded-xl drop-shadow-md p-5 h-full flex flex-col">
                   {/* Calendar Header */}
                   <div className="flex justify-between items-center mb-2">
                     <h2 className="text-lg font-semibold text-gray-900">{currentMonth}</h2>
@@ -170,26 +170,24 @@ export default function MetrologyDashboard() {
                         </div>
                       ))}
                     </div>
-                    
-                    <div className="grid grid-cols-7 gap-px bg-gray-200 flex-1">
-                      {calendarDays.map((dayObj, index) => (
-                        dayObj.isCurrentMonth ? (
+                      <div className="grid grid-cols-7 gap-px bg-gray-200 flex-1">
+                        {calendarDays.map((dayObj, index) => (
                           <button
                             key={index}
                             className={`
                               relative text-sm flex items-center justify-center bg-white hover:bg-gray-50
-                              ${isCurrentDay(dayObj.day) ? 'font-bold text-blue-600' : 'text-gray-900'}
+                              ${dayObj.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'} 
+                              ${isCurrentDay(dayObj.day) ? 'font-bold text-blue-600' : ''}
                               ${isSelectedDay(dayObj.day) ? 'ring-2 ring-blue-500' : ''}
                             `}
-                            onClick={() => setSelectedDay(dayObj.day)}
+                            onClick={() => dayObj.isCurrentMonth && setSelectedDay(dayObj.day)}
+                            disabled={!dayObj.isCurrentMonth}
                           >
                             {dayObj.day}
                           </button>
-                        ) : (
-                          <div key={index} className="bg-gray-50" />
-                        )
-                      ))}
+                        ))}
                     </div>
+
                   </div>
                   
                   {/* Day Info */}
@@ -203,7 +201,7 @@ export default function MetrologyDashboard() {
                       <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="red">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="blue">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                           </div>
@@ -214,8 +212,8 @@ export default function MetrologyDashboard() {
                       
                       <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="Purple">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
@@ -226,8 +224,8 @@ export default function MetrologyDashboard() {
                       
                       <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="red">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
@@ -263,7 +261,7 @@ export default function MetrologyDashboard() {
                     </div>
                     <p className="text-[10px] text-gray-300">
                         New managers have been added.
-                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        <Link href="/metrology/dashboard/reports" className="text-gray-100 underline hover:text-blue-200">View info</Link>
                         </p>
                   </div>
                   
@@ -285,7 +283,7 @@ export default function MetrologyDashboard() {
                     </div>
                     <p className="text-[10px] text-gray-200">
                         New Appointments added. 
-                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        <Link href="/metrology/dashboard/calendar" className="text-gray-100 underline hover:text-blue-200">View info</Link>
                         </p>
                   </div>
                   
@@ -308,7 +306,7 @@ export default function MetrologyDashboard() {
                     </div>
                     <p className="text-[10px] text-gray-300">
                         Appointments Today. 
-                        <Link href="#" className="text-gray-100 underline hover:text-blue-200">View info</Link>
+                        <Link href="/metrology/dashboard/calendar" className="text-gray-100 underline hover:text-blue-200">View info</Link>
                         </p>
                   </div>
                   

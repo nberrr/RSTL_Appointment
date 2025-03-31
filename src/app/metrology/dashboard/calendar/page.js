@@ -170,7 +170,7 @@ export default function CalendarPage() {
                   <div className="grid grid-cols-3 gap-6">
                   <div className="bg-gray-600 border border-white/40 rounded-lg p-4 shadow-md">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 flex items-center justify-center bg-blue-700 text-white rounded-lg">
+                        <div className="w-10 h-10 flex items-center justify-center bg-cyan-700 text-white rounded-lg">
                           <FaTint className="w-5 h-5" />
                         </div>
                         <div>

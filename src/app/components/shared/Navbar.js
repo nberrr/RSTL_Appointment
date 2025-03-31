@@ -1,20 +1,29 @@
 "use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
-  
-  const isActive = (path) => {
-    return pathname === path ? 'text-blue-600' : 'text-gray-700';
-  };
+
+  // Define main pages where the navbar should be visible
+  const mainPages = ["/metrology", "/microbiology", "/chemistry", "/shelf-life"];
+
+  // Check if the current path is a subpage (starts with but is not an exact match)
+  const isSubpage = mainPages.some((page) => pathname.startsWith(page) && pathname !== page);
+
+  // Hide navbar on subpages
+  if (isSubpage) return null;
+
+  // Function to check if link is active
+  const isActive = (path) => (pathname === path ? "text-blue-600" : "text-gray-700");
 
   return (
     <nav className="main-navbar bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
+          {/* Logo and Branding */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image
@@ -31,41 +40,24 @@ export default function Navbar() {
             </Link>
           </div>
 
+          {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/"
-              className={`${isActive('/')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
-            >
+            <Link href="/" className={`${isActive("/")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Home
             </Link>
-            <Link
-              href="/metrology"
-              className={`${isActive('/metrology')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
-            >
+            <Link href="/metrology" className={`${isActive("/metrology")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Metrology
             </Link>
-            <Link
-              href="/microbiology"
-              className={`${isActive('/microbiology')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
-            >
+            <Link href="/microbiology" className={`${isActive("/microbiology")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Microbiology
             </Link>
-            <Link
-              href="/chemistry"
-              className={`${isActive('/chemistry')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
-            >
+            <Link href="/chemistry" className={`${isActive("/chemistry")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Chemical
             </Link>
-            <Link
-              href="/shelf-life"
-              className={`${isActive('/shelf-life')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
-            >
+            <Link href="/shelf-life" className={`${isActive("/shelf-life")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Shelf Life
             </Link>
-            <Link
-              href="/consultancy"
-              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
-            >
+            <Link href="/consultancy" className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium">
               Research Consultancy
             </Link>
           </div>
@@ -73,4 +65,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-} 
+}

@@ -1090,57 +1090,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Ready to get started section */}
-      <div className="py-12 bg-white">
-        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="flex justify-between items-start">
-              <div className="max-w-2xl">
-                <h2 className="text-2xl font-bold text-blue-600 mb-4">Ready to get started?</h2>
-                <p className="text-gray-600 mb-6">
-                  Lorem ipsum dolor sit amet. Ab ullam dolorem eos internos dolore quo nostrum
-                  nihil.Et quasi veniam et dicta aperiam non nemo illum ut exercitationem quod.
-                </p>
-                <div className="flex items-center space-x-8">
-                  <div className="flex items-center text-gray-600">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    Lorem ipsum dolor sit amet
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    Lorem ipsum dolor sit amet
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                      <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    Lorem ipsum dolor sit amet
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/pricing"
-                className="flex items-center text-blue-600 font-medium hover:text-blue-700"
-              >
-                View Pricing
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+  
 
       {/* Research Consultation Section */}
       <div className="py-16 bg-white">

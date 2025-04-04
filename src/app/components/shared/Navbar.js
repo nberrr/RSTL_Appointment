@@ -56,6 +56,7 @@ export default function Navbar() {
             >
               Chemical
             </Link>
+            
             <Link
               href="/shelf-life"
               className={`${isActive('/shelf-life')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
@@ -64,9 +65,15 @@ export default function Navbar() {
             </Link>
             <Link
               href="/research-consultation"
-              className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors"
+              className={`${isActive('/research-consultation')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
             >
               Research Consultancy
+            </Link>
+            <Link
+              href="/metrology/manager-registration"
+              className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors"
+            >
+              PLACEHOLDER
             </Link>
           </div>
         </div>

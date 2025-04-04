@@ -2,43 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaGripHorizontal, FaRegCalendarAlt, FaRegFileAlt, FaCog } from "react-icons/fa";
+import { FaGripHorizontal, FaRegFile, FaCog, FaHourglassHalf } from "react-icons/fa";
+import { FaFlask, FaComments } from "react-icons/fa6"; // Icons for extra tabs
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
 
-  const navItems = [
-    { 
-      id: "dashboard", 
-      label: "Overview", 
-      icon: <FaGripHorizontal className="h-7 w-7" />, 
-      href: "/metrology/dashboard" 
-    },
-    { 
-      id: "calendar", 
-      label: "Calendar", 
-      icon: <FaRegCalendarAlt className="h-7 w-7" />, 
-      href: "/metrology/dashboard/calendar" 
-    },
-    { 
-      id: "reports", 
-      label: "Reports", 
-      icon: <FaRegFileAlt className="h-7 w-7" />, 
-      href: "/metrology/dashboard/reports" 
-    },
-    { 
-      id: "services", 
-      label: "Manage Services", 
-      icon: <FaCog className="h-7 w-7" />, 
-      href: "/metrology/dashboard/services" 
-    }
+  // Identify the base path for each lab (Metrology, Chemistry, Microbiology)
+  let basePath = "/metrology"; // Default path
+  if (pathname.includes("/chemistry")) basePath = "/chemistry";
+  if (pathname.includes("/microbiology")) basePath = "/microbiology";
+
+  // Default navigation items for all labs
+  let navItems = [
+    { id: "dashboard", label: "Overview", icon: <FaGripHorizontal className="h-7 w-7" />, href: `${basePath}/dashboard` },
+    { id: "calendar", label: "Chemistry", icon: <FaFlask className="h-7 w-7" />, href: `${basePath}/dashboard/calendar` },
   ];
+
+  // Add extra tabs only for Chemistry & Microbiology (AFTER Calendar)
+  if (basePath === "/chemistry" || basePath === "/microbiology") {
+    navItems.push(
+      { id: "shelf-life", label: "Shelf Life", icon: <FaHourglassHalf className="h-7 w-7" />, href: `${basePath}/dashboard/shelf-life` },
+      { id: "consultancy", label: "Consultancy", icon: <FaComments className="h-7 w-7" />, href: `${basePath}/dashboard/consultancy` }
+    );
+  }
+
+  // Continue with remaining default items
+  navItems.push(
+    { id: "reports", label: "Reports", icon: <FaRegFile className="h-7 w-7" />, href: `${basePath}/dashboard/reports` },
+    { id: "services", label: "Manage Services", icon: <FaCog className="h-7 w-7" />, href: `${basePath}/dashboard/services` }
+  );
 
   return (
     <aside className="bg-white w-16 shadow-md h-full flex-shrink-0">
       <div className="p-4 flex flex-col items-center">
         {navItems.map((item) => {
-          // Only mark as active when `pathname` exactly matches the `href`
           const isActive = pathname === item.href;
 
           return (

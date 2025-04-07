@@ -20,6 +20,12 @@ export default function MetrologyAppointment() {
     const [errors, setErrors] = useState({});
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submissionStatus, setSubmissionStatus] = useState({
+        success: true,
+        message: '',
+        appointmentId: null
+    });
 
     const validateForm = () => {
         const newErrors = {};
@@ -62,10 +68,64 @@ export default function MetrologyAppointment() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            console.log('Form submitted:', formData);
+            const formDataToSubmit = {
+                ...formData,
+                selectedDate: selectedDate ? selectedDate.toISOString() : null,
+            };
+            
+            try {
+                setIsSubmitting(true);
+                const response = await fetch('/api/appointments/metrology', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formDataToSubmit),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    setSubmissionStatus({
+                        success: true,
+                        message: 'Your appointment has been scheduled successfully!',
+                        appointmentId: data.appointmentId
+                    });
+                    // Reset form
+                    setFormData({
+                        name: '',
+                        email: '',
+                        contactNumber: '',
+                        sex: '',
+                        plateNumber: '',
+                        companyName: '',
+                        sampleDescription: '',
+                        numberOfLiters: '',
+                        typeOfTest: 'Volume Standard Test',
+                        nameOfSamples: '',
+                        terms: false
+                    });
+                    setSelectedDate(null);
+                } else {
+                    // Show error message
+                    setSubmissionStatus({
+                        success: false,
+                        message: data.message || 'Failed to schedule appointment. Please try again.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setSubmissionStatus({
+                    success: false,
+                    message: 'Network error. Please check your connection and try again.'
+                });
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -417,13 +477,44 @@ export default function MetrologyAppointment() {
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
-                                    className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    disabled={isSubmitting}
+                                    className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Submit Appointment
+                                    {isSubmitting ? 'Submitting...' : 'Submit Appointment'}
                                 </button>
                             </div>
                         </div>
                     </form>
+                    
+                    {/* Success/Error Message */}
+                    {submissionStatus.message && (
+                        <div className={`mt-6 p-4 rounded-md ${submissionStatus.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0">
+                                    {submissionStatus.success ? (
+                                        <svg className="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <div className="ml-3">
+                                    <h3 className={`text-sm font-medium ${submissionStatus.success ? 'text-green-800' : 'text-red-800'}`}>
+                                        {submissionStatus.success ? 'Success!' : 'Error'}
+                                    </h3>
+                                    <div className={`mt-1 text-sm ${submissionStatus.success ? 'text-green-700' : 'text-red-700'}`}>
+                                        <p>{submissionStatus.message}</p>
+                                        {submissionStatus.success && submissionStatus.appointmentId && (
+                                            <p className="mt-1">Appointment ID: {submissionStatus.appointmentId}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

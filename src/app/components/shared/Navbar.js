@@ -21,7 +21,7 @@ export default function Navbar() {
 
   return (
     <nav className="main-navbar bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6.7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo and Branding */}
           <div className="flex items-center">
@@ -54,10 +54,16 @@ export default function Navbar() {
             <Link href="/chemistry" className={`${isActive("/chemistry")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
               Chemical
             </Link>
-            <Link href="/shelf-life" className={`${isActive("/shelf-life")} hover:text-blue-500 px-3 py-2 text-sm font-medium`}>
+            <Link
+              href="/shelf-life"
+              className={`${isActive('/shelf-life')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
               Shelf Life
             </Link>
-            <Link href="/consultancy" className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium">
+            <Link
+              href="/research-consultation"
+              className={`${isActive('/research-consultation')} hover:text-blue-500 px-3 py-2 text-sm font-medium`}
+            >
               Research Consultancy
             </Link>
           </div>

@@ -14,6 +14,7 @@ export default function DashboardNav() {
     if (pathname.includes("/metrology")) return "Metrology Appointment Management";
     if (pathname.includes("/chemistry")) return "Chemistry Appointment Management";
     if (pathname.includes("/microbiology")) return "Microbiology Appointment Management";
+    if (pathname.includes("/shelf-life")) return "Shelf Life Appointment Management";
     return "Dashboard"; // Default title if none match
   };
 

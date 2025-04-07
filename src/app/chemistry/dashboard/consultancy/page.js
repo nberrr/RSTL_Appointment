@@ -49,6 +49,17 @@ export default function ConsultancyPage() {
     setShowDetails(true);
   };
 
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-50 text-yellow-800 flex items-center gap-1 before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full';
+      case 'in progress': return 'bg-blue-100 text-blue-800';
+      case 'declined': return 'bg-red-50 text-red-800';
+      case 'accepted': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="h-screen flex flex-col">
@@ -87,12 +98,8 @@ export default function ConsultancyPage() {
                             <p className="text-sm text-gray-600">{appointment.organization}</p>
                             <p className="text-sm text-gray-500 mt-1">{appointment.researchType}</p>
                           </div>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            appointment.status === 'Accepted' 
-                              ? 'bg-green-500 text-white' 
-                              : ''
-                          }`}>
-                            {appointment.status === 'Accepted' && 'Accepted'}
+                          <span className={`px-2 py-1 text-xs rounded-full inline-flex items-center ${getStatusColor(appointment.status)}`}>
+                            {appointment.status}
                           </span>
                         </div>
                       </div>
@@ -155,11 +162,7 @@ export default function ConsultancyPage() {
                           </td>
                           <td className="py-4 px-4 text-sm">{appointment.researchType}</td>
                           <td className="py-4 px-4">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              appointment.status === 'Accepted' 
-                                ? 'bg-green-500 text-white' 
-                                : 'bg-orange-500 text-white'
-                            }`}>
+                            <span className={`px-2 py-1 text-xs rounded-full inline-flex items-center ${getStatusColor(appointment.status)}`}>
                               {appointment.status}
                             </span>
                           </td>

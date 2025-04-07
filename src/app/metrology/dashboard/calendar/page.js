@@ -111,12 +111,7 @@ export default function CalendarPage() {
                     const isCurrentDay = isSameDay(day, today);
                     const status = getAppointmentStatus(day);
 
-                    const bgColor = {
-                      'available': 'bg-green-50',
-                      'limited': 'bg-yellow-50',
-                      'booked': 'bg-red-100',
-                    }[status] || 'bg-white';
-
+                   
                     const dotColor = {
                       'available': 'bg-green-500',
                       'limited': 'bg-yellow-500',
@@ -129,7 +124,7 @@ export default function CalendarPage() {
                       onClick={() => setSelectedDate(day)}
                       className={`
                         relative p-6 text-sm flex flex-col items-center justify-center
-                        ${bgColor}
+                        
                         ${isSelected ? 'ring-2 ring-blue-500' : ''}
                         ${isCurrentDay ? 'font-extrabold text-blue-600 ring-2 ring-blue-500' : ''}
                         hover:bg-opacity-75 transition-colors duration-200

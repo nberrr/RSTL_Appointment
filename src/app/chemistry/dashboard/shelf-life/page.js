@@ -14,6 +14,7 @@ const dummyAppointments = [
     started: "dd --- yyyy",
     estEnd: "dd --- yyyy",
     status: "Pending",
+    serviceType: "Accelerated Shelf Life Testing",
     // Contact Information
     contactPerson: "John Smith",
     email: "john.smith@naturalfoods.com",
@@ -49,6 +50,7 @@ const dummyAppointments = [
     started: "29 Mar 2025",
     estEnd: "29 Sep 2025",
     status: "In Progress",
+    serviceType: "Real-Time Shelf Life Testing",
     // Contact Information
     contactPerson: "Sarah Johnson",
     email: "sarah.j@healthplus.com",
@@ -82,6 +84,7 @@ const dummyAppointments = [
     started: "dd --- yyyy",
     estEnd: "dd --- yyyy",
     status: "Declined",
+    serviceType: "Accelerated Shelf Life Testing",
     // Contact Information
     contactPerson: "Mike Wilson",
     email: "mike.w@fitlife.com",
@@ -115,6 +118,7 @@ const dummyAppointments = [
     started: "dd --- yyyy",
     estEnd: "dd --- yyyy",
     status: "Pending",
+    serviceType: "Real-Time Shelf Life Testing",
     // Contact Information
     contactPerson: "Emily Chen",
     email: "emily.c@greenvalley.com",
@@ -148,6 +152,7 @@ const dummyAppointments = [
     started: "29 Mar 2025",
     estEnd: "29 May 2025",
     status: "Completed",
+    serviceType: "Accelerated Shelf Life Testing",
     // Contact Information
     contactPerson: "Lisa Brown",
     email: "lisa.b@plantbased.com",
@@ -426,134 +431,190 @@ const ProductDetailsModal = ({ isOpen, onClose, product }) => {
   if (!isOpen || !product) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl p-4 w-full max-w-5xl max-h-[85vh] overflow-y-auto">
+        {/* Header */}
         <div className="sticky top-0 bg-white pb-4 mb-4 border-b border-gray-200">
           <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-2xl font-bold">{product.productName}</h2>
+            <div className="space-y-1">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h2 className="text-xl font-bold text-gray-900">{product.productName}</h2>
+                <StatusBadge status={product.status} />
+              </div>
               <p className="text-gray-600">{product.company}</p>
             </div>
-            <div className="flex items-center gap-4">
-              <StatusBadge status={product.status} />
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Contact Information */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 text-blue-800">Contact Information</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-blue-800">Contact Person</label>
-                <p className="text-blue-900">{product.contactPerson}</p>
+          <div className="space-y-4">
+            <div className="bg-white border border-blue-100 rounded-lg overflow-hidden">
+              <div className="bg-blue-50 px-4 py-2 border-b border-blue-100">
+                <h3 className="text-sm font-semibold text-blue-900">Contact Information</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-blue-800">Email</label>
-                <p className="text-blue-900">{product.email}</p>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Contact Person</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.contactPerson}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Email</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.email}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Contact Number</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.contactNo}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Company Address</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.companyAddress}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium text-blue-800">Contact Number</label>
-                <p className="text-blue-900">{product.contactNo}</p>
+            </div>
+
+            {/* Test Status */}
+            <div className="bg-white border border-purple-100 rounded-lg overflow-hidden">
+              <div className="bg-purple-50 px-4 py-2 border-b border-purple-100">
+                <h3 className="text-sm font-semibold text-purple-900">Test Status</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-blue-800">Company Address</label>
-                <p className="text-blue-900">{product.companyAddress}</p>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Service Type</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.serviceType}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Request Date</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.requestDate}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Testing Period</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.testingPeriod}</p>
+                </div>
+                {product.status === "In Progress" && (
+                  <>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">Started</label>
+                      <p className="text-sm text-gray-900 mt-1">{product.started}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">Est. End</label>
+                      <p className="text-sm text-gray-900 mt-1">{product.estEnd}</p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           {/* Product Information */}
-          <div className="bg-green-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 text-green-800">Product Information</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-green-800">Brand Name</label>
-                <p className="text-green-900">{product.brandName}</p>
+          <div className="space-y-4">
+            <div className="bg-white border border-green-100 rounded-lg overflow-hidden">
+              <div className="bg-green-50 px-4 py-2 border-b border-green-100">
+                <h3 className="text-sm font-semibold text-green-900">Product Information</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-green-800">Net Weight</label>
-                <p className="text-green-900">{product.netWeight}</p>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Brand Name</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.brandName}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Net Weight</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.netWeight}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Quantity for Testing</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.quantity}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Description</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.productDescription}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium text-green-800">Quantity for Testing</label>
-                <p className="text-green-900">{product.quantity}</p>
+            </div>
+
+            {/* Test Details */}
+            <div className="bg-white border border-amber-100 rounded-lg overflow-hidden">
+              <div className="bg-amber-50 px-4 py-2 border-b border-amber-100">
+                <h3 className="text-sm font-semibold text-amber-900">Test Details</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-green-800">Description</label>
-                <p className="text-green-900">{product.productDescription}</p>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Objective</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.objective}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Target Shelf Life</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.targetShelfLife}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Method of Preservation</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.methodOfPreservation}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Test Details */}
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 text-purple-800">Test Details</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-purple-800">Objective</label>
-                <p className="text-purple-900">{product.objective}</p>
+          {/* Technical Details */}
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900">Technical Details</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-purple-800">Testing Period</label>
-                <p className="text-purple-900">{product.testingPeriod}</p>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Packaging Material</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.packagingMaterial}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Production Type</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.productionType}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Existing Market</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.existingMarket}</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500">Existing Permits</label>
+                  <p className="text-sm text-gray-900 mt-1">{product.existingPermits}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium text-purple-800">Target Shelf Life</label>
-                <p className="text-purple-900">{product.targetShelfLife}</p>
+            </div>
+
+            {/* Mode of Deterioration */}
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900">Mode of Deterioration</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-purple-800">Method of Preservation</label>
-                <p className="text-purple-900">{product.methodOfPreservation}</p>
+              <div className="p-4">
+                <ul className="list-disc pl-5 text-sm text-gray-900 space-y-1">
+                  {product.modeOfDeterioration.map((mode, index) => (
+                    <li key={index}>{mode}</li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
 
-          {/* Additional Details */}
-          <div className="bg-amber-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 text-amber-800">Additional Details</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-amber-800">Existing Market</label>
-                <p className="text-amber-900">{product.existingMarket}</p>
+          {/* Full Width Section */}
+          <div className="col-span-full">
+            {/* Ingredients */}
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-900">Product Ingredients</h3>
               </div>
-              <div>
-                <label className="text-sm font-medium text-amber-800">Production Type</label>
-                <p className="text-amber-900">{product.productionType}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-amber-800">Packaging Material</label>
-                <p className="text-amber-900">{product.packagingMaterial}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-amber-800">Existing Permits</label>
-                <p className="text-amber-900">{product.existingPermits}</p>
+              <div className="p-4">
+                <p className="text-sm text-gray-900">{product.productIngredients}</p>
               </div>
             </div>
-          </div>
-
-          {/* Full Width Sections */}
-          <div className="md:col-span-2 bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Product Ingredients</h3>
-            <p className="text-gray-800">{product.productIngredients}</p>
-          </div>
-
-          <div className="md:col-span-2 bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Mode of Deterioration</h3>
-            <ul className="list-disc pl-5 text-gray-800">
-              {product.modeOfDeterioration.map((mode, index) => (
-                <li key={index}>{mode}</li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>
@@ -702,12 +763,11 @@ export default function ShelfLifePage() {
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar/>
           <main className="flex-1 bg-gray-100 p-5">
-            <div className="grid grid-cols-[350px_1fr] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4">
               {/* Left Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Calendar Card */}
-                <div className="bg-white rounded-lg border border-gray-200 shadow-lg ">
-                
+                <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
                   <div className="p-4">
                     <div className="text-center mb-4">
                       <h3 className="text-base font-medium">April 2025</h3>
@@ -740,7 +800,7 @@ export default function ShelfLifePage() {
                 </div>
 
                 {/* Testing Status */}
-                <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-lg">
+                <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
                   <h2 className="text-base font-medium mb-3">Testing Status</h2>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-2 py-1 rounded hover:bg-gray-50">
@@ -790,12 +850,10 @@ export default function ShelfLifePage() {
                     </div>
                   </div>
                 </div>
-
-               
               </div>
 
               {/* Main Content */}
-              <div className="bg-white rounded-lg border border-gray-200">
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div className="p-4 border-b border-gray-200">
                   <div className="flex justify-between items-center mb-4">
                     <div>
@@ -832,9 +890,10 @@ export default function ShelfLifePage() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="min-w-full">
+                  <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Weight</th>
@@ -849,6 +908,9 @@ export default function ShelfLifePage() {
                           key={index}
                           className="hover:bg-gray-50"
                         >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {appointment.contactPerson}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {appointment.productName}
                           </td>

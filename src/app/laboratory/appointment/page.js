@@ -10,7 +10,7 @@ export default function LaboratoryAppointment() {
     const [appointments, setAppointments] = useState([{
         id: 1,
         // General Information
-        fullName: '',
+        clientName: '',
         emailAddress: '',
         phoneNumber: '',
         organization: '',
@@ -67,7 +67,7 @@ export default function LaboratoryAppointment() {
 
     // Add progress calculation function
     const calculateContactProgress = () => {
-        const requiredFields = ['fullName', 'emailAddress', 'phoneNumber', 'organization'];
+        const requiredFields = ['clientName', 'emailAddress', 'phoneNumber', 'organization'];
         const filledFields = requiredFields.filter(field => appointments[0][field].trim() !== '');
         return (filledFields.length / requiredFields.length) * 100;
     };
@@ -148,7 +148,7 @@ export default function LaboratoryAppointment() {
         const currentAppointment = appointments[currentAppointmentIndex];
         
         if (currentAppointment.hasAttemptedSubmit) {
-            if (!currentAppointment.fullName) newErrors.fullName = 'Please enter your full name';
+            if (!currentAppointment.clientName) newErrors.clientName = 'Please enter client name';
             if (!currentAppointment.emailAddress) newErrors.emailAddress = 'Please enter your email address';
             if (!currentAppointment.phoneNumber) newErrors.phoneNumber = 'Please enter your phone number';
             if (!currentAppointment.organization) newErrors.organization = 'Please enter your organization name';
@@ -173,7 +173,7 @@ export default function LaboratoryAppointment() {
         const newAppointment = {
             id: appointments.length + 1,
             // Keep contact information from the first appointment
-            fullName: appointments[0].fullName,
+            clientName: appointments[0].clientName,
             emailAddress: appointments[0].emailAddress,
             phoneNumber: appointments[0].phoneNumber,
             organization: appointments[0].organization,
@@ -513,7 +513,7 @@ export default function LaboratoryAppointment() {
 
     const validateContactInfo = () => {
         const newErrors = {};
-        if (!appointments[0].fullName) newErrors.fullName = 'Please enter your full name';
+        if (!appointments[0].clientName) newErrors.clientName = 'Please enter client name';
         if (!appointments[0].emailAddress) newErrors.emailAddress = 'Please enter your email address';
         if (!appointments[0].phoneNumber) newErrors.phoneNumber = 'Please enter your phone number';
         if (!appointments[0].organization) newErrors.organization = 'Please enter your organization name';
@@ -732,19 +732,19 @@ export default function LaboratoryAppointment() {
                                 <div className="bg-gray-50 p-8 rounded-xl border border-gray-200">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
                                             <input
                                                 type="text"
-                                                name="fullName"
-                                                value={appointments[0].fullName}
+                                                name="clientName"
+                                                value={appointments[0].clientName}
                                                 onChange={handleChange}
-                                                placeholder="Enter your full name"
+                                                placeholder="Enter your client name"
                                                 className={`w-full px-4 py-3 rounded-lg border ${
-                                                    appointments[0].hasAttemptedSubmit && errors.fullName ? 'border-red-500' : 'border-gray-300'
+                                                    appointments[0].hasAttemptedSubmit && errors.clientName ? 'border-red-500' : 'border-gray-300'
                                                 } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                                             />
-                                            {appointments[0].hasAttemptedSubmit && errors.fullName && (
-                                                <p className="mt-2 text-sm text-red-600">{errors.fullName}</p>
+                                            {appointments[0].hasAttemptedSubmit && errors.clientName && (
+                                                <p className="mt-2 text-sm text-red-600">{errors.clientName}</p>
                                             )}
                                         </div>
                                         <div>
@@ -867,7 +867,7 @@ export default function LaboratoryAppointment() {
                                                 newAppointments[currentAppointmentIndex] = {
                                                     ...newAppointments[currentAppointmentIndex],
                                                     // Keep contact information and preferred date
-                                                    fullName: appointments[0].fullName,
+                                                    clientName: appointments[0].clientName,
                                                     emailAddress: appointments[0].emailAddress,
                                                     phoneNumber: appointments[0].phoneNumber,
                                                     organization: appointments[0].organization,
@@ -1477,8 +1477,8 @@ export default function LaboratoryAppointment() {
                                 <div className="bg-white p-6 rounded-xl border border-blue-100">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-blue-50/50 p-4 rounded-lg">
-                                            <p className="text-sm font-medium text-blue-900 mb-1">Full Name</p>
-                                            <p className="text-base text-blue-700">{appointments[0].fullName}</p>
+                                            <p className="text-sm font-medium text-blue-900 mb-1">Client Name</p>
+                                            <p className="text-base text-blue-700">{appointments[0].clientName}</p>
                                         </div>
                                         <div className="bg-blue-50/50 p-4 rounded-lg">
                                             <p className="text-sm font-medium text-blue-900 mb-1">Email Address</p>

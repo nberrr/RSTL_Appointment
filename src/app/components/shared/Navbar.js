@@ -69,12 +69,6 @@ export default function Navbar() {
             >
               Research Consultancy
             </Link>
-            <Link
-              href="/metrology/manager-registration"
-              className="border border-blue-600 text-blue-600 px-4 py-2 rounded-md font-medium flex items-center hover:bg-blue-50 transition-colors"
-            >
-              PLACEHOLDER
-            </Link>
           </div>
         </div>
       </div>

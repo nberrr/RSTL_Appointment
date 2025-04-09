@@ -15,7 +15,7 @@ import {
   addDays,
   getDay
 } from 'date-fns';
-import { FaFlask, FaClock, FaSearch, FaCalendar, FaTimes } from 'react-icons/fa';
+import { FaFlask, FaClock, FaSearch, FaCalendar, FaTimes, FaEllipsisH } from 'react-icons/fa';
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
@@ -451,52 +451,52 @@ export default function CalendarPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sample Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sample Name</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Laboratory</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {appointments.map((appointment, index) => (
                         <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm font-medium text-blue-600">AP-{1000 + index}</td>
+                          <td className="px-6 py-4 text-sm text-gray-500">{appointment.requestDate}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{appointment.organization}</td>
                           <td className="px-6 py-4">
-                            <div className="text-sm font-medium text-gray-900">{appointment.name}</div>
+                            <div className="flex items-center">
+                              <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
+                                {appointment.name.split(' ').map(n => n[0]).join('')}
+                              </div>
+                              <div className="ml-3">
+                                <p className="text-sm font-medium text-gray-900">{appointment.name}</p>
+                              </div>
+                            </div>
                           </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">{appointment.sampleName}</td>
+                          <td className="px-6 py-4 text-sm text-gray-500">{appointment.testType}</td>
                           <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">{appointment.sampleName}</div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">{appointment.testType}</div>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">{appointment.requestDate}</td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                              ${appointment.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                appointment.status === 'Confirmed' ? 'bg-green-100 text-green-800' : 
-                                'bg-gray-100 text-gray-800'
-                              }`}>
+                            <span className={`px-3 py-1 text-sm rounded-full ${
+                              appointment.status === 'Pending' 
+                                ? 'bg-yellow-100 text-yellow-800' 
+                                : appointment.status === 'Confirmed'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
                               {appointment.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4">
-                            {appointment.status === "Pending" ? (
-                              <button
-                                onClick={() => handleSchedule(appointment)}
-                                className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                              >
-                                Schedule
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleSchedule(appointment)}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                              >
-                                Details
-                              </button>
-                            )}
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            <button 
+                              onClick={() => handleSchedule(appointment)}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              <FaEllipsisH className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))}

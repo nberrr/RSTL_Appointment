@@ -14,6 +14,9 @@ export default function DashboardSidebar() {
   let basePath = "/metrology"; // Default path
   if (pathname.includes("/chemistry")) basePath = "/chemistry";
   if (pathname.includes("/microbiology")) basePath = "/microbiology";
+  
+  // Check if we're in the shelf-life section
+  const isShelfLife = pathname.includes("/shelf-life");
 
   // Default navigation items for all labs
   let navItems = [
@@ -32,8 +35,35 @@ export default function DashboardSidebar() {
     navItems.push(
       { id: "reports", label: "Reports", icon: <FaRegFile className="h-7 w-7" />, href: `${basePath}/dashboard/reports` }
     );
+  } else if (isShelfLife) {
+    // For Shelf-life section, only show Calendar and Reports
+    navItems.push({
+      id: "calendar",
+      label: "Calendar",
+      icon: <FaFlask className="h-7 w-7" />,
+      href: `${basePath}/dashboard/calendar`
+    });
+    
+    navItems.push({
+      id: "reports",
+      label: "Reports",
+      icon: <FaRegFile className="h-7 w-7" />,
+      isDropdown: true,
+      subItems: [
+        { 
+          id: "reports-tests",
+          label: "Tests",
+          href: `${basePath}/dashboard/reports/tests`
+        },
+        { 
+          id: "reports-consultancy",
+          label: "Consultancy",
+          href: `${basePath}/dashboard/reports/consultancy`
+        }
+      ]
+    });
   } else {
-    // For Chemistry and Microbiology
+    // For Chemistry and Microbiology (when not in shelf-life)
     navItems.push({
       id: "calendar",
       label: basePath === "/chemistry" ? "Chemistry" : "Microbiology",
@@ -41,9 +71,8 @@ export default function DashboardSidebar() {
       href: `${basePath}/dashboard/calendar`
     });
     
-    // Add shelf life and consultancy tabs
+    // Add consultancy tab
     navItems.push(
-      { id: "shelf-life", label: "Shelf Life", icon: <FaHourglassHalf className="h-7 w-7" />, href: `${basePath}/dashboard/shelf-life` },
       { id: "consultancy", label: "Consultancy", icon: <FaComments className="h-7 w-7" />, href: `${basePath}/dashboard/consultancy` }
     );
 
@@ -60,11 +89,6 @@ export default function DashboardSidebar() {
           href: `${basePath}/dashboard/reports/tests`
         },
         { 
-          id: "reports-shelf-life",
-          label: "Shelf Life",
-          href: `${basePath}/dashboard/reports/shelf-life`
-        },
-        { 
           id: "reports-consultancy",
           label: "Consultancy",
           href: `${basePath}/dashboard/reports/consultancy`
@@ -73,10 +97,12 @@ export default function DashboardSidebar() {
     });
   }
 
-  // Add manage services for all labs
-  navItems.push(
-    { id: "services", label: "Manage Services", icon: <FaCog className="h-7 w-7" />, href: `${basePath}/dashboard/services` }
-  );
+  // Add manage services for all labs (but not for shelf-life)
+  if (!isShelfLife) {
+    navItems.push(
+      { id: "services", label: "Manage Services", icon: <FaCog className="h-7 w-7" />, href: `${basePath}/dashboard/services` }
+    );
+  }
 
   return (
     <aside className="bg-white w-16 shadow-md h-full flex-shrink-0">

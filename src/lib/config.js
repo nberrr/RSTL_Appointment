@@ -10,9 +10,9 @@ const dbConfig = {
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'rstl_appointment_portal',
-  password: process.env.DB_PASSWORD || 'postgres',
+  password: process.env.DB_PASSWORD || 'nebneb',
   port: parseInt(process.env.DB_PORT || '5432'),
-};
+};  
 
 // Validate essential configuration
 const validateConfig = () => {

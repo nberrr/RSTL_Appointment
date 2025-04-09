@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from 'react';
-import { FaSearch, FaDownload, FaEllipsisH } from 'react-icons/fa';
+import { FaSearch, FaDownload, FaEllipsisH, FaFilter } from 'react-icons/fa';
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 
 export default function ConsultancyReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [dateSort, setDateSort] = useState('newest');
 
   // Sample data for completed consultancy appointments
   const consultancyData = [
@@ -51,6 +53,25 @@ export default function ConsultancyReportsPage() {
   const getStatusColor = (status) => {
     return 'bg-green-100 text-green-800'; // All items are completed
   };
+
+  const sortByDate = (a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateSort === 'newest' ? dateB - dateA : dateA - dateB;
+  };
+
+  const filteredData = consultancyData
+    .filter(item => {
+      const matchesSearch = 
+        item.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.researcher.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.type.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesFilter = filterType === 'all' || item.type.toLowerCase() === filterType.toLowerCase();
+      
+      return matchesSearch && matchesFilter;
+    })
+    .sort(sortByDate);
 
   return (
     <AdminLayout>
@@ -103,17 +124,41 @@ export default function ConsultancyReportsPage() {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold">Consultation History</h2>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FaSearch className="h-4 w-4 text-gray-400" />
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaSearch className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        className="pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Search consultations..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      className="pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Search consultations..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <FaFilter className="text-gray-400" />
+                      <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="all">All Types</option>
+                        <option value="thesis/dissertation">Thesis/Dissertation</option>
+                        <option value="industry research">Industry Research</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={dateSort}
+                        onChange={(e) => setDateSort(e.target.value)}
+                        className="border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -133,7 +178,7 @@ export default function ConsultancyReportsPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {consultancyData.map((consultation, index) => (
+                    {filteredData.map((consultation, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.id}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{consultation.date}</td>

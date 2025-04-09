@@ -55,7 +55,7 @@ const dummyAppointments = [
     contactPerson: "Sarah Johnson",
     email: "sarah.j@healthplus.com",
     contactNo: "+1 (555) 234-5678",
-    // Product Details
+    // Product Details 
     productDescription: "Daily multivitamin supplement formulated with essential vitamins and minerals. Suitable for adults aged 18-65.",
     quantity: "500 bottles",
     objective: "Evaluate vitamin stability and potency",
@@ -182,21 +182,21 @@ const dummyAppointments = [
 
 const StatusBadge = ({ status }) => {
   const statusStyles = {
-    Pending: "bg-yellow-50 text-yellow-800 border-yellow-200",
-    "In Progress": "bg-blue-50 text-blue-800 border-blue-200",
-    Declined: "bg-red-50 text-red-800 border-red-200",
-    Completed: "bg-green-50 text-green-800 border-green-200",
-    Failed: "bg-red-50 text-red-800 border-red-200",
-    Cancelled: "bg-gray-200 text-gray-800 border-gray-400"
+    Pending: "px-2 py-1 text-xs rounded-full inline-flex items-center bg-yellow-50 text-yellow-800 flex items-center gap-1 before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full",
+    "In Progress": "px-2 py-1 text-xs rounded-full inline-flex items-center bg-blue-50 text-blue-800 flex items-center   before:rounded-full",
+    Declined: "px-2 py-1 text-xs rounded-full inline-flex items-center bg-red-50 text-red-800 flex items-center   before:rounded-full",
+    Completed: "px-2 py-1 text-xs rounded-full inline-flex items-center bg-green-50 text-green-800 flex items-center   before:rounded-full",
+    Failed: "px-2 py-1 text-xs rounded-full inline-flex items-center bg-red-100 text-red-900 flex items-center   before:rounded-full",
+    Cancelled: "px-2 py-1 text-xs rounded-full inline-flex items-center bg-gray-50 text-gray-800 flex items-center   before:rounded-full"
   };
 
   return (
     <span className={`px-3 py-1 rounded-full text-sm border ${statusStyles[status]}`}>
       {status === "In Progress" && (
-        <span className="inline-block w-1.5 h-1.5 bg-blue-600 rounded-full mr-1.5"></span>
+        <span className="inline-block "></span>
       )}
       {status === "Pending" && (
-        <span className="inline-block w-1.5 h-1.5 bg-yellow-600 rounded-full mr-1.5"></span>
+        <span className="inline-block"></span>
       )}
       {status}
     </span>

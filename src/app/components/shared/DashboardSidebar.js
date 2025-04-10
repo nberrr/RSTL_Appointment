@@ -14,6 +14,7 @@ export default function DashboardSidebar() {
   let basePath = "/metrology"; // Default path
   if (pathname.includes("/chemistry")) basePath = "/chemistry";
   if (pathname.includes("/microbiology")) basePath = "/microbiology";
+  if (pathname.includes("/shelf-life")) basePath = "/shelf-life";
   
   // Check if we're in the shelf-life section
   const isShelfLife = pathname.includes("/shelf-life");

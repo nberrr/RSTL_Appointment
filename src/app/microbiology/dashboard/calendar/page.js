@@ -15,7 +15,7 @@ import {
   addDays,
   getDay
 } from 'date-fns';
-import { FaFlask, FaClock, FaSearch, FaCalendar, FaTimes, FaEllipsisH } from 'react-icons/fa';
+import { FaBacteria, FaClock, FaSearch, FaCalendar, FaTimes, FaEllipsisH } from 'react-icons/fa';
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
@@ -115,7 +115,6 @@ const ScheduleModal = ({ isOpen, onClose, appointment }) => {
                         <p className="text-sm font-medium text-gray-900">{appointment?.scheduledTime}</p>
                       </div>
                     </div>
-                    
                   </>
                 )}
               </div>
@@ -147,7 +146,6 @@ const ScheduleModal = ({ isOpen, onClose, appointment }) => {
                         </select>
                       </div>
                     </div>
-                   
                   </div>
                 </div>
               </>
@@ -210,42 +208,42 @@ export default function CalendarPage() {
   // Sample data
   const appointments = [
     {
-      name: 'Pedro Reyes',
-      email: 'pedro@123petroleum.com',
-      organization: 'Dost',
-      phone: '+63 912 345 6789',
+      name: 'Dr. Maria Santos',
+      email: 'maria@microbio.ph',
+      organization: 'University of the Philippines',
+      phone: '+63 917 876 5432',
       requestDate: 'Mar 25, 2025',
-      sampleName: 'Crude Oil Sample A',
-      sampleDescription: 'Extracted from Well #42',
-      quantity: '100 L',
-      sampleType: 'Crude Oil',
-      testType: 'Viscosity Analysis',
+      sampleName: 'Water Sample A',
+      sampleDescription: 'Collected from Pasig River',
+      quantity: '500 mL',
+      sampleType: 'Water Sample',
+      testType: 'Bacterial Culture',
       status: 'Pending'
     },
     {
-      name: 'Maria Santos',
-      email: 'maria@chemworks.ph',
-      organization: 'Dost',
-      phone: '+63 917 876 5432',
+      name: 'Dr. Juan Dela Cruz',
+      email: 'juan@research.ph',
+      organization: 'DOST',
+      phone: '+63 918 765 4321',
       requestDate: 'Apr 2, 2025',
-      sampleName: 'Ethanol Solution',
-      sampleDescription: '70% concentration, batch #A123',
-      quantity: '50 L',
-      sampleType: 'Alcohol Solution',
-      testType: 'Purity Testing',
+      sampleName: 'Soil Sample B',
+      sampleDescription: 'Agricultural soil, batch #B456',
+      quantity: '1 kg',
+      sampleType: 'Soil Sample',
+      testType: 'Microbial Analysis',
       status: 'Confirmed'
     },
     {
-      name: 'Juan Dela Cruz',
-      email: 'juan@nationalchem.com',
-      organization: 'Dost',
-      phone: '+63 918 765 4321',
+      name: 'Dr. Ana Reyes',
+      email: 'ana@foodsafety.ph',
+      organization: 'Food Safety Institute',
+      phone: '+63 919 654 3210',
       requestDate: 'Apr 3, 2025',
-      sampleName: 'Water Sample B',
-      sampleDescription: 'Collected from Pasig River',
-      quantity: '20 L',
-      sampleType: 'Water Sample',
-      testType: 'Contamination Analysis',
+      sampleName: 'Food Sample C',
+      sampleDescription: 'Raw chicken meat',
+      quantity: '200 g',
+      sampleType: 'Food Sample',
+      testType: 'Pathogen Testing',
       status: 'Pending'
     }
   ];
@@ -296,23 +294,21 @@ export default function CalendarPage() {
           <DashboardSidebar />
           <main className="flex-1 bg-gray-50 p-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-6 mb-6 ">
-              <div className="bg-cyan-50 rounded-xl p-4 border border-gray-200">
+            <div className="grid grid-cols-3 gap-6 mb-6">
+              <div className="bg-teal-50 rounded-xl p-4 border border-gray-200 shadow-md">
                 <div className="flex items-center gap-4">
-                  <div className="bg-cyan-500 rounded-full p-3">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
+                  <div className="bg-teal-500 rounded-full p-3">
+                    <FaBacteria className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-cyan-900 font-medium">Pending Tests</p>
-                    <p className="text-2xl font-semibold text-cyan-700">15</p>
-                    <p className="text-sm text-cyan-600">Chemical Analysis</p>
+                    <p className="text-teal-900 font-medium">Pending Tests</p>
+                    <p className="text-2xl font-semibold text-teal-700">12</p>
+                    <p className="text-sm text-teal-600">Microbial Analysis</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-emerald-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-emerald-50 rounded-xl p-4 shadow-md  border border-gray-200">
                 <div className="flex items-center gap-4">
                   <div className="bg-emerald-500 rounded-full p-3">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,13 +317,13 @@ export default function CalendarPage() {
                   </div>
                   <div>
                     <p className="text-emerald-900 font-medium">Tests in Progress</p>
-                    <p className="text-2xl font-semibold text-emerald-700">8</p>
+                    <p className="text-2xl font-semibold text-emerald-700">6</p>
                     <p className="text-sm text-emerald-600">Active Analysis</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-purple-50 rounded-xl p-4 shadow-md border border-gray-200">
                 <div className="flex items-center gap-4">
                   <div className="bg-purple-500 rounded-full p-3">
                     <FaCalendar className="w-6 h-6 text-white" />
@@ -335,10 +331,10 @@ export default function CalendarPage() {
                   <div>
                     <p className="text-purple-900 font-medium">Today's Schedule</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-semibold text-purple-700">5</p>
+                      <p className="text-2xl font-semibold text-purple-700">4</p>
                       <p className="text-sm text-purple-600">Tests</p>
                     </div>
-                    <p className="text-sm text-purple-600 mt-1">Next: 10:30 AM - pH Analysis</p>
+                    <p className="text-sm text-purple-600 mt-1">Next: 10:30 AM - Bacterial Culture</p>
                   </div>
                 </div>
               </div>
@@ -346,7 +342,7 @@ export default function CalendarPage() {
 
             <div className="flex gap-6">
               {/* Calendar Section */}
-              <div className="bg-white rounded-xl shadow-sm w-[400px]  border border-gray-200">
+              <div className="bg-white rounded-xl shadow-sm w-[400px]">
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold">{currentMonth}</h2>
@@ -386,8 +382,8 @@ export default function CalendarPage() {
                           onClick={() => setSelectedDate(day)}
                           className={`
                             relative p-4 text-xs flex flex-col items-center justify-center
-                            ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                            ${isCurrentDay ? 'font-extrabold text-blue-600 ring-2 ring-blue-500' : ''}
+                            ${isSelected ? 'ring-2 ring-teal-500' : ''}
+                            ${isCurrentDay ? 'font-extrabold text-teal-600 ring-2 ring-teal-500' : ''}
                             hover:bg-gray-50 transition-colors duration-200
                           `}
                         >
@@ -421,23 +417,23 @@ export default function CalendarPage() {
               </div>
 
               {/* Appointments Table Section */}
-              <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="flex-1 bg-white rounded-xl shadow-sm">
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <FaFlask className="text-emerald-600" />
-                      <h2 className="text-lg font-semibold text-gray-900">Sample Testing Schedule</h2>
+                      <FaBacteria className="text-teal-600" />
+                      <h2 className="text-lg font-semibold text-gray-900">Microbial Testing Schedule</h2>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <input
                           type="text"
                           placeholder="Search samples..."
-                          className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                          className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                         />
                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       </div>
-                      <select className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                      <select className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
                         <option value="all">All Tests</option>
                         <option value="pending">Pending</option>
                         <option value="inProgress">In Progress</option>
@@ -456,7 +452,7 @@ export default function CalendarPage() {
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sample Name</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Laboratory</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Type</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
@@ -464,7 +460,7 @@ export default function CalendarPage() {
                     <tbody className="divide-y divide-gray-100">
                       {appointments.map((appointment, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-blue-600">AP-{1000 + index}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-teal-600">MB-{1000 + index}</td>
                           <td className="px-6 py-4 text-sm text-gray-500">{appointment.requestDate}</td>
                           <td className="px-6 py-4 text-sm text-gray-900">{appointment.organization}</td>
                           <td className="px-6 py-4">

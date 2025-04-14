@@ -6,7 +6,7 @@ import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 
-export default function ChemistryReportsPage() {
+export default function MicrobiologyReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [dateSort, setDateSort] = useState('newest');
@@ -158,7 +158,7 @@ export default function ChemistryReportsPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm border border-gray-200">
+              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">Completed Tests</span>
@@ -168,7 +168,7 @@ export default function ChemistryReportsPage() {
                 <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
               </div>
               
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm  border border-gray-200">
+              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">Declined Tests</span>
@@ -178,7 +178,7 @@ export default function ChemistryReportsPage() {
                 <div className="absolute right-0 top-0 h-full w-1 bg-red-500"></div>
               </div>
               
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-msm  border border-gray-200">
+              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">Cancelled Tests</span>
@@ -191,7 +191,7 @@ export default function ChemistryReportsPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-[1fr,300px] gap-6">
               {/* Main Content */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+              <div className="bg-white rounded-2xl shadow-sm  border border-gray-200 ">
                 <div className="p-6 border-b border-gray-200 ">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <h2 className="text-lg font-semibold">Completed Appointments</h2>

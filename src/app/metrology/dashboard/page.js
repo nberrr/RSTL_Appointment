@@ -137,7 +137,7 @@ export default function MetrologyDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-[45%,1fr] gap-4 h-full">
               {/* Left Section - Calendar and Info */}
               <div className="h-full">
-                <div className="bg-white rounded-xl drop-shadow-md p-5 h-full flex flex-col">
+                <div className="bg-white rounded-xl drop-shadow-sm  border border-gray-200 p-5 h-full flex flex-col">
                   {/* Calendar Header */}
                   <div className="flex justify-between items-center mb-2">
                     <h2 className="text-lg font-semibold text-gray-900">{currentMonth}</h2>
@@ -243,7 +243,7 @@ export default function MetrologyDashboard() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-3 gap-4">
                   {/* Registered Managers */}
-                 <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md">
+                 <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md  border border-gray-200 ">
 
                     <div className="flex flex-col">
                       <div className="flex justify-between items-start">
@@ -266,7 +266,7 @@ export default function MetrologyDashboard() {
                   </div>
                   
                   {/* Scheduled Appointments */}
-                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md">
+                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md  border border-gray-200">
                     <div className="flex flex-col">
                       <div className="flex justify-between items-start">
                         <div>
@@ -289,7 +289,7 @@ export default function MetrologyDashboard() {
                   
                   
                   {/* Appointments Today */}
-                  <div className="bg-gradient-to-br from-violet-700 to-violet-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md">
+                  <div className="bg-gradient-to-br from-violet-700 to-violet-500 rounded-xl p-3 min-h-[150px] flex flex-col justify-between drop-shadow-md border border-gray-200">
                     <div className="flex flex-col">
                       <div className="flex justify-between items-start">
                         <div>
@@ -313,7 +313,7 @@ export default function MetrologyDashboard() {
                 </div>
                 
                 {/* Chart Section */}
-                <div className="bg-white rounded-xl drop-shadow-md p-3">
+                <div className="bg-white rounded-xl drop-shadow-sm p-3 border border-gray-200">
                   <h3 className="text-sm font-semibold mb-2">Daily Liquid Volume (Last 7 Days)</h3>
                   <div className="h-[200px] flex items-center justify-center border border-gray-200 rounded-lg">
                     <p className="text-xs text-gray-500">Chart will be displayed here</p>
@@ -322,7 +322,7 @@ export default function MetrologyDashboard() {
                 </div>
                 
                 {/* Appointments Table */}
-                <div className="bg-white rounded-xl drop-shadow-md p-3">
+                <div className="bg-white rounded-xl drop-shadow-sm p-3  border border-gray-200">
                   <h3 className="text-sm font-semibold mb-2">Upcoming Appointments</h3>
                   <div className="overflow-hidden rounded-lg border border-gray-200">
                     <table className="min-w-full divide-y divide-gray-200">

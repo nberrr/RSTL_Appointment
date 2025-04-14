@@ -22,7 +22,8 @@ const ConsultationModal = ({ isOpen, onClose, consultation }) => {
               <FaTimes className="w-5 h-5" />
             </button>
           </div>
-        </div> 
+        </div>
+
         <div className="p-6">
           <div className="flex items-center gap-6 mb-6">
             <div>
@@ -284,7 +285,7 @@ export default function ConsultancyReportsPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-xl p-4  border border-gray-200 shadow-md">
                 <h3 className="text-sm font-medium text-gray-600 mb-2">Total Consultations</h3>
                 <div className="flex justify-between items-end">
                   <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
@@ -293,7 +294,7 @@ export default function ConsultancyReportsPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm  border border-gray-200">
+              <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-600 mb-2">Research Types</h3>
                 <div className="flex justify-between items-end">
                   <div>
@@ -306,7 +307,7 @@ export default function ConsultancyReportsPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-600 mb-2">Completion Rate</h3>
                 <p className="text-2xl font-bold text-green-600">100%</p>
                 <p className="text-sm text-gray-600 mt-1">All consultations completed</p>
@@ -314,7 +315,7 @@ export default function ConsultancyReportsPage() {
             </div>
 
             {/* Main Content */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white rounded-xl shadow-sm  border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold">Consultation History</h2>

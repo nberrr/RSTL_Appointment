@@ -74,7 +74,7 @@ export default function CalendarPage() {
           <main className="flex-1 bg-gray-100 p-5">
             <div className="flex gap-6">
               {/* Left Side - Calendar */}
-              <div className="bg-white rounded-xl drop-shadow-md p-4 w-[600px]">
+              <div className="bg-white rounded-xl drop-shadow-sm  border border-gray-200 p-4 w-[600px]">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">{currentMonth}</h2>
                   <div className="flex gap-2">

@@ -100,7 +100,7 @@ export default function ReportsPage() {
                 {/* Stats Cards - Right Side */}
                 <div className="flex-1 grid grid-cols-2 gap-4">
                   {/* Total Liters Card */}
-                  <div className="bg-gradient-to-br from-cyan-700 to-cyan-500 rounded-xl drop-shadow-md p-3">
+                  <div className="bg-gradient-to-br from-cyan-700 to-cyan-500 rounded-xl shadow-md  border border-gray-200  p-3">
                     <div className="flex justify-between items-start">
                       <div>
                       <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default function ReportsPage() {
                   </div>
 
                   {/* Total Appointments Card */}
-                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl drop-shadow-md p-3">
+                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl  border border-gray-200 shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export default function ReportsPage() {
                   </div>
 
                   {/* Registered Managers Card */}
-                  <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl drop-shadow-md p-3">
+                  <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl  border border-gray-200 shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function ReportsPage() {
                   </div>
 
                   {/* Registered Trucks Card */}
-                  <div className="bg-gradient-to-br from-orange-700 to-orange-500 rounded-xl drop-shadow-md p-3">
+                  <div className="bg-gradient-to-br from-orange-700 to-orange-500 rounded-xl border border-gray-200 shadow-md p-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ export default function ReportsPage() {
               )}
 
               {/* Table Section */}
-              <div className="bg-white rounded-xl drop-shadow-md mt-5 p-4 flex-1">
+              <div className="bg-white rounded-xl drop-shadow-sm mt-5 p-4 flex-1  border border-gray-200">
                 {/* Search and Filter */}
                 <div className="flex items-center gap-4 mb-3">
                   <div className="relative w-64">

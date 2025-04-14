@@ -35,15 +35,17 @@ const dummyAppointments = [
   }
 ];
 
-const StatusCard = ({ title, count, icon, color }) => {
+const StatusCard = ({ title, count, icon, color, textColor, borderColor }) => {
   return (
-    <div className={`bg-white p-4 rounded-lg border border-gray-200 flex items-center justify-between`}>
-      <div>
-        <h3 className="text-gray-500 text-sm">{title}</h3>
-        <p className="text-2xl font-semibold mt-1">{count}</p>
-      </div>
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${color}`}>
-        {icon}
+    <div className={`p-6 rounded-xl border ${borderColor} ${color} transition-all duration-200 hover:shadow-md`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <p className={`text-2xl font-semibold mt-2 ${textColor}`}>{count}</p>
+        </div>
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${color}`}>
+          {icon}
+        </div>
       </div>
     </div>
   );
@@ -81,30 +83,48 @@ export default function ShelfLifePage() {
             </div>
 
             {/* Status Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-6">
               <StatusCard
-                title="Pending"
+                title="Pending Tests"
                 count="2"
                 color="bg-yellow-50"
-                icon={<span className="text-yellow-600 text-2xl">⏳</span>}
+                textColor="text-yellow-700"
+                borderColor="border-yellow-100"
+                icon={
+                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
               />
               <StatusCard
-                title="Progress"
+                title="In Progress" 
                 count="1"
                 color="bg-blue-50"
-                icon={<span className="text-blue-600 text-2xl">🔄</span>}
+                textColor="text-blue-700"
+                borderColor="border-blue-100"
+                icon={
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                }
               />
               <StatusCard
                 title="Completed"
                 count="0"
                 color="bg-green-50"
-                icon={<span className="text-green-600 text-2xl">✓</span>}
+                textColor="text-green-700"
+                borderColor="border-green-100"
+                icon={
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
               />
             </div>
 
             <div className="grid grid-cols-1 gap-6">
               {/* Calendar Card */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
                 <div className="text-center mb-4">
                   <h3 className="text-base font-medium">April 2025</h3>
                   <p className="text-sm text-gray-500">Calendar view of testing appointments</p>

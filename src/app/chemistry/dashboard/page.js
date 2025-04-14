@@ -17,17 +17,16 @@ export default function MetrologyDashboard() {
   // Sample appointment data
   const appointmentData = {
     "2025-03-24": { chemistry: true, consultancy: true },
-    "2025-03-25": { shelfLife: true },
-    "2025-03-26": { chemistry: true, shelfLife: true },
+    "2025-03-25": {},
+    "2025-03-26": { chemistry: true },
     "2025-03-27": { consultancy: true },
-    "2025-03-28": { chemistry: true, consultancy: true, shelfLife: true },
+    "2025-03-28": { chemistry: true, consultancy: true },
   };
   
   // Sample data for the graph
   const weeklyData = {
     chemistry: [12, 15, 8, 20, 14, 18, 24],
     consultancy: [8, 10, 12, 15, 9, 11, 15],
-    shelfLife: [5, 8, 10, 12, 15, 13, 18],
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   };
   
@@ -124,7 +123,7 @@ export default function MetrologyDashboard() {
           <main className="flex-1 bg-gray-100 p-4">
             <div className="grid grid-cols-1 lg:grid-cols-[40%,1fr] gap-4 h-[calc(100vh-7rem)]">
               {/* Left Section - Calendar */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col">
+              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col border border-gray-200">
                 {/* Calendar Header */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">{currentMonth}</h2>
@@ -179,9 +178,6 @@ export default function MetrologyDashboard() {
                             {dayObj.appointments.consultancy && (
                               <div className="w-1.5 h-1.5 rounded-full bg-green-500" title="Consultancy"></div>
                             )}
-                            {dayObj.appointments.shelfLife && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-purple-500" title="Shelf Life"></div>
-                            )}
                           </div>
                         )}
                       </button>
@@ -200,10 +196,6 @@ export default function MetrologyDashboard() {
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
                       <span className="text-xs text-gray-600">Consultancy</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                      <span className="text-xs text-gray-600">Shelf Life</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -211,7 +203,7 @@ export default function MetrologyDashboard() {
               {/* Right Section */}
               <div className="space-y-4">
                 {/* Stats Cards */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   {/* Chemistry Tests */}
                   <div className="bg-gradient-to-br from-blue-700 to-blue-500 rounded-xl p-3 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
@@ -239,25 +231,11 @@ export default function MetrologyDashboard() {
                     </div>
                     <p className="text-xs text-green-100 mt-2">5 Pending • 3 Today</p>
                   </div>
-                  
-                  {/* Shelf Life */}
-                  <div className="bg-gradient-to-br from-purple-700 to-purple-500 rounded-xl p-3 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-sm text-white">Shelf Life</h3>
-                        <p className="text-2xl font-bold text-white mt-2">18</p>
-                      </div>
-                      <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-lg">
-                        <FaCubes className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-purple-100 mt-2">7 Pending • 4 Today</p>
-                  </div>
                 </div>
 
                 {/* Graph Section */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
-                  <div className="flex justify-between items-center mb-4">
+                <div className="mt-6  border border-gray-200 bg-white">
+                  <div className="flex justify-between items-center mb-4 p-4">
                     <h3 className="text-sm font-semibold">Weekly Appointment Trends</h3>
                     <div className="flex items-center gap-4 text-xs text-gray-500">
                       <div className="flex items-center gap-2">
@@ -268,14 +246,10 @@ export default function MetrologyDashboard() {
                         <div className="w-2 h-2 rounded-full bg-green-500"></div>
                         <span>Consultancy</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                        <span>Shelf Life</span>
-                      </div>
                     </div>
                   </div>
                   
-                  <div className="h-[120px] flex items-end gap-2">
+                  <div className="flex gap-4">
                     {weeklyData.labels.map((label, index) => (
                       <div key={label} className="flex-1 flex flex-col items-center gap-1">
                         <div className="w-full flex items-end justify-center gap-0.5 h-[100px]">
@@ -287,10 +261,6 @@ export default function MetrologyDashboard() {
                             className="w-2 bg-green-500 rounded-t"
                             style={{ height: `${(weeklyData.consultancy[index] / 24) * 100}%` }}
                           ></div>
-                          <div 
-                            className="w-2 bg-purple-500 rounded-t"
-                            style={{ height: `${(weeklyData.shelfLife[index] / 24) * 100}%` }}
-                          ></div>
                         </div>
                         <span className="text-xs text-gray-500">{label}</span>
                       </div>
@@ -299,7 +269,7 @@ export default function MetrologyDashboard() {
                 </div>
 
                 {/* Today's Schedule */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white rounded-xl shadow-sm p-4  border border-gray-200">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-sm font-semibold">Today&apos;s Schedule</h3>
                     <span className="text-xs text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
@@ -319,13 +289,7 @@ export default function MetrologyDashboard() {
                         <p className="text-xs text-gray-500">11:30 AM • Consultancy</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-2 bg-purple-50 rounded-lg">
-                      <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Food Product Testing - ABC Foods</p>
-                        <p className="text-xs text-gray-500">2:00 PM • Shelf Life</p>
-                      </div>
-                    </div>
+                   
                   </div>
                 </div>
               </div>

@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ChevronLeft } from 'lucide-react';
 import {
-  LayoutGrid,
-  ScrollText,
-  FileText,
-  Settings,
-  MessageSquare,
+  Grid2x2,
+  CalendarDays,
+  FileStack,
+  SlidersHorizontal,
+  MessagesSquare   
 } from "lucide-react";
+
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
@@ -28,7 +29,7 @@ export default function DashboardSidebar() {
     {
       id: "dashboard",
       label: "Overview",
-      icon: <LayoutGrid size={20} />,
+      icon: <Grid2x2 size={24} />,
       href: `${basePath}/dashboard`,
     },
     ...(basePath === "/metrology"
@@ -36,13 +37,13 @@ export default function DashboardSidebar() {
           {
             id: "calendar",
             label: "Appointments",
-            icon: <ScrollText size={20} />,
+            icon: <CalendarDays size={24} />,
             href: `${basePath}/dashboard/calendar`,
           },
           {
             id: "reports",
             label: "Reports",
-            icon: <FileText size={20} />,
+            icon: <FileStack size={24} />,
             href: `${basePath}/dashboard/reports`,
           },
         ]
@@ -51,37 +52,33 @@ export default function DashboardSidebar() {
           {
             id: "calendar",
             label: "Calendar",
-            icon: <ScrollText size={20} />,
+            icon: <CalendarDays size={24} />,
             href: `${basePath}/dashboard/calendar`,
           },
           {
             id: "reports",
             label: "Reports",
-            icon: <FileText size={20} />,
-            isDropdown: true,
-            subItems: [
-              { id: "reports-tests", label: "Tests", href: `${basePath}/dashboard/reports/tests` },
-              { id: "reports-consultancy", label: "Consultancy", href: `${basePath}/dashboard/reports/consultancy` },
-            ],
+            icon: <FileStack size={24} />,
+            href: `${basePath}/dashboard/reports`,
           },
         ]
       : [
           {
             id: "calendar",
             label: basePath === "/chemistry" ? "Chemistry" : "Microbiology",
-            icon: <ScrollText size={20} />,
+            icon: <CalendarDays size={24} />,
             href: `${basePath}/dashboard/calendar`,
           },
           {
             id: "consultancy",
             label: "Consultancy",
-            icon: <MessageSquare size={20} />,
+            icon: <MessagesSquare size={24} />,
             href: `${basePath}/dashboard/consultancy`,
           },
           {
             id: "reports",
             label: "Reports",
-            icon: <FileText size={20} />,
+            icon: <FileStack size={24} />,
             isDropdown: true,
             subItems: [
               { id: "reports-tests", label: "Tests", href: `${basePath}/dashboard/reports/tests` },
@@ -89,24 +86,32 @@ export default function DashboardSidebar() {
             ],
           },
         ]),
-
     !isShelfLife && {
       id: "services",
-      label: "Manage Services",
-      icon: <Settings size={20} />,
+      label: "Manage    ",
+      icon: <SlidersHorizontal size={24} />,
       href: `${basePath}/dashboard/services`,
     },
   ].filter(Boolean);
+  
 
   return (
-    <aside className={`bg-white border-r border-gray-100 h-full transition-all duration-300 ease-in-out ${isCollapsed ? "w-[60px]" : "w-[240px]"}`}>
+    <aside 
+      className={`bg-white border-r border-gray-200 h-full transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-[72px]" : "w-[240px]"
+      }`}
+    >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-100">
-          <span className={`text-base font-medium text-gray-900 ${isCollapsed ? 'hidden' : 'block'}`}>Dashboard</span>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+          <span className={`text-base font-medium text-gray-900 transition-opacity duration-200 ${
+            isCollapsed ? 'opacity-0 w-0' : 'opacity-100'
+          }`}>
+            Dashboard
+          </span>
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="ml-auto p-1 text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-50"
           >
             <ChevronLeft className={`w-5 h-5 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`} />
           </button>
@@ -114,7 +119,7 @@ export default function DashboardSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 py-4">
-          <div className="px-3 space-y-0.5">
+          <div className="px-3 space-y-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href || 
                              (item.subItems && item.subItems.some(sub => pathname === sub.href)) ||
@@ -126,39 +131,43 @@ export default function DashboardSidebar() {
                     <>
                       <button
                         onClick={() => setIsReportsOpen(!isReportsOpen)}
-                        className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                        className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-colors ${
                           isActive 
                             ? "bg-blue-500 text-white" 
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="flex-shrink-0">{item.icon}</div>
+                        <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                          {item.icon}
+                        </div>
                         {!isCollapsed && (
                           <>
                             <span className="ml-3 text-[15px]">{item.label}</span>
-                            <ChevronLeft className={`ml-auto w-4 h-4 transition-transform duration-200 ${isReportsOpen ? '-rotate-90' : '90'}`} />
+                            <ChevronLeft className={`ml-auto w-4 h-4 transition-transform duration-200 ${
+                              isReportsOpen ? '-rotate-90' : '90'
+                            }`} />
                           </>
                         )}
                       </button>
 
                       {/* Tooltip for collapsed state */}
                       {isCollapsed && (
-                        <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                           {item.label}
                         </div>
                       )}
 
                       {/* Dropdown items */}
                       {isReportsOpen && !isCollapsed && (
-                        <div className="mt-0.5 ml-7 space-y-0.5">
+                        <div className="mt-1 ml-9 space-y-1">
                           {item.subItems.map((subItem) => (
                             <Link
                               key={subItem.id}
                               href={subItem.href}
                               className={`block px-3 py-2 text-[15px] rounded-md transition-colors ${
                                 pathname === subItem.href
-                                  ? "text-blue-600"
-                                  : "text-gray-600 hover:text-gray-900"
+                                  ? "text-blue-600 bg-blue-50"
+                                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                               }`}
                             >
                               {subItem.label}
@@ -171,19 +180,21 @@ export default function DashboardSidebar() {
                     <>
                       <Link
                         href={item.href}
-                        className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center px-3 py-2.5 rounded-lg transition-colors ${
                           isActive 
                             ? "bg-blue-500 text-white" 
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="flex-shrink-0">{item.icon}</div>
+                        <div className="flex-shrink-0 flex items-center justify-center w-6 h-6">
+                          {item.icon}
+                        </div>
                         {!isCollapsed && <span className="ml-3 text-[15px]">{item.label}</span>}
                       </Link>
 
                       {/* Tooltip for collapsed state */}
                       {isCollapsed && (
-                        <div className="absolute left-full top-0 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                           {item.label}
                         </div>
                       )}

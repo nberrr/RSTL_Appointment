@@ -6,7 +6,7 @@ import AdminLayout from "@/app/components/shared/AdminLayout";
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 
-// Add this Toggle Switch component at the top level of the file
+// Toggle Switch component
 function ToggleSwitch({ enabled, onChange, activeColor = "bg-blue-600", inactiveColor = "bg-gray-200" }) {
   return (
     <button
@@ -32,171 +32,170 @@ export default function ServicesPage() {
   const [editedService, setEditedService] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState(null);
-  const [modalType, setModalType] = useState(null); // 'save', 'cancel', 'emptySave', 'emptyCancel'
+  const [modalType, setModalType] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
 
-  // Sample data for services
+  // Sample data for microbiology services
   const [services, setServices] = useState([
     {
       id: 1,
-      sampleType: 'Petroleum',
-      description: 'Crude oil and refined petroleum products',
-      testType: 'Density Testing',
-      testDescription: 'Measurement of density at standard temperature',
-      pricing: 2500,
-      appointment: 'Allowed',
-      status: 'Active'
-    },
-    {
-      id: 2,
       sampleType: 'Water',
       description: 'Potable and non-potable water samples',
-      testType: 'Chemical Analysis',
-      testDescription: 'Full chemical composition analysis including pH, minerals, and contaminants',
+      testType: 'Microbial Analysis',
+      testDescription: 'Detection and quantification of bacteria, viruses, and other microorganisms',
       pricing: 3500,
       appointment: 'Allowed',
       status: 'Active'
     },
     {
-      id: 3,
-      sampleType: 'Soil',
-      description: 'Agricultural and construction soil samples',
-      testType: 'Composition Analysis',
-      testDescription: 'Analysis of soil composition, nutrients, and contaminants',
-      pricing: 4000,
-      appointment: 'Not Allowed',
-      status: 'Active'
-    },
-    {
-      id: 4,
-      sampleType: 'Gas',
-      description: 'Natural gas and industrial gas samples',
-      testType: 'Purity Testing',
-      testDescription: 'Measurement of gas purity and composition',
-      pricing: 3000,
+      id: 2,
+      sampleType: 'Food',
+      description: 'Raw and processed food products',
+      testType: 'Pathogen Testing',
+      testDescription: 'Detection of foodborne pathogens including Salmonella, E. coli, and Listeria',
+      pricing: 4500,
       appointment: 'Allowed',
       status: 'Active'
     },
     {
-      id: 5,
-      sampleType: 'Metals',
-      description: 'Various metal alloys and compounds',
-      testType: 'Hardness Testing',
-      testDescription: 'Measurement of metal hardness and structural integrity',
+      id: 3,
+      sampleType: 'Environmental',
+      description: 'Air, surface, and environmental swabs',
+      testType: 'Air Quality Testing',
+      testDescription: 'Microbial air quality assessment and surface contamination analysis',
+      pricing: 4000,
+      appointment: 'Allowed',
+      status: 'Active'
+    },
+    {
+      id: 4,
+      sampleType: 'Clinical',
+      description: 'Clinical specimens and medical samples',
+      testType: 'Culture and Sensitivity',
+      testDescription: 'Microbial culture and antibiotic susceptibility testing',
       pricing: 5000,
+      appointment: 'Not Allowed',
+      status: 'Active'
+    },
+    {
+      id: 5,
+      sampleType: 'Pharmaceutical',
+      description: 'Drug products and raw materials',
+      testType: 'Sterility Testing',
+      testDescription: 'Testing for microbial contamination in pharmaceutical products',
+      pricing: 6000,
       appointment: 'Allowed',
       status: 'Inactive'
     }
   ]);
 
   const handleEdit = (service) => {
-  setEditingId(service.id);
-  setEditedService({ ...service });
-};
+    setEditingId(service.id);
+    setEditedService({ ...service });
+  };
 
-const handleSave = () => {
-  if (
-    !editedService.sampleType.trim() ||
-    !editedService.description.trim() ||
-    !editedService.testType.trim() ||
-    !editedService.testDescription.trim()
-  ) {
-    setModalType('emptySave');
-    setModalMessage('Are you sure you want to save service without information?');
-    return;
-  }
+  const handleSave = () => {
+    if (
+      !editedService.sampleType.trim() ||
+      !editedService.description.trim() ||
+      !editedService.testType.trim() ||
+      !editedService.testDescription.trim()
+    ) {
+      setModalType('emptySave');
+      setModalMessage('Are you sure you want to save service without information?');
+      return;
+    }
 
-  setModalType('save');
-  setModalMessage('Are you sure you want to save changes?');
-};
+    setModalType('save');
+    setModalMessage('Are you sure you want to save changes?');
+  };
 
-const handleCancel = () => {
-  if (!editedService.sampleType.trim() &&
-      !editedService.description.trim() &&
-      !editedService.testType.trim() &&
-      !editedService.testDescription.trim()) {
-    setModalType('emptyCancel');
-    setModalMessage('This new service is empty. Delete it?');
-  } else {
-    setModalType('cancel');
-    setModalMessage('Are you sure you want to cancel changes?');
-  }
-};
+  const handleCancel = () => {
+    if (!editedService.sampleType.trim() &&
+        !editedService.description.trim() &&
+        !editedService.testType.trim() &&
+        !editedService.testDescription.trim()) {
+      setModalType('emptyCancel');
+      setModalMessage('This new service is empty. Delete it?');
+    } else {
+      setModalType('cancel');
+      setModalMessage('Are you sure you want to cancel changes?');
+    }
+  };
 
-const handleAddNew = () => {
-  setModalType('add');
-  setModalMessage('Are you sure you want to add a new service?');
-};
+  const handleAddNew = () => {
+    setModalType('add');
+    setModalMessage('Are you sure you want to add a new service?');
+  };
 
-const handleChange = (field, value) => {
-  setEditedService({ ...editedService, [field]: value });
-};
+  const handleChange = (field, value) => {
+    setEditedService({ ...editedService, [field]: value });
+  };
 
-const activeTests = services.filter(service => service.status === 'Active').length;
-const totalTests = services.length;
+  const activeTests = services.filter(service => service.status === 'Active').length;
+  const totalTests = services.length;
 
-const handleDeleteClick = (service) => {
-  setServiceToDelete(service);
-  setDeleteModal(true);
-};
+  const handleDeleteClick = (service) => {
+    setServiceToDelete(service);
+    setDeleteModal(true);
+  };
 
-const handleDeleteConfirm = () => {
-  setServices(services.filter(service => service.id !== serviceToDelete.id));
-  setDeleteModal(false);
-  setServiceToDelete(null);
-};
+  const handleDeleteConfirm = () => {
+    setServices(services.filter(service => service.id !== serviceToDelete.id));
+    setDeleteModal(false);
+    setServiceToDelete(null);
+  };
 
-const handleDeleteCancel = () => {
-  setDeleteModal(false);
-  setServiceToDelete(null);
-};
+  const handleDeleteCancel = () => {
+    setDeleteModal(false);
+    setServiceToDelete(null);
+  };
 
-const handleModalConfirm = () => {
-  switch (modalType) {
-    case 'save':
-      setServices(services.map(service => 
-        service.id === editingId ? editedService : service
-        
-      ));
-      setEditingId(null);
-      setEditedService(null);
-      break;
-    case 'emptySave':
-      setServices(services.map(service => 
-        service.id === editingId ? editedService : service
-      ));
-      break;
-    case 'cancel':
-      setEditingId(null);
-      setEditedService(null);
-      break;
-    case 'emptyCancel':
-      setServices(services.filter(service => service.id !== editingId));
-      setEditingId(null);
-      setEditedService(null);
-      break;
-    case 'add':
-      const newService = {
-        id: services.length + 1,
-        sampleType: '',
-        description: '',
-        testType: '',
-        testDescription: '',
-        pricing: 0,
-        appointment: 'Allowed',
-        status: 'Active'
-      };
-      setServices([newService, ...services]);
-      setEditingId(newService.id);
-      setEditedService({ ...newService });
-      break;
-  }
-  setModalType(null);
-};
+  const handleModalConfirm = () => {
+    switch (modalType) {
+      case 'save':
+        setServices(services.map(service => 
+          service.id === editingId ? editedService : service
+        ));
+        setEditingId(null);
+        setEditedService(null);
+        break;
+      case 'emptySave':
+        setServices(services.map(service => 
+          service.id === editingId ? editedService : service
+        ));
+        break;
+      case 'cancel':
+        setEditingId(null);
+        setEditedService(null);
+        break;
+      case 'emptyCancel':
+        setServices(services.filter(service => service.id !== editingId));
+        setEditingId(null);
+        setEditedService(null);
+        break;
+      case 'add':
+        const newService = {
+          id: services.length + 1,
+          sampleType: '',
+          description: '',
+          testType: '',
+          testDescription: '',
+          pricing: 0,
+          appointment: 'Allowed',
+          status: 'Active'
+        };
+        setServices([newService, ...services]);
+        setEditingId(newService.id);
+        setEditedService({ ...newService });
+        break;
+    }
+    setModalType(null);
+  };
 
-const handleModalCancel = () => {
-  setModalType(null);
-};
+  const handleModalCancel = () => {
+    setModalType(null);
+  };
 
   return (
     <AdminLayout>
@@ -218,42 +217,40 @@ const handleModalCancel = () => {
                 </button>
               </div>
 
-              <div className="flex justify-between items-center">
-                <div className="flex gap-4 items-center">
-                  <div className="relative">
-                    <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search sample or test type..."
-                      className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option>All Test Types</option>
-                    <option>Density Testing</option>
-                    <option>Chemical Analysis</option>
-                    <option>Composition Analysis</option>
-                    <option>Purity Testing</option>
-                    <option>Hardness Testing</option>
-                  </select>
+              <div className="flex gap-4 items-center">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search sample or test type..."
+                    className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
-                <div className="text-gray-600">
-                  <span>Total Tests: {totalTests}</span>
-                  <span className="mx-2">|</span>
-                  <span>Active: {activeTests}</span>
-                </div>
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option>All Test Types</option>
+                  <option>Microbial Analysis</option>
+                  <option>Pathogen Testing</option>
+                  <option>Air Quality Testing</option>
+                  <option>Culture and Sensitivity</option>
+                  <option>Sterility Testing</option>
+                </select>
+              </div>
+              <div className="text-gray-600">
+                <span>Total Tests: {totalTests}</span>
+                <span className="mx-2">|</span>
+                <span>Active: {activeTests}</span>
               </div>
             </div>
 
             {/* Scrollable Table Section */}
-            <div className="flex-1 overflow-hidden p-5 pt-0">
-              <div className="bg-white rounded-lg shadow-sm h-full flex flex-col border border-gray-200 ">
+            <div className="flex-1 overflow-auto p-5">
+              <div className="bg-white rounded-lg shadow h-full flex flex-col  border border-gray-200">
                 <div className="overflow-auto">
                   <table className="min-w-full">
                     <thead className="bg-gray-50 sticky top-0">
@@ -266,9 +263,9 @@ const handleModalCancel = () => {
                         <th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
+                    <tbody>
                       {services.map((service) => (
-                        <tr key={service.id}>
+                        <tr key={service.id} className="border-b">
                           <td className="w-1/4 px-6 py-4">
                             {editingId === service.id ? (
                               <div className="space-y-1">
@@ -364,7 +361,7 @@ const handleModalCancel = () => {
                               </span>
                             )}
                           </td>
-                          <td className="w-24 px-6 py-4 text-sm">
+                          <td className="w-24 px-6 py-4">
                             <div className="flex gap-2 justify-center">
                               {editingId === service.id ? (
                                 <>

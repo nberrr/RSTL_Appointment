@@ -39,32 +39,32 @@ export default function DashboardNav() {
   }, []);
 
   return (
-    <div className="dashboard-nav bg-white shadow-md h-20" style={{ height: "65px" }}>
-      <div className="container mx-auto px-4 flex justify-between items-center h-full">
-        <div className="flex items-center space-x-4">
-          <div className="w-[40px] h-[40px] overflow-hidden rounded">
-            <Image src="/dost-logo.png" alt="DOST Logo" width={40} height={40} />
-          </div>
-          <h1 className="text-xl font-bold">{getManagementTitle()}</h1>
-        </div>
-
-        <div className="flex items-center space-x-6">
-          <div className="text-right">
-            <div className="font-semibold">Philippine Standard Time</div>
-            <div className="text-sm whitespace-nowrap font-mono text-gray-600">{dateTime}</div>
+      <div className="dashboard-nav bg-white shadow-md h-20" style={{ height: "65px" }}>
+        <div className="container px-4 flex flex-auto justify-between items-center h-full">
+          <div className="flex items-center space-x-4">
+            <div className="w-[40px] h-[40px] overflow-hidden rounded">
+              <Image src="/dost-logo.png" alt="DOST Logo" width={40} height={40} />
+            </div>
+            <h1 className="text-xl font-bold">{getManagementTitle()}</h1>
           </div>
 
-          <button
-            className="relative p-2 rounded-full hover:bg-gray-100"
-            onClick={() => setNotifications(!notifications)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-700"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="flex items-center space-x-6">
+            <div className="text-right">
+              <div className="font-semibold">Philippine Standard Time</div>
+              <div className="text-sm whitespace-nowrap font-mono text-gray-600">{dateTime}</div>
+            </div>
+
+            <button
+              className="  relative p-2 rounded-full hover:bg-gray-100"
+              onClick={() => setNotifications(!notifications)}
             >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-gray-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

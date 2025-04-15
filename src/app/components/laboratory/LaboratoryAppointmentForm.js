@@ -970,6 +970,7 @@ export default function LaboratoryAppointmentForm() {
                 onPrevious={handlePreviousStep}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
+                allAppointments={appointments}
               />
             </>
           )}

@@ -1,5 +1,7 @@
 'use client';
 
+import { Fragment } from 'react';
+
 export default function ReviewSection({ 
   appointment = {
     clientName: '',
@@ -29,7 +31,8 @@ export default function ReviewSection({
   errors = {},
   onPrevious,
   isSubmitting = false,
-  onSubmit
+  onSubmit,
+  allAppointments = []
 }) {
   // Get selected services details
   const getSelectedServicesDetails = () => {
@@ -108,210 +111,155 @@ export default function ReviewSection({
   };
 
   // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Not selected';
-    
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (e) {
-      return dateString;
-    }
+  const formatDate = (date) => {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   // Render section with label and value
-  const renderSection = (label, value, isError = false) => (
-    <div className="py-3">
-      <dt className="text-sm font-medium text-gray-500">{label}</dt>
-      <dd className={`mt-1 text-sm ${isError ? 'text-red-600' : 'text-gray-900'}`}>
-        {value || 'Not provided'}
-      </dd>
-    </div>
-  );
+  const renderSection = (label, value) => {
+    if (!value) return null;
+    return (
+      <div className="py-1">
+        <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <dd className="mt-1 text-sm text-gray-900">{value}</dd>
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-6 mb-8">
-      <h3 className="text-lg font-semibold text-gray-900 border-b pb-3">Review Your Appointment Details</h3>
-      
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        {/* Contact Information */}
-        <div className="px-4 py-5 sm:px-6 bg-gray-50">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Contact Information</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-          <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-            {renderSection('Client Name', appointment.clientName, errors.clientName)}
-            {renderSection('Email Address', appointment.emailAddress, errors.emailAddress)}
-            {renderSection('Phone Number', appointment.phoneNumber, errors.phoneNumber)}
-            {renderSection('Organization', appointment.organization)}
-          </dl>
-        </div>
-        
-        {/* Sample Details */}
-        <div className="px-4 py-5 sm:px-6 bg-gray-50">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Sample Details</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-          <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-            {renderSection('Sample Name', appointment.sampleName, errors.sampleName)}
-            {renderSection('Sample Type', appointment.sampleType, errors.sampleType)}
-            {renderSection('Quantity', appointment.quantity, errors.quantity)}
-            {renderSection('Preferred Date', formatDate(appointment.preferredDate), errors.preferredDate)}
-          </dl>
-          <div className="mt-4">
-            {renderSection('Sample Description', appointment.sampleDescription, errors.sampleDescription)}
+    <div className="space-y-6">
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">
+            Appointments Summary
+          </h3>
+          <div className="mt-2 max-w-xl text-sm text-gray-500">
+            <p>Review your appointment details before submission.</p>
           </div>
-        </div>
-        
-        {/* Selected Services */}
-        <div className="px-4 py-5 sm:px-6 bg-gray-50">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Selected Services</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-          {getSelectedServicesDetails().length > 0 ? (
-            <div className="space-y-4">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {getSelectedServicesDetails().map((service) => (
-                    <tr key={service.id}>
-                      <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{service.name}</td>
-                      <td className="px-3 py-4 whitespace-nowrap text-sm capitalize text-gray-700">
-                        {service.serviceType === 'chemical' ? 'Chemical Analysis' :
-                         service.serviceType === 'microbiological' ? 'Microbiological Test' :
-                         'Shelf Life Test'}
-                      </td>
-                      <td className="px-3 py-4 text-sm text-gray-500">{service.description || 'N/A'}</td>
-                      <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                        {service.price || 'N/A'}
-                        {service.unit && <span className="text-xs text-gray-500"> per {service.unit}</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th colSpan="3" className="px-3 py-3 text-right text-sm font-semibold text-gray-700">Total Estimated Price:</th>
-                    <th className="px-3 py-3 text-right text-sm font-semibold text-gray-900">
-                      ₱{calculateTotalPrice().toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                    </th>
-                  </tr>
-                </tfoot>
-              </table>
-              <p className="text-xs text-gray-500 mt-2">
-                *Note: Final pricing may vary based on additional requirements or complexities discovered during testing.
-              </p>
+          
+          {allAppointments && allAppointments.length > 0 ? (
+            <div className="mt-5 space-y-6">
+              {allAppointments.map((appointment, index) => (
+                <div 
+                  key={index}
+                  className={`p-4 rounded-lg ${
+                    index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                  } border border-gray-200`}
+                >
+                  <h4 className="text-md font-medium text-gray-900 mb-4">
+                    Appointment #{index + 1}
+                  </h4>
+                  <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                    {renderSection("Client Name", appointment.clientName)}
+                    {renderSection("Email", appointment.emailAddress)}
+                    {renderSection("Phone", appointment.phoneNumber)}
+                    {renderSection("Organization", appointment.organization)}
+                    {renderSection("Sample Name", appointment.sampleName)}
+                    {renderSection("Sample Type", appointment.sampleType)}
+                    {renderSection("Quantity", appointment.quantity)}
+                    {renderSection("Preferred Date", formatDate(appointment.preferredDate))}
+                    {renderSection("Sample Description", appointment.sampleDescription)}
+                    
+                    {appointment.shelfLifeDetails && (
+                      <Fragment>
+                        {renderSection("Storage Temperature", appointment.shelfLifeDetails.storageTemperature)}
+                        {renderSection("Storage Condition", appointment.shelfLifeDetails.storageCondition)}
+                        {renderSection("Shelf Life Duration", appointment.shelfLifeDetails.shelfLifeDuration)}
+                      </Fragment>
+                    )}
+                  </dl>
+                </div>
+              ))}
             </div>
           ) : (
-            <div className="py-4 text-center text-gray-500">
-              <p>No services selected</p>
-              {errors.selectedServices && (
-                <p className="text-red-600 mt-2">{errors.selectedServices}</p>
-              )}
+            <div className="mt-5">
+              <p className="text-sm text-red-600">No appointments have been added yet.</p>
             </div>
           )}
         </div>
-        
-        {/* Shelf Life Details - Only show if shelf life is selected */}
-        {appointment.currentServiceTab === 'shelflife' && (
-          <>
-            <div className="px-4 py-5 sm:px-6 bg-gray-50">
-              <h3 className="text-base font-semibold leading-6 text-gray-900">Shelf Life Study Details</h3>
-            </div>
-            <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-                {renderSection('Product Name', appointment.productName, errors.productName)}
-                {renderSection('Net Weight', appointment.netWeight, errors.netWeight)}
-                {renderSection('Brand Name', appointment.brandName)}
-                {renderSection('Existing Market', appointment.existingMarket)}
-                {renderSection('Production Type', appointment.productionType)}
-                {renderSection('Method of Preservation', appointment.methodOfPreservation, errors.methodOfPreservation)}
-                {renderSection('Product Ingredients', appointment.productIngredients, errors.productIngredients)}
-                {renderSection('Packaging Material', appointment.packagingMaterial, errors.packagingMaterial)}
-                {renderSection('Target Shelf Life', appointment.targetShelfLife, errors.targetShelfLife)}
-              </dl>
-              
-              <div className="mt-4">
-                <dt className="text-sm font-medium text-gray-500">Modes of Deterioration</dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {appointment.modeOfDeterioration && appointment.modeOfDeterioration.length > 0 && appointment.modeOfDeterioration[0] ? (
-                    <ul className="list-disc pl-5 space-y-1">
-                      {appointment.modeOfDeterioration.map((mode, index) => (
-                        mode && <li key={index}>{mode}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={errors.modeOfDeterioration ? 'text-red-600' : 'text-gray-500'}>
-                      {errors.modeOfDeterioration || 'No modes of deterioration specified'}
-                    </p>
-                  )}
-                </dd>
-              </div>
-            </div>
-          </>
-        )}
-        
-        {/* Terms and Conditions */}
-        <div className="px-4 py-5 sm:px-6 bg-gray-50">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">Terms and Conditions</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <div className={`w-5 h-5 rounded border ${appointment.terms ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
-                {appointment.terms && (
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </div>
-            </div>
-            <div className="ml-3 text-sm">
-              <p className={`${errors.terms ? 'text-red-600' : 'text-gray-500'}`}>
-                {errors.terms || 'I agree to the terms and conditions of the laboratory testing services.'}
-              </p>
-            </div>
+      </div>
+
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">
+            Selected Services
+          </h3>
+          <div className="mt-5">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Service
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {getSelectedServicesDetails().map((service, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {service.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {service.price}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Total
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                    ₱{calculateTotalPrice().toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-4">
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">
+            Terms and Conditions
+          </h3>
+          <div className="mt-2 max-w-xl text-sm text-gray-500">
+            <p>By submitting this form, you agree to our terms of service and privacy policy.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between">
         <button
           type="button"
           onClick={onPrevious}
-          className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isSubmitting}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
         >
-          Back to {appointment.currentServiceTab === 'shelflife' ? 'Shelf Life Details' : 'Sample Details'}
+          Back
         </button>
-
         <button
           type="button"
           onClick={onSubmit}
-          className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
           disabled={isSubmitting}
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
         >
           {isSubmitting ? (
-            <div className="flex items-center justify-center">
+            <Fragment>
               <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Submitting...
-            </div>
+            </Fragment>
           ) : (
             'Submit Appointment'
           )}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
-export default function AppointmentCalendar({ selectedDate, onDateSelect, bookedDates = [] }) {
+export default function AppointmentCalendar({ selectedDate, onDateSelect, bookedDates = [], disabled = false }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState([]);
   
@@ -113,6 +113,10 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
       classes += "text-gray-800 hover:bg-blue-50 ";
     }
     
+    if (disabled) {
+      classes += "opacity-50 cursor-not-allowed ";
+    }
+    
     return classes;
   };
   
@@ -135,7 +139,8 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
         <button
           type="button"
           onClick={goToPreviousMonth}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={disabled}
         >
           <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
         </button>
@@ -145,7 +150,8 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
         <button
           type="button"
           onClick={goToNextMonth}
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={disabled}
         >
           <ChevronRightIcon className="h-5 w-5 text-gray-600" />
         </button>
@@ -170,7 +176,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
             <button
               type="button"
               onClick={() => handleDateClick(dayInfo)}
-              disabled={!dayInfo.isCurrentMonth || isPastDate(dayInfo.date) || isBookedDate(dayInfo.date)}
+              disabled={!dayInfo.isCurrentMonth || isPastDate(dayInfo.date) || isBookedDate(dayInfo.date) || disabled}
               className={getDayClass(dayInfo)}
             >
               {dayInfo.date.getDate()}

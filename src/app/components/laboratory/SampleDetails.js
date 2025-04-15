@@ -4,7 +4,8 @@ export default function SampleDetails({
   appointment, 
   onChange, 
   errors = {},
-  hasAttemptedSubmit
+  hasAttemptedSubmit,
+  disabled = false
 }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,10 +16,10 @@ export default function SampleDetails({
     const baseClasses = "block w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-colors";
     
     if (hasAttemptedSubmit && errors[fieldName]) {
-      return `${baseClasses} border-red-400 bg-red-50 text-red-800`;
+      return `${baseClasses} border-red-400 bg-red-50 text-red-800 disabled:opacity-75`;
     }
     
-    return `${baseClasses} border-gray-300 bg-white`;
+    return `${baseClasses} border-gray-300 bg-white disabled:opacity-75 disabled:bg-gray-100`;
   };
 
   return (
@@ -38,6 +39,7 @@ export default function SampleDetails({
             onChange={handleChange}
             placeholder="Enter the sample name"
             className={getInputClasses("sampleName")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.sampleName && (
             <p className="mt-1 text-sm text-red-600">{errors.sampleName}</p>
@@ -54,6 +56,7 @@ export default function SampleDetails({
             value={appointment.sampleType}
             onChange={handleChange}
             className={getInputClasses("sampleType")}
+            disabled={disabled}
           >
             <option value="">Select sample type</option>
             <option value="Food">Food</option>
@@ -79,6 +82,7 @@ export default function SampleDetails({
             onChange={handleChange}
             placeholder="Enter quantity (e.g., 2 liters, 500g)"
             className={getInputClasses("quantity")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.quantity && (
             <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
@@ -94,7 +98,7 @@ export default function SampleDetails({
             id="preferredDate"
             name="preferredDate"
             value={appointment.preferredDate}
-            disabled
+            disabled={true}
             className={`${getInputClasses("preferredDate")} cursor-not-allowed bg-gray-50`}
           />
           {hasAttemptedSubmit && errors.preferredDate && (
@@ -116,6 +120,7 @@ export default function SampleDetails({
           rows={4}
           placeholder="Provide a detailed description of the sample including relevant characteristics"
           className={getInputClasses("sampleDescription")}
+          disabled={disabled}
         />
         {hasAttemptedSubmit && errors.sampleDescription && (
           <p className="mt-1 text-sm text-red-600">{errors.sampleDescription}</p>

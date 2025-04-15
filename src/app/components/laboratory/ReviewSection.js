@@ -28,30 +28,72 @@ export default function ReviewSection({
   servicesData = {},
   errors = {},
   onPrevious,
-  isSubmitting = false
+  isSubmitting = false,
+  onSubmit
 }) {
   // Get selected services details
   const getSelectedServicesDetails = () => {
     if (!appointment.selectedServices || appointment.selectedServices.length === 0) {
+      console.log("No selected services found");
       return [];
     }
     
-    // Make sure servicesData and the current tab exist
-    if (!servicesData || !servicesData[appointment.currentServiceTab]) {
+    // Make sure servicesData exists
+    if (!servicesData) {
+      console.log("No servicesData available");
       return [];
     }
     
-    const tabData = servicesData[appointment.currentServiceTab];
+    console.log("Selected services IDs:", appointment.selectedServices);
     
-    // Extract all services from all categories
-    const allServices = tabData.categories 
-      ? tabData.categories.flatMap(category => category.services || [])
-      : [];
-      
-    // Filter to get only selected services
-    return allServices.filter(service => 
-      appointment.selectedServices.includes(service.id)
-    );
+    // Collect all services from all tabs
+    const allServices = [];
+    
+    // Loop through all service types (chemical, microbiological, shelflife)
+    Object.keys(servicesData).forEach(tabKey => {
+      const tabData = servicesData[tabKey];
+      if (tabData && tabData.categories) {
+        // Extract services from each category in this tab
+        tabData.categories.forEach(category => {
+          if (category.services) {
+            category.services.forEach(service => {
+              if (appointment.selectedServices.includes(service.id)) {
+                allServices.push({
+                  ...service,
+                  serviceType: tabKey  // Add the service type for reference
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    // Also check shelf life services if applicable
+    if (appointment.shelfLifeServices) {
+      Object.entries(appointment.shelfLifeServices).forEach(([key, isSelected]) => {
+        if (isSelected && servicesData.shelflife && servicesData.shelflife.categories) {
+          // Convert the key format (e.g., microbiologicalAnalysis to microbiological-analysis)
+          const serviceId = key.replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
+          
+          // Find this service in the shelflife category
+          servicesData.shelflife.categories.forEach(category => {
+            if (category.services) {
+              const service = category.services.find(s => s.id === serviceId);
+              if (service) {
+                allServices.push({
+                  ...service,
+                  serviceType: 'shelflife'
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    console.log("Selected services details:", allServices);
+    return allServices;
   };
 
   // Calculate total price
@@ -137,6 +179,7 @@ export default function ReviewSection({
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                     <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                   </tr>
@@ -145,6 +188,11 @@ export default function ReviewSection({
                   {getSelectedServicesDetails().map((service) => (
                     <tr key={service.id}>
                       <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{service.name}</td>
+                      <td className="px-3 py-4 whitespace-nowrap text-sm capitalize text-gray-700">
+                        {service.serviceType === 'chemical' ? 'Chemical Analysis' :
+                         service.serviceType === 'microbiological' ? 'Microbiological Test' :
+                         'Shelf Life Test'}
+                      </td>
                       <td className="px-3 py-4 text-sm text-gray-500">{service.description || 'N/A'}</td>
                       <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                         {service.price || 'N/A'}
@@ -155,7 +203,7 @@ export default function ReviewSection({
                 </tbody>
                 <tfoot>
                   <tr>
-                    <th colSpan="2" className="px-3 py-3 text-right text-sm font-semibold text-gray-700">Total Estimated Price:</th>
+                    <th colSpan="3" className="px-3 py-3 text-right text-sm font-semibold text-gray-700">Total Estimated Price:</th>
                     <th className="px-3 py-3 text-right text-sm font-semibold text-gray-900">
                       ₱{calculateTotalPrice().toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </th>
@@ -244,16 +292,29 @@ export default function ReviewSection({
         <button
           type="button"
           onClick={onPrevious}
-          className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isSubmitting}
         >
           Back to {appointment.currentServiceTab === 'shelflife' ? 'Shelf Life Details' : 'Sample Details'}
         </button>
+
         <button
-          type="submit"
-          className={`px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed`}
+          type="button"
+          onClick={onSubmit}
+          className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Appointment'}
+          {isSubmitting ? (
+            <div className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Submitting...
+            </div>
+          ) : (
+            'Submit Appointment'
+          )}
         </button>
       </div>
     </div>

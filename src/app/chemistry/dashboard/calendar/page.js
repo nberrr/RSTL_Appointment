@@ -16,9 +16,9 @@ import {
   getDay
 } from 'date-fns';
 import { FaFlask, FaClock, FaSearch, FaCalendar, FaTimes, FaEllipsisH } from 'react-icons/fa';
-import DashboardNav from "@/app/components/shared/DashboardNav";
-import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
-import AdminLayout from "@/app/components/shared/AdminLayout";
+import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 const ScheduleModal = ({ isOpen, onClose, appointment }) => {
   if (!isOpen) return null;

@@ -1,12 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'; // Use solid icon
+
+// Helper component for inline error messages
+const InlineError = ({ message }) => {
+  if (!message) return null;
+  return (
+    <div className="flex items-center mt-1.5 px-2 py-1 rounded-md bg-yellow-50 border border-yellow-200">
+      <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500 mr-1.5 flex-shrink-0" aria-hidden="true" />
+      <p className="text-xs font-medium text-yellow-800">{message}</p>
+    </div>
+  );
+};
 
 export default function ContactInformation({ 
   contactInfo, 
   onContactInfoChange, 
   errors, 
-  hasAttemptedSubmit,
   onNext,
   disabled = false
 }) {
@@ -18,7 +29,7 @@ export default function ContactInformation({
   const getInputClasses = (fieldName) => {
     const baseClasses = "block w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-colors";
     
-    if (hasAttemptedSubmit && errors[fieldName]) {
+    if (errors[fieldName]) {
       return `${baseClasses} border-red-400 bg-red-50 text-red-800 disabled:opacity-75`;
     }
     
@@ -44,9 +55,7 @@ export default function ContactInformation({
             className={getInputClasses("clientName")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.clientName && (
-            <p className="mt-1 text-sm text-red-600">{errors.clientName}</p>
-          )}
+          <InlineError message={errors.clientName} />
         </div>
         
         <div>
@@ -63,9 +72,7 @@ export default function ContactInformation({
             className={getInputClasses("emailAddress")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.emailAddress && (
-            <p className="mt-1 text-sm text-red-600">{errors.emailAddress}</p>
-          )}
+          <InlineError message={errors.emailAddress} />
         </div>
         
         <div>
@@ -82,9 +89,7 @@ export default function ContactInformation({
             className={getInputClasses("phoneNumber")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.phoneNumber && (
-            <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
-          )}
+          <InlineError message={errors.phoneNumber} />
         </div>
         
         <div>
@@ -101,9 +106,7 @@ export default function ContactInformation({
             className={getInputClasses("organization")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.organization && (
-            <p className="mt-1 text-sm text-red-600">{errors.organization}</p>
-          )}
+          <InlineError message={errors.organization} />
         </div>
       </div>
       

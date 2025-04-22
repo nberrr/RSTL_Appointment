@@ -16,9 +16,9 @@ import {
   getDay
 } from 'date-fns';
 import { FaBacteria, FaClock, FaSearch, FaCalendar, FaTimes, FaEllipsisH } from 'react-icons/fa';
-import DashboardNav from "@/app/components/shared/DashboardNav";
-import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
-import AdminLayout from "@/app/components/shared/AdminLayout";
+import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 const ScheduleModal = ({ isOpen, onClose, appointment }) => {
   if (!isOpen) return null;
@@ -290,9 +290,9 @@ export default function CalendarPage() {
     <AdminLayout>
       <div className="h-screen flex flex-col">
         <DashboardNav />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-50 p-6">
+          <main className="flex-1 bg-gray-100 p-5">
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-6 mb-6">
               <div className="bg-teal-50 rounded-xl p-4 border border-gray-200 shadow-md">
@@ -302,8 +302,8 @@ export default function CalendarPage() {
                   </div>
                   <div>
                     <p className="text-teal-900 font-medium">Pending Tests</p>
-                    <p className="text-2xl font-semibold text-teal-700">12</p>
-                    <p className="text-sm text-teal-600">Microbial Analysis</p>
+                    <p className="text-2xl font-semibold text-teal-700">12</p> {/* Placeholder value */}
+                    <p className="text-sm text-teal-600">Microbial Analysis</p> {/* Placeholder value */}
                   </div>
                 </div>
               </div>
@@ -317,8 +317,8 @@ export default function CalendarPage() {
                   </div>
                   <div>
                     <p className="text-emerald-900 font-medium">Tests in Progress</p>
-                    <p className="text-2xl font-semibold text-emerald-700">6</p>
-                    <p className="text-sm text-emerald-600">Active Analysis</p>
+                    <p className="text-2xl font-semibold text-emerald-700">6</p> {/* Placeholder value */}
+                    <p className="text-sm text-emerald-600">Active Analysis</p> {/* Placeholder value */}
                   </div>
                 </div>
               </div>
@@ -331,93 +331,91 @@ export default function CalendarPage() {
                   <div>
                     <p className="text-purple-900 font-medium">Today's Schedule</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-semibold text-purple-700">4</p>
+                      <p className="text-2xl font-semibold text-purple-700">4</p> {/* Placeholder value */}
                       <p className="text-sm text-purple-600">Tests</p>
                     </div>
-                    <p className="text-sm text-purple-600 mt-1">Next: 10:30 AM - Bacterial Culture</p>
+                    <p className="text-sm text-purple-600 mt-1">Next: 10:30 AM - Bacterial Culture</p> {/* Placeholder value */}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-6">
-              {/* Calendar Section */}
-              <div className="bg-white rounded-xl shadow-sm w-[400px]">
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-bold">{currentMonth}</h2>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-                        className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        &lt;
-                      </button>
-                      <button 
-                        onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-                        className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        &gt;
-                      </button>
-                    </div>
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Left Side - Calendar */}
+              <div className="bg-white rounded-xl drop-shadow-sm border border-gray-200 p-4 w-full lg:w-[600px] lg:flex-shrink-0">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">{currentMonth}</h2>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+                      className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      &lt;
+                    </button>
+                    <button 
+                      onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+                      className="p-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      &gt;
+                    </button>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-7 gap-[1px]">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="p-1 text-center text-xs font-medium text-gray-500">
-                        {day}
-                      </div>
-                    ))}
-                    
-                    {calendarDays.map((day, idx) => {
-                      if (!day) return <div key={idx} className="p-4"></div>;
+                <div className="grid grid-cols-7 gap-[1px]">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="p-1 text-center text-xs font-medium text-gray-500">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {calendarDays.map((day, idx) => {
+                    if (!day) return <div key={idx} className="p-4"></div>;
 
-                      const isSelected = isSameDay(day, selectedDate);
-                      const isCurrentDay = isSameDay(day, today);
-                      const status = getAppointmentStatus(day);
+                    const isSelected = isSameDay(day, selectedDate);
+                    const isCurrentDay = isSameDay(day, today);
+                    const status = getAppointmentStatus(day);
 
-                      return (
-                        <button
-                          key={day.toString()}
-                          onClick={() => setSelectedDate(day)}
-                          className={`
-                            relative p-4 text-xs flex flex-col items-center justify-center
-                            ${isSelected ? 'ring-2 ring-teal-500' : ''}
-                            ${isCurrentDay ? 'font-extrabold text-teal-600 ring-2 ring-teal-500' : ''}
-                            hover:bg-gray-50 transition-colors duration-200
-                          `}
-                        >
-                          {format(day, 'd')}
-                          <span className={`w-2 h-2 rounded-full absolute bottom-2 ${
-                            status === 'booked' ? 'bg-red-500' :
-                            status === 'limited' ? 'bg-yellow-500' :
-                            'bg-green-500'
-                          }`} />
-                        </button>
-                      );
-                    })}
+                    return (
+                      <button
+                        key={day.toString()}
+                        onClick={() => setSelectedDate(day)}
+                        className={`
+                          relative p-4 text-xs flex flex-col items-center justify-center
+                          ${isSelected ? 'ring-2 ring-teal-500' : ''}
+                          ${isCurrentDay ? 'font-extrabold text-teal-600 ring-2 ring-teal-500' : ''}
+                          hover:bg-gray-50 transition-colors duration-200
+                        `}
+                      >
+                        {format(day, 'd')}
+                        <span className={`w-2 h-2 rounded-full absolute bottom-2 ${
+                          status === 'booked' ? 'bg-red-500' :
+                          status === 'limited' ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`} />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Status indicators */}
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="text-sm text-gray-600">Available</span>
                   </div>
-
-                  {/* Status indicators */}
-                  <div className="flex items-center justify-center gap-4 mt-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm text-gray-600">Available</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <span className="text-sm text-gray-600">Limited Slots</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span className="text-sm text-gray-600">Fully Booked</span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <span className="text-sm text-gray-600">Limited Slots</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span className="text-sm text-gray-600">Fully Booked</span>
                   </div>
                 </div>
               </div>
 
               {/* Appointments Table Section */}
-              <div className="flex-1 bg-white rounded-xl shadow-sm">
+              <div className="flex-1 bg-white rounded-xl shadow-sm min-w-0">
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -444,7 +442,7 @@ export default function CalendarPage() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full table-fixed">
                     <thead>
                       <tr className="bg-gray-50">
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>

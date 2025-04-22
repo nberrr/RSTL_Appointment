@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 // Import components
@@ -10,7 +10,7 @@ import SampleDetails from './SampleDetails';
 import ServiceSelection from './ServiceSelection';
 import ShelfLifeDetails from './ShelfLifeDetails';
 import ReviewSection from './ReviewSection';
-import { AlertMessage, SubmissionStatus, DeleteConfirmModal } from './Notifications';
+import { SubmissionStatus, DeleteConfirmModal } from './Notifications';
 
 // Import services data
 import { servicesData } from './servicesData';
@@ -80,17 +80,13 @@ export default function LaboratoryAppointmentForm() {
   const [errors, setErrors] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [currentStep, setCurrentStep] = useState('contact');
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
   const [bookedDates, setBookedDates] = useState([]);
   const [isSelectingService, setIsSelectingService] = useState(false);
 
-  // Show alert message
-  const showAlertMessage = (message) => {
-    setAlertMessage(message);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 5000);
-  };
+  // Add useEffect to log errors state changes
+  useEffect(() => {
+    console.log("Errors state updated:", errors);
+  }, [errors]);
 
   // Handle contact info change
   const handleContactInfoChange = (name, value) => {
@@ -260,12 +256,10 @@ export default function LaboratoryAppointmentForm() {
       const newAppointments = [...prev];
       const newModes = [...newAppointments[currentAppointmentIndex].modeOfDeterioration];
       newModes[index] = value;
-      
       newAppointments[currentAppointmentIndex] = {
         ...newAppointments[currentAppointmentIndex],
         modeOfDeterioration: newModes
       };
-      
       return newAppointments;
     });
   };
@@ -288,7 +282,7 @@ export default function LaboratoryAppointmentForm() {
       const newAppointments = [...prev];
       newAppointments[currentAppointmentIndex] = {
         ...newAppointments[currentAppointmentIndex],
-        modeOfDeterioration: prev[currentAppointmentIndex].modeOfDeterioration.filter((_, index) => index !== indexToRemove)
+        modeOfDeterioration: newAppointments[currentAppointmentIndex].modeOfDeterioration.filter((_, index) => index !== indexToRemove)
       };
       return newAppointments;
     });
@@ -297,24 +291,20 @@ export default function LaboratoryAppointmentForm() {
   // Handle file change
   const handleFileChange = (e, fieldName) => {
     const file = e.target.files[0];
-    if (file) {
-      setAppointments(prev => {
-        const newAppointments = [...prev];
-        newAppointments[currentAppointmentIndex] = {
-          ...newAppointments[currentAppointmentIndex],
-          [fieldName]: file
-        };
-        return newAppointments;
-      });
-    }
+    setAppointments(prev => {
+      const newAppointments = [...prev];
+      newAppointments[currentAppointmentIndex] = {
+        ...newAppointments[currentAppointmentIndex],
+        [fieldName]: file
+      };
+      return newAppointments;
+    });
   };
 
-  // Add a new appointment
+  // Add new appointment tab
   const addNewAppointment = () => {
-    // Check if the current tab is empty
-    const currentAppointment = appointments[currentAppointmentIndex];
-    if (!currentAppointment.sampleName && !currentAppointment.quantity && !currentAppointment.sampleDescription) {
-      showAlertMessage(`Please fill out Appointment ${currentAppointmentIndex + 1} before adding more tabs`);
+    if (!selectedDate) {
+      // console.warn('Please select a date before adding another appointment'); // Removed log
       return;
     }
 
@@ -369,8 +359,9 @@ export default function LaboratoryAppointmentForm() {
 
   // Confirm delete appointment
   const confirmDeleteAppointment = () => {
+    // console.log("confirmDeleteAppointment called for index:", appointmentToDelete); // Remove log
     if (appointments.length <= 1) {
-      showAlertMessage('Cannot delete the only appointment');
+      // console.warn('Cannot delete the only appointment'); // Removed log
       setShowDeleteModal(false);
       return;
     }
@@ -393,48 +384,33 @@ export default function LaboratoryAppointmentForm() {
     if (!appointments[0].phoneNumber) newErrors.phoneNumber = 'Please enter your phone number';
     if (!appointments[0].organization) newErrors.organization = 'Please enter your organization name';
     
-    setErrors(newErrors);
-    
-    if (Object.keys(newErrors).length > 0) {
-      showAlertMessage('Please fill in all required contact information fields');
-    }
-    
-    return Object.keys(newErrors).length === 0;
+    // DON'T setErrors here
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }; // Return error object
   };
 
-  const validateSampleDetails = (showErrors = true) => {
-    // Skip validation if we're in the middle of a service selection
-    if (isSelectingService) {
-      return true;
-    }
-    
+  const validateSampleDetails = () => {
     const newErrors = {};
     const currentAppointment = appointments[currentAppointmentIndex];
-    
+
     if (!currentAppointment.sampleName) newErrors.sampleName = 'Please enter sample name';
     if (!currentAppointment.quantity) newErrors.quantity = 'Please enter quantity';
     if (!currentAppointment.preferredDate) newErrors.preferredDate = 'Please select a preferred date';
     if (!currentAppointment.sampleDescription) newErrors.sampleDescription = 'Please enter sample description';
-    
-    // Only check for service selection if we're not switching between service tabs
-    if (currentAppointment.selectedServices.length === 0) {
-      newErrors.services = 'Please select at least one service';
-    }
-    
-    // Only update errors and show messages if requested
-    if (showErrors) {
-      // Update errors without triggering navigation
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        ...newErrors
-      }));
-      
-      if (Object.keys(newErrors).length > 0) {
-        showAlertMessage(`Please fill in all required sample details fields for Appointment ${currentAppointmentIndex + 1}`);
+
+    // Check if services are selected based on the tab
+    if (currentAppointment.currentServiceTab === 'chemical' || currentAppointment.currentServiceTab === 'microbiological') {
+      if (currentAppointment.selectedServices.length === 0) {
+        newErrors.services = `Please select at least one ${currentAppointment.currentServiceTab} service`;
+      }
+    } else if (currentAppointment.currentServiceTab === 'shelflife') {
+      // For shelf life, check if any checkbox is selected
+      if (!Object.values(currentAppointment.shelfLifeServices).some(val => val === true)) {
+        newErrors.shelfLifeServices = 'Please select at least one shelf life testing service';
       }
     }
-    
-    return Object.keys(newErrors).length === 0;
+
+    // DON'T setErrors here
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }; // Return error object
   };
 
   const validateShelfLifeDetails = () => {
@@ -455,74 +431,85 @@ export default function LaboratoryAppointmentForm() {
       newErrors.modeOfDeterioration = 'Please enter at least one mode of deterioration';
     }
     
-    setErrors(newErrors);
-    
-    if (Object.keys(newErrors).length > 0) {
-      showAlertMessage('Please fill in all required shelf life information fields');
-    }
-    
-    return Object.keys(newErrors).length === 0;
+    // DON'T setErrors here
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }; // Return error object
   };
 
   const validateForm = () => {
-    // First validate contact info
-    if (!validateContactInfo()) return false;
-    
-    // Then validate all appointments
-    let isValid = true;
+    const contactValidation = validateContactInfo();
+    if (!contactValidation.isValid) {
+        setErrors(prev => ({ ...prev, ...contactValidation.errors })); // Ensure errors are set
+        return false;
+    }
+
+    let allAppointmentsValid = true;
+    let combinedErrors = {}; // Keep combined errors locally for this validation pass
+
     for (let i = 0; i < appointments.length; i++) {
-      const currentIndex = currentAppointmentIndex;
-      setCurrentAppointmentIndex(i);
-      
-      if (!validateSampleDetails()) {
-        isValid = false;
-      }
-      
-      // If this is a shelf life appointment, validate shelf life details
-      if (isShelfLifeSelected() && !validateShelfLifeDetails()) {
-        isValid = false;
-      }
-      
-      setCurrentAppointmentIndex(currentIndex);
+        const currentIndex = currentAppointmentIndex; 
+        setCurrentAppointmentIndex(i); 
+
+        const sampleValidation = validateSampleDetails();
+        combinedErrors = { ...combinedErrors, ...sampleValidation.errors }; 
+        if (!sampleValidation.isValid) {
+            allAppointmentsValid = false;
+        }
+
+        const currentApp = appointments[i]; 
+        const hasShelfLife = Object.values(currentApp.shelfLifeServices).some(value => value);
+        if (hasShelfLife) {
+            const shelfLifeValidation = validateShelfLifeDetails();
+            combinedErrors = { ...combinedErrors, ...shelfLifeValidation.errors }; 
+            if (!shelfLifeValidation.isValid) {
+                allAppointmentsValid = false;
+            }
+        }
+        
+        setCurrentAppointmentIndex(currentIndex); 
     }
     
-    return isValid;
+    setErrors(combinedErrors); // Set all collected errors at the end
+
+    return allAppointmentsValid;
   };
 
   // Navigation functions
   const handleNextStep = () => {
-    let canProceed = false;
+    let validationResult = { isValid: false, errors: {} };
     
     switch (currentStep) {
       case 'contact':
-        canProceed = validateContactInfo();
-        if (canProceed) {
+        validationResult = validateContactInfo();
+        setErrors(validationResult.errors);
+        if (validationResult.isValid) {
+          // Log state right before changing step
+          // console.log("Appointments state before setting step to sample:", appointments); // Remove log
           setCurrentStep('sample');
         }
         break;
       case 'sample':
-        // Check if any appointment tab is empty
-        let emptyTabIndex = -1;
-        appointments.forEach((appointment, index) => {
-          if (!appointment.sampleName && !appointment.quantity && !appointment.sampleDescription) {
-            emptyTabIndex = index;
-          }
-        });
+        const emptyTabIndex = appointments.findIndex(
+          (appointment) => !appointment.sampleName && !appointment.quantity && !appointment.sampleDescription
+        );
 
-        if (emptyTabIndex !== -1) {
-          showAlertMessage(`Please fill out Appointment ${emptyTabIndex + 1} or remove it before proceeding`);
+        if (emptyTabIndex !== -1 && appointments.length > 1) {
+          // console.warn(`Attempted to proceed with empty Appointment ${emptyTabIndex + 1}`); // Removed log
+          setErrors(prev => ({ ...prev, global: `Please fill out Appointment ${emptyTabIndex + 1} or remove it.` })); // Example global error
           return;
         }
 
-        // Validate the current appointment tab
-        canProceed = validateSampleDetails();
-        if (canProceed) {
-          setCurrentStep('review');
+        validationResult = validateSampleDetails();
+        setErrors(validationResult.errors);
+        if (validationResult.isValid) {
+           const hasShelfLife = appointments.some(appointment => 
+             Object.values(appointment.shelfLifeServices).some(value => value));
+           setCurrentStep(hasShelfLife ? 'shelflife' : 'review');
         }
         break;
       case 'shelflife':
-        canProceed = validateShelfLifeDetails();
-        if (canProceed) {
+        validationResult = validateShelfLifeDetails();
+        setErrors(validationResult.errors);
+        if (validationResult.isValid) {
           setCurrentStep('review');
         }
         break;
@@ -532,6 +519,8 @@ export default function LaboratoryAppointmentForm() {
   };
 
   const handlePreviousStep = () => {
+    // Clear errors when going back
+    setErrors({}); 
     switch (currentStep) {
       case 'sample':
         setCurrentStep('contact');
@@ -550,7 +539,9 @@ export default function LaboratoryAppointmentForm() {
   };
 
   const handleContinueToShelfLife = () => {
-    if (validateSampleDetails()) {
+    const validationResult = validateSampleDetails();
+    setErrors(validationResult.errors);
+    if (validationResult.isValid) {
       setCurrentStep('shelflife');
     }
   };
@@ -585,8 +576,9 @@ export default function LaboratoryAppointmentForm() {
       }))
     );
     
+    // Call validateForm which now handles setting errors state ONLY on final submit validation
     if (!validateForm()) {
-      showAlertMessage('Please fix the errors before submitting');
+      // showAlertMessage is already called inside validateForm if invalid
       return;
     }
     
@@ -721,69 +713,45 @@ export default function LaboratoryAppointmentForm() {
       }
       
     } catch (error) {
-      console.error('Error submitting appointments:', error);
+      // console.error('Submission error:', error); // Keep error logging for now
       setSubmissionStatus({
         success: false,
-        message: error.message || 'Failed to submit appointment. Please try again.'
+        message: error.message || 'An error occurred during submission. Please try again.'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Add this useEffect to lock the current step during service selection
+  // Add this useEffect to handle the beforeunload event
   useEffect(() => {
-    if (isSelectingService) {
-      // When we're selecting a service, we don't want to allow navigation changes
-      // The timeout will reset this flag shortly after
+    if (isSubmitting) {
       const handleBeforeUnload = (e) => {
         e.preventDefault();
         e.returnValue = '';
       };
-      
       window.addEventListener('beforeunload', handleBeforeUnload);
-      
       return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
       };
     }
-  }, [isSelectingService]);
+  }, [isSubmitting]);
+
+  // console.log("Rendering LaboratoryAppointmentForm"); // Removed log
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-      {/* Loading Overlay */}
-      <LoadingOverlay isVisible={isSubmitting} />
-      
-      {/* Notifications */}
-      <AlertMessage 
-        show={showAlert} 
-        message={alertMessage} 
-        onClose={() => setShowAlert(false)} 
-      />
-      
-      <SubmissionStatus 
-        status={submissionStatus} 
-        onClose={() => setSubmissionStatus(null)} 
-      />
-      
-      <DeleteConfirmModal 
-        show={showDeleteModal} 
-        onCancel={() => setShowDeleteModal(false)} 
-        onConfirm={confirmDeleteAppointment} 
-      />
-      
-      <div className="max-w-[98rem] mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
-            Laboratory Testing Appointment
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Schedule testing services for your samples across our specialized laboratories
-          </p>
-        </div>
+    <div className="mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          show={showDeleteModal}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={confirmDeleteAppointment}
+        />
+      )}
+      {isSubmitting && <LoadingOverlay isVisible={isSubmitting} />}
 
-        {/* Progress Steps */}
+      {/* Navigation / Stepper */}
+      <div className="mb-10 px-16 hidden md:block">
         <div className="flex justify-center items-center gap-6 mb-12">
           <div className="flex items-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -811,6 +779,7 @@ export default function LaboratoryAppointmentForm() {
             }`}>Sample Details</span>
           </div>
           <div className="w-24 h-0.5 bg-gray-200"></div>
+          
           <div className="flex items-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
               currentStep === 'review' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
@@ -821,88 +790,114 @@ export default function LaboratoryAppointmentForm() {
             </div>
             <span className={`ml-3 text-sm font-medium ${
               currentStep === 'review' ? 'text-blue-600' : 'text-gray-400'
-            }`}>Review</span>
+            }`}>Review & Submit</span>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-8">
-          {/* Contact Information Section */}
-          {currentStep === 'contact' && (
+      {/* Submission Status Message */}
+      {submissionStatus && (
+        <SubmissionStatus status={submissionStatus} onClose={() => setSubmissionStatus(null)} />
+      )}
+      
+      {/* Form Container */}
+      <div className="bg-gray-50 p-6 sm:p-8 rounded-lg shadow-sm border border-gray-200">
+        {/* Contact Information Section */}
+        {currentStep === 'contact' && (
+          <>
             <ContactInformation
-              contactInfo={appointments[0]}
+              contactInfo={appointments[0]} // Always use the first appointment for contact info
               onContactInfoChange={handleContactInfoChange}
               errors={errors}
-              hasAttemptedSubmit={appointments[0].hasAttemptedSubmit}
               onNext={handleNextStep}
               disabled={isSubmitting}
             />
-          )}
+          </>
+        )}
 
-          {/* Sample Details and Services Section */}
-          {currentStep === 'sample' && (
-            <div className="space-y-8">
-              {/* Calendar Section */}
-              <AppointmentCalendar
-                selectedDate={selectedDate}
-                onDateSelect={handleDateSelect}
-                bookedDates={bookedDates}
-                disabled={isSubmitting}
-              />
-
-              {/* Laboratory Appointments Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-xl font-semibold text-gray-900">Laboratory Appointments</h2>
-                <div className="flex gap-4">
+        {/* Sample Details and Service Selection Section */}
+        {(currentStep === 'sample' || currentStep === 'shelflife') && (
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            {/* Appointment Tabs */}
+            <div className="flex flex-wrap items-center border-b border-gray-200 pb-4 mb-6">
+              {appointments.map((appointment, index) => {
+                // Determine the label: use sampleName if available, otherwise default
+                const tabLabel = (appointment.sampleName && appointment.sampleName.trim())
+                                 ? appointment.sampleName.trim()
+                                 : `Appointment ${index + 1}`;
+                
+                return (
                   <button
+                    key={index}
                     type="button"
-                    onClick={addNewAppointment}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => setCurrentAppointmentIndex(index)}
+                    className={`px-4 py-2 mr-2 mb-2 rounded-lg text-sm font-medium border transition-colors max-w-[150px] sm:max-w-[200px] ${
+                      index === currentAppointmentIndex
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                     disabled={isSubmitting}
+                    title={tabLabel}
                   >
-                    <PlusIcon className="w-5 h-5 mr-2" />
-                    Add Another Appointment
-                  </button>
-                </div>
-              </div>
-
-              {/* Sample Details and Services */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                {/* Appointment Tabs */}
-                <div className="flex flex-wrap gap-3 mb-8">
-                  {appointments.map((appointment, index) => (
-                    <div key={appointment.id} className="relative group">
-                      <button
-                        type="button"
-                        onClick={() => setCurrentAppointmentIndex(index)}
-                        className={`px-5 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                          currentAppointmentIndex === index
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        disabled={isSubmitting}
-                      >
-                        {appointment.sampleName || `Appointment ${index + 1}`}
-                      </button>
+                    {/* Use flexbox to align label and delete icon */}
+                    <div className="flex items-center justify-between w-full">
+                      {/* Display the dynamic label, truncated */} 
+                      <span className="truncate block mr-2"> {/* Added right margin */}
+                        {tabLabel}
+                      </span>
                       {appointments.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteAppointment(index)}
-                          className="absolute -top-2 -right-2 p-1 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200 disabled:opacity-0"
-                          disabled={isSubmitting}
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            console.log(`Delete clicked for index: ${index}, label: ${tabLabel}`); // Add log
+                            e.stopPropagation(); // Prevent tab selection
+                            handleDeleteAppointment(index);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              console.log(`Delete keydown for index: ${index}, label: ${tabLabel}`); // Add log
+                              e.stopPropagation(); // Prevent tab selection
+                              handleDeleteAppointment(index);
+                            }
+                          }}
+                          className="text-gray-400 hover:text-red-500 inline-block flex-shrink-0 cursor-pointer"
+                          aria-label={`Delete ${tabLabel}`} // Use dynamic label in aria-label
                         >
-                          <XMarkIcon className="w-4 h-4" />
-                        </button>
+                          <XMarkIcon className="h-4 w-4 inline-block" />
+                        </span>
                       )}
                     </div>
-                  ))}
-                </div>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={addNewAppointment}
+                className="px-4 py-2 mr-2 mb-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
+              >
+                <PlusIcon className="h-4 w-4 inline-block mr-1" /> Add Appointment
+              </button>
+            </div>
 
-                {/* Sample Details Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left side: Calendar */}
+              <div className="lg:col-span-1">
+                <AppointmentCalendar 
+                  selectedDate={selectedDate} 
+                  onDateSelect={handleDateSelect}
+                  bookedDates={bookedDates}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              {/* Right side: Sample details and services */}
+              <div className="lg:col-span-2">
                 <SampleDetails
                   appointment={appointments[currentAppointmentIndex]}
                   onChange={handleAppointmentChange}
                   errors={errors}
-                  hasAttemptedSubmit={appointments[currentAppointmentIndex].hasAttemptedSubmit}
                   disabled={isSubmitting}
                 />
 
@@ -939,42 +934,40 @@ export default function LaboratoryAppointmentForm() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Shelf Life Information Section */}
-          {currentStep === 'shelflife' && (
-            <ShelfLifeDetails
-              appointment={appointments[currentAppointmentIndex]}
-              onChange={handleAppointmentChange}
-              onModeChange={handleModeChange}
-              onAddMode={handleAddMode}
-              onRemoveMode={handleRemoveMode}
-              onFileChange={handleFileChange}
+        
+        {currentStep === 'shelflife' && (
+          <ShelfLifeDetails
+            appointment={appointments[currentAppointmentIndex]}
+            onChange={handleAppointmentChange}
+            onModeChange={handleModeChange}
+            onAddMode={handleAddMode}
+            onRemoveMode={handleRemoveMode}
+            onFileChange={handleFileChange}
+            errors={errors}
+            disabled={isSubmitting}
+          />
+        )}
+
+        {/* Review Section */}
+        {currentStep === 'review' && (
+          <>
+            {/* Removed logs for review section props */}
+            {/* {console.log("Current appointment in review:", appointments[currentAppointmentIndex])} */}
+            {/* {console.log("All appointments:", appointments)} */}
+            {/* {console.log("Service data:", servicesData)} */}
+            <ReviewSection
+              servicesData={servicesData}
               errors={errors}
               onPrevious={handlePreviousStep}
-              onNext={handleNextStep}
-              disabled={isSubmitting}
+              isSubmitting={isSubmitting}
+              onSubmit={handleSubmit}
+              allAppointments={appointments}
             />
-          )}
-
-          {/* Review Section */}
-          {currentStep === 'review' && (
-            <>
-              {console.log("Current appointment in review:", appointments[currentAppointmentIndex])}
-              {console.log("All appointments:", appointments)}
-              {console.log("Service data:", servicesData)}
-              <ReviewSection
-                appointment={appointments[currentAppointmentIndex]}
-                servicesData={servicesData}
-                errors={errors}
-                onPrevious={handlePreviousStep}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-                allAppointments={appointments}
-              />
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

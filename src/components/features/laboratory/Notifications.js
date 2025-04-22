@@ -1,45 +1,41 @@
 'use client';
 
-import { Fragment } from 'react';
-import { Transition } from '@headlessui/react';
 import { CheckCircleIcon, XCircleIcon, XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 // Alert message component for form validation and user notifications
 export function AlertMessage({ show, message, onClose }) {
+  if (!show) return null;
+
   return (
-    <Transition
-      show={show}
-      as={Fragment}
-      enter="transform ease-out duration-300 transition"
-      enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-      enterTo="translate-y-0 opacity-100 sm:translate-x-0"
-      leave="transition ease-in duration-200"
-      leaveFrom="opacity-100"
-      leaveTo="opacity-0"
+    <div 
+      className={`
+        fixed top-4 right-4 z-50 bg-white rounded-lg border-l-4 border-yellow-400 
+        shadow-md py-4 px-6 max-w-md 
+        transition-opacity duration-300 ease-out
+        ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+      `}
     >
-      <div className="fixed top-4 right-4 z-50 bg-white rounded-lg border-l-4 border-yellow-400 shadow-md py-4 px-6 max-w-md">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400" aria-hidden="true" />
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-800">{message}</p>
-          </div>
-          <div className="ml-auto pl-3">
-            <div className="-mx-1.5 -my-1.5">
-              <button
-                type="button"
-                onClick={onClose}
-                className="inline-flex rounded-md p-1.5 text-gray-500 hover:bg-gray-100 focus:outline-none"
-              >
-                <span className="sr-only">Dismiss</span>
-                <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
+      <div className="flex items-start">
+        <div className="flex-shrink-0">
+          <ExclamationTriangleIcon className="h-6 w-6 text-yellow-400" aria-hidden="true" />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-medium text-gray-800">{message}</p>
+        </div>
+        <div className="ml-auto pl-3">
+          <div className="-mx-1.5 -my-1.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex rounded-md p-1.5 text-gray-500 hover:bg-gray-100 focus:outline-none"
+            >
+              <span className="sr-only">Dismiss</span>
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>
-    </Transition>
+    </div>
   );
 }
 

@@ -1,7 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, XMarkIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
+
+// Helper component for inline error messages
+const InlineError = ({ message }) => {
+  if (!message) return null;
+  return (
+    <div className="flex items-center mt-1.5 px-2 py-1 rounded-md bg-yellow-50 border border-yellow-200">
+      <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500 mr-1.5 flex-shrink-0" aria-hidden="true" />
+      <p className="text-xs font-medium text-yellow-800">{message}</p>
+    </div>
+  );
+};
 
 export default function ShelfLifeDetails({ 
   appointment, 
@@ -11,7 +22,6 @@ export default function ShelfLifeDetails({
   onModeChange,
   onFileChange,
   errors = {},
-  hasAttemptedSubmit,
   disabled = false
 }) {
   const handleChange = (e) => {
@@ -22,7 +32,7 @@ export default function ShelfLifeDetails({
   const getInputClasses = (fieldName) => {
     const baseClasses = "block w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-colors";
     
-    if (hasAttemptedSubmit && errors[fieldName]) {
+    if (errors[fieldName]) {
       return `${baseClasses} border-red-400 bg-red-50 text-red-800 disabled:opacity-50`;
     }
     
@@ -48,9 +58,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("objectiveOfStudy")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.objectiveOfStudy && (
-            <p className="mt-1 text-sm text-red-600">{errors.objectiveOfStudy}</p>
-          )}
+          <InlineError message={errors.objectiveOfStudy} />
         </div>
         
         <div>
@@ -67,9 +75,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("productName")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.productName && (
-            <p className="mt-1 text-sm text-red-600">{errors.productName}</p>
-          )}
+          <InlineError message={errors.productName} />
         </div>
         
         <div>
@@ -86,9 +92,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("netWeight")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.netWeight && (
-            <p className="mt-1 text-sm text-red-600">{errors.netWeight}</p>
-          )}
+          <InlineError message={errors.netWeight} />
         </div>
         
         <div>
@@ -161,9 +165,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("methodOfPreservation")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.methodOfPreservation && (
-            <p className="mt-1 text-sm text-red-600">{errors.methodOfPreservation}</p>
-          )}
+          <InlineError message={errors.methodOfPreservation} />
         </div>
         
         <div className="md:col-span-2">
@@ -180,9 +182,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("productIngredients")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.productIngredients && (
-            <p className="mt-1 text-sm text-red-600">{errors.productIngredients}</p>
-          )}
+          <InlineError message={errors.productIngredients} />
         </div>
         
         <div>
@@ -199,9 +199,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("packagingMaterial")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.packagingMaterial && (
-            <p className="mt-1 text-sm text-red-600">{errors.packagingMaterial}</p>
-          )}
+          <InlineError message={errors.packagingMaterial} />
         </div>
         
         <div>
@@ -218,9 +216,7 @@ export default function ShelfLifeDetails({
             className={getInputClasses("targetShelfLife")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.targetShelfLife && (
-            <p className="mt-1 text-sm text-red-600">{errors.targetShelfLife}</p>
-          )}
+          <InlineError message={errors.targetShelfLife} />
         </div>
       </div>
       
@@ -248,28 +244,37 @@ export default function ShelfLifeDetails({
                 className="p-2 text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={disabled}
               >
-                <XMarkIcon className="w-5 h-5" />
+                <XMarkIcon className="h-5 w-5" />
               </button>
             )}
           </div>
         ))}
-        
-        {hasAttemptedSubmit && errors.modeOfDeterioration && (
-          <p className="mt-1 text-sm text-red-600">{errors.modeOfDeterioration}</p>
-        )}
-        
         <button
           type="button"
           onClick={onAddMode}
-          className="mt-2 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-2 flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={disabled}
         >
-          <PlusIcon className="w-4 h-4" />
-          <span>Add another mode</span>
+          <PlusIcon className="h-4 w-4 mr-1" /> Add Another Mode
         </button>
+        <InlineError message={errors.modeOfDeterioration} />
       </div>
       
-      {/* Certificate of Analysis File Upload */}
+      {/* File Uploads */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Existing FDA Permits (if any)
+        </label>
+        <input
+          type="file"
+          onChange={onFileChange}
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          disabled={disabled}
+        />
+        <p className="mt-1 text-xs text-gray-500">Accepted file types: PDF, Word, JPEG, PNG (max 5MB)</p>
+      </div>
+
       <div className="mt-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Certificate of Analysis (if available)

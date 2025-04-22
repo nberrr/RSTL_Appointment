@@ -1,10 +1,11 @@
 "use client";
 
+import React from 'react';
 import { useState } from 'react';
 import { FaSearch, FaDownload, FaEllipsisH, FaFilter, FaTimes } from 'react-icons/fa';
-import DashboardNav from "@/app/components/shared/DashboardNav";
-import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
-import AdminLayout from "@/app/components/shared/AdminLayout";
+import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 export default function MicrobiologyReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');

@@ -3,30 +3,6 @@
 import { Fragment } from 'react';
 
 export default function ReviewSection({ 
-  appointment = {
-    clientName: '',
-    emailAddress: '',
-    phoneNumber: '',
-    organization: '',
-    sampleName: '',
-    sampleType: '',
-    quantity: '',
-    preferredDate: '',
-    sampleDescription: '',
-    selectedServices: [],
-    currentServiceTab: 'chemical',
-    productName: '',
-    netWeight: '',
-    brandName: '',
-    existingMarket: '',
-    productionType: '',
-    methodOfPreservation: '',
-    productIngredients: '',
-    packagingMaterial: '',
-    targetShelfLife: '',
-    modeOfDeterioration: [],
-    terms: false
-  },
   servicesData = {},
   errors = {},
   onPrevious,
@@ -34,36 +10,41 @@ export default function ReviewSection({
   onSubmit,
   allAppointments = []
 }) {
-  // Get selected services details
-  const getSelectedServicesDetails = () => {
-    if (!appointment.selectedServices || appointment.selectedServices.length === 0) {
-      console.log("No selected services found");
+  // Log the received allAppointments prop
+  console.log("ReviewSection received allAppointments:", allAppointments);
+
+  // Helper to get selected services details for a SINGLE appointment
+  const getSelectedServicesDetailsForAppointment = (appointment) => {
+    if (!appointment) return [];
+
+    const selectedServiceIds = appointment.selectedServices || [];
+    const shelfLifeServices = appointment.shelfLifeServices || {};
+
+    if (selectedServiceIds.length === 0 && !Object.values(shelfLifeServices).some(Boolean)) {
       return [];
     }
     
-    // Make sure servicesData exists
     if (!servicesData) {
       console.log("No servicesData available");
       return [];
     }
     
-    console.log("Selected services IDs:", appointment.selectedServices);
+    const allServicesDetails = [];
     
-    // Collect all services from all tabs
-    const allServices = [];
-    
-    // Loop through all service types (chemical, microbiological, shelflife)
+    // Loop through standard service types
     Object.keys(servicesData).forEach(tabKey => {
+      // Skip shelf life tab here, handle separately
+      if (tabKey === 'shelflife') return; 
+
       const tabData = servicesData[tabKey];
       if (tabData && tabData.categories) {
-        // Extract services from each category in this tab
         tabData.categories.forEach(category => {
           if (category.services) {
             category.services.forEach(service => {
-              if (appointment.selectedServices.includes(service.id)) {
-                allServices.push({
+              if (selectedServiceIds.includes(service.id)) {
+                allServicesDetails.push({
                   ...service,
-                  serviceType: tabKey  // Add the service type for reference
+                  serviceType: tabKey
                 });
               }
             });
@@ -72,42 +53,42 @@ export default function ReviewSection({
       }
     });
     
-    // Also check shelf life services if applicable
-    if (appointment.shelfLifeServices) {
-      Object.entries(appointment.shelfLifeServices).forEach(([key, isSelected]) => {
-        if (isSelected && servicesData.shelflife && servicesData.shelflife.categories) {
-          // Convert the key format (e.g., microbiologicalAnalysis to microbiological-analysis)
-          const serviceId = key.replace(/([A-Z])/g, '-$1').toLowerCase().substring(1);
-          
-          // Find this service in the shelflife category
-          servicesData.shelflife.categories.forEach(category => {
-            if (category.services) {
-              const service = category.services.find(s => s.id === serviceId);
-              if (service) {
-                allServices.push({
-                  ...service,
-                  serviceType: 'shelflife'
-                });
-              }
+    // Handle shelf life services checkboxes
+    Object.entries(shelfLifeServices).forEach(([key, isSelected]) => {
+      if (isSelected && servicesData.shelflife && servicesData.shelflife.categories) {
+        const serviceId = key.replace(/([A-Z])/g, '-$1').toLowerCase(); // Adjusted key conversion
+        
+        servicesData.shelflife.categories.forEach(category => {
+          if (category.services) {
+            const service = category.services.find(s => s.id === serviceId);
+            // Avoid duplicates if already added via selectedServices (unlikely but possible)
+            if (service && !allServicesDetails.some(s => s.id === service.id)) { 
+              allServicesDetails.push({
+                ...service,
+                serviceType: 'shelflife'
+              });
             }
-          });
-        }
-      });
-    }
-    
-    console.log("Selected services details:", allServices);
-    return allServices;
+          }
+        });
+      }
+    });
+
+    return allServicesDetails;
   };
 
-  // Calculate total price
-  const calculateTotalPrice = () => {
-    const services = getSelectedServicesDetails();
+  // Helper to calculate total price for a SINGLE appointment
+  const calculateTotalPriceForAppointment = (appointment) => {
+    const services = getSelectedServicesDetailsForAppointment(appointment);
     return services.reduce((total, service) => {
-      // Convert price from string format like '₱1,500.00' to number
       const priceString = service.price || '₱0';
       const priceNumber = parseFloat(priceString.replace(/[₱,]/g, '')) || 0;
       return total + priceNumber;
     }, 0);
+  };
+
+  // Calculate overall total price for ALL appointments
+  const calculateOverallTotalPrice = () => {
+    return allAppointments.reduce((total, app) => total + calculateTotalPriceForAppointment(app), 0);
   };
 
   // Format date
@@ -187,41 +168,59 @@ export default function ReviewSection({
       <div className="bg-white shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Selected Services
+            Selected Services Summary
           </h3>
-          <div className="mt-5">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Service
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {getSelectedServicesDetails().map((service, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {service.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                      {service.price}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Total
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                    ₱{calculateTotalPrice().toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="mt-5 space-y-6">
+            {allAppointments.map((appointment, index) => {
+              const servicesForThisAppointment = getSelectedServicesDetailsForAppointment(appointment);
+              const totalForThisAppointment = calculateTotalPriceForAppointment(appointment);
+              
+              // Don't render a table if no services selected for this appointment
+              if (servicesForThisAppointment.length === 0) {
+                return null; 
+              }
+
+              return (
+                <div key={`services-${index}`} className="border border-gray-200 rounded-lg overflow-hidden">
+                   <h4 className="text-md font-medium text-gray-800 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    Services for Appointment #{index + 1} (Sample: {appointment.sampleName || 'N/A'})
+                  </h4>
+                  <table className="min-w-full divide-y divide-gray-200">
+                    {/* Optional: Add thead back if desired per table */}
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {servicesForThisAppointment.map((service, serviceIndex) => (
+                        <tr key={serviceIndex}>
+                          <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {service.name}
+                          </td>
+                          <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">
+                            {service.price}
+                          </td>
+                        </tr>
+                      ))}
+                      {/* Subtotal for this appointment */} 
+                      <tr className="bg-gray-50">
+                        <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                          Subtotal
+                        </td>
+                        <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                          ₱{totalForThisAppointment.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+
+            {/* Overall Total Section */} 
+            <div className="mt-6 pt-4 border-t border-gray-300 flex justify-end items-center">
+              <span className="text-lg font-semibold text-gray-900 mr-4">Overall Total:</span>
+              <span className="text-xl font-bold text-blue-600">
+                ₱{calculateOverallTotalPrice().toFixed(2)}
+              </span>
+            </div>
+
           </div>
         </div>
       </div>
@@ -248,21 +247,11 @@ export default function ReviewSection({
         </button>
         <button
           type="button"
-          onClick={onSubmit}
+          onClick={onSubmit} // Use the passed onSubmit prop
           disabled={isSubmitting}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
         >
-          {isSubmitting ? (
-            <Fragment>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Submitting...
-            </Fragment>
-          ) : (
-            'Submit Appointment'
-          )}
+          {isSubmitting ? 'Submitting...' : 'Submit Appointment'}
         </button>
       </div>
     </div>

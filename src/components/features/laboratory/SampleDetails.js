@@ -1,10 +1,22 @@
 'use client';
 
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
+
+// Helper component for inline error messages
+const InlineError = ({ message }) => {
+  if (!message) return null;
+  return (
+    <div className="flex items-center mt-1.5 px-2 py-1 rounded-md bg-yellow-50 border border-yellow-200">
+      <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500 mr-1.5 flex-shrink-0" aria-hidden="true" />
+      <p className="text-xs font-medium text-yellow-800">{message}</p>
+    </div>
+  );
+};
+
 export default function SampleDetails({ 
   appointment, 
   onChange, 
   errors = {},
-  hasAttemptedSubmit,
   disabled = false
 }) {
   const handleChange = (e) => {
@@ -15,7 +27,7 @@ export default function SampleDetails({
   const getInputClasses = (fieldName) => {
     const baseClasses = "block w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-colors";
     
-    if (hasAttemptedSubmit && errors[fieldName]) {
+    if (errors[fieldName]) {
       return `${baseClasses} border-red-400 bg-red-50 text-red-800 disabled:opacity-75`;
     }
     
@@ -41,9 +53,7 @@ export default function SampleDetails({
             className={getInputClasses("sampleName")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.sampleName && (
-            <p className="mt-1 text-sm text-red-600">{errors.sampleName}</p>
-          )}
+          <InlineError message={errors.sampleName} />
         </div>
         
         <div>
@@ -84,9 +94,7 @@ export default function SampleDetails({
             className={getInputClasses("quantity")}
             disabled={disabled}
           />
-          {hasAttemptedSubmit && errors.quantity && (
-            <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-          )}
+          <InlineError message={errors.quantity} />
         </div>
         
         <div>
@@ -101,9 +109,7 @@ export default function SampleDetails({
             disabled={true}
             className={`${getInputClasses("preferredDate")} cursor-not-allowed bg-gray-50`}
           />
-          {hasAttemptedSubmit && errors.preferredDate && (
-            <p className="mt-1 text-sm text-red-600">{errors.preferredDate}</p>
-          )}
+          <InlineError message={errors.preferredDate} />
           <p className="mt-1 text-xs text-gray-500">Select a date from the calendar above</p>
         </div>
       </div>
@@ -122,9 +128,7 @@ export default function SampleDetails({
           className={getInputClasses("sampleDescription")}
           disabled={disabled}
         />
-        {hasAttemptedSubmit && errors.sampleDescription && (
-          <p className="mt-1 text-sm text-red-600">{errors.sampleDescription}</p>
-        )}
+        <InlineError message={errors.sampleDescription} />
       </div>
     </div>
   );

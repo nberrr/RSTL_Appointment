@@ -16,9 +16,9 @@ import {
   getDay
 } from 'date-fns';
 import { FaFlask, FaClock, FaTint, FaSearch } from 'react-icons/fa';
-import DashboardNav from "@/app/components/shared/DashboardNav";
-import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
-import AdminLayout from "@/app/components/shared/AdminLayout";
+import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 export default function CalendarPage() {
   const today = new Date(); 
@@ -67,14 +67,14 @@ export default function CalendarPage() {
 
   return (
     <AdminLayout>
-      <div className="h-screen flex flex-col col">
+      <div className="h-screen flex flex-col">
         <DashboardNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
           <main className="flex-1 bg-gray-100 p-5">
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Side - Calendar */}
-              <div className="bg-white rounded-xl drop-shadow-sm  border border-gray-200 p-4 w-[600px]">
+              <div className="bg-white rounded-xl drop-shadow-sm border border-gray-200 p-4 w-full lg:w-[600px] lg:flex-shrink-0">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">{currentMonth}</h2>
                   <div className="flex gap-2">

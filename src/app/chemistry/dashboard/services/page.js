@@ -1,10 +1,11 @@
 "use client";
 
+import React from 'react';
 import { useState } from 'react';
 import { FaPlus, FaSearch, FaCheck, FaTimes, FaTrash } from 'react-icons/fa';
-import AdminLayout from "@/app/components/shared/AdminLayout";
-import DashboardNav from "@/app/components/shared/DashboardNav";
-import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
+import AdminLayout from "@/components/layout/AdminLayout";
+import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardSidebar from "@/components/layout/DashboardSidebar";
 
 // Add this Toggle Switch component at the top level of the file
 function ToggleSwitch({ enabled, onChange, activeColor = "bg-blue-600", inactiveColor = "bg-gray-200" }) {

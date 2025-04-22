@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft } from 'lucide-react';
 import {
   Grid2x2,
@@ -15,8 +15,25 @@ import {
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Initialize state from localStorage if available
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedState = localStorage.getItem('sidebarIsCollapsed');
+      // Default to false (expanded) if nothing is saved or value is invalid
+      return savedState !== null ? JSON.parse(savedState) : false;
+    }
+    return false; // Default state for SSR
+  });
+
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+
+  // Effect to save state to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebarIsCollapsed', JSON.stringify(isCollapsed));
+    }
+  }, [isCollapsed]);
 
   let basePath = "/metrology";
   if (pathname.includes("/chemistry")) basePath = "/chemistry";
@@ -208,4 +225,4 @@ export default function DashboardSidebar() {
       </div>
     </aside>
   );
-}
+} 

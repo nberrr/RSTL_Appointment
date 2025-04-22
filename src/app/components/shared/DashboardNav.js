@@ -40,7 +40,7 @@ export default function DashboardNav() {
 
   return (
       <div className="dashboard-nav bg-white shadow-md h-20" style={{ height: "65px" }}>
-        <div className="container px-4 flex flex-auto justify-between items-center h-full">
+        <div className=" px-4 flex flex-auto justify-between items-center w-full h-full">
           <div className="flex items-center space-x-4">
             <div className="w-[40px] h-[40px] overflow-hidden rounded">
               <Image src="/dost-logo.png" alt="DOST Logo" width={40} height={40} />

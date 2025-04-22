@@ -217,7 +217,7 @@ export default function ServicesPage() {
                 </button>
               </div>
 
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center inline-block">
                 <div className="relative">
                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
@@ -231,7 +231,7 @@ export default function ServicesPage() {
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="px-4 py-2 text-gray-500 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option>All Test Types</option>
                   <option>Microbial Analysis</option>
@@ -240,14 +240,15 @@ export default function ServicesPage() {
                   <option>Culture and Sensitivity</option>
                   <option>Sterility Testing</option>
                 </select>
-              </div>
-              <div className="text-gray-600">
+                <div className="text-gray-600 inline-block flex">
                 <span>Total Tests: {totalTests}</span>
                 <span className="mx-2">|</span>
                 <span>Active: {activeTests}</span>
               </div>
             </div>
 
+              </div>
+             
             {/* Scrollable Table Section */}
             <div className="flex-1 overflow-auto p-5">
               <div className="bg-white rounded-lg shadow h-full flex flex-col  border border-gray-200">

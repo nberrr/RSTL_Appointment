@@ -7,7 +7,8 @@ export default function ContactInformation({
   onContactInfoChange, 
   errors, 
   hasAttemptedSubmit,
-  onNext
+  onNext,
+  disabled = false
 }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,10 +19,10 @@ export default function ContactInformation({
     const baseClasses = "block w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-colors";
     
     if (hasAttemptedSubmit && errors[fieldName]) {
-      return `${baseClasses} border-red-400 bg-red-50 text-red-800`;
+      return `${baseClasses} border-red-400 bg-red-50 text-red-800 disabled:opacity-75`;
     }
     
-    return `${baseClasses} border-gray-300 bg-white`;
+    return `${baseClasses} border-gray-300 bg-white disabled:opacity-75 disabled:bg-gray-100`;
   };
 
   return (
@@ -41,6 +42,7 @@ export default function ContactInformation({
             onChange={handleChange}
             placeholder="Enter your full name"
             className={getInputClasses("clientName")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.clientName && (
             <p className="mt-1 text-sm text-red-600">{errors.clientName}</p>
@@ -59,6 +61,7 @@ export default function ContactInformation({
             onChange={handleChange}
             placeholder="Enter your email address"
             className={getInputClasses("emailAddress")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.emailAddress && (
             <p className="mt-1 text-sm text-red-600">{errors.emailAddress}</p>
@@ -77,6 +80,7 @@ export default function ContactInformation({
             onChange={handleChange}
             placeholder="Enter your phone number"
             className={getInputClasses("phoneNumber")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.phoneNumber && (
             <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
@@ -95,6 +99,7 @@ export default function ContactInformation({
             onChange={handleChange}
             placeholder="Enter your organization name"
             className={getInputClasses("organization")}
+            disabled={disabled}
           />
           {hasAttemptedSubmit && errors.organization && (
             <p className="mt-1 text-sm text-red-600">{errors.organization}</p>
@@ -106,7 +111,8 @@ export default function ContactInformation({
         <button
           type="button"
           onClick={onNext}
-          className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md"
+          className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={disabled}
         >
           Continue to Sample Details
         </button>

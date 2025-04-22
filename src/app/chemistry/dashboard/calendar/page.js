@@ -297,7 +297,7 @@ export default function CalendarPage() {
           <main className="flex-1 bg-gray-50 p-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-6 mb-6 ">
-              <div className="bg-cyan-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-cyan-50 rounded-xl p-4 border border-gray-200 shadow-md">
                 <div className="flex items-center gap-4">
                   <div className="bg-cyan-500 rounded-full p-3">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +312,7 @@ export default function CalendarPage() {
                 </div>
               </div>
 
-              <div className="bg-emerald-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-emerald-50 rounded-xl p-4 border border-gray-200 shadow-md">
                 <div className="flex items-center gap-4">
                   <div className="bg-emerald-500 rounded-full p-3">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,7 +327,7 @@ export default function CalendarPage() {
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-purple-50 rounded-xl p-4 border border-gray-200 shadow-md">
                 <div className="flex items-center gap-4">
                   <div className="bg-purple-500 rounded-full p-3">
                     <FaCalendar className="w-6 h-6 text-white" />

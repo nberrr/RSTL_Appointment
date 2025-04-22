@@ -458,7 +458,7 @@ export default function CalendarPage() {
                     <tbody className="divide-y divide-gray-100">
                       {appointments.map((appointment, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-teal-600">MB-{1000 + index}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-violet-600">MB-{1000 + index}</td>
                           <td className="px-6 py-4 text-sm text-gray-500">{appointment.requestDate}</td>
                           <td className="px-6 py-4 text-sm text-gray-900">{appointment.organization}</td>
                           <td className="px-6 py-4">

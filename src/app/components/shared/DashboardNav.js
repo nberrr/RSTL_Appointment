@@ -40,7 +40,7 @@ export default function DashboardNav() {
   }, []);
 
   const handleViewAllAppointments = () => {
-    setNotifications(false); // Close the dropdown
+    setNotifications(false); //to close
   
     if (pathname.includes("/metrology")) {
       router.push("/metrology/dashboard/calendar");

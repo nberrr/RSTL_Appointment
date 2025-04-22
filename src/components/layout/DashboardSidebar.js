@@ -16,24 +16,35 @@ import {
 export default function DashboardSidebar() {
   const pathname = usePathname();
   
-  // Initialize state from localStorage if available
-  const [isCollapsed, setIsCollapsed] = useState(() => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Effect 1: Read initial state from localStorage *after* mount
+  useEffect(() => {
+    console.log('Sidebar: Mount effect running');
     if (typeof window !== 'undefined') {
       const savedState = localStorage.getItem('sidebarIsCollapsed');
-      // Default to false (expanded) if nothing is saved or value is invalid
-      return savedState !== null ? JSON.parse(savedState) : false;
+      console.log(`Sidebar: Read from localStorage: ${savedState}`);
+      if (savedState !== null) {
+        const parsedState = JSON.parse(savedState);
+        console.log(`Sidebar: Setting state from localStorage to: ${parsedState}`);
+        setIsCollapsed(parsedState);
+      }
+      // Set initial load to false after checking localStorage
+      setIsInitialLoad(false);
     }
-    return false; // Default state for SSR
-  });
+  }, []);
 
-  const [isReportsOpen, setIsReportsOpen] = useState(false);
-
-  // Effect to save state to localStorage when it changes
-  useEffect(() => {
+  const handleToggleCollapse = () => {
+    const newState = !isCollapsed;
+    console.log(`Sidebar: Toggling collapse. New state: ${newState}`);
+    setIsCollapsed(newState);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('sidebarIsCollapsed', JSON.stringify(isCollapsed));
+      localStorage.setItem('sidebarIsCollapsed', JSON.stringify(newState));
+      console.log(`Sidebar: Saved to localStorage directly: ${JSON.stringify(newState)}`);
     }
-  }, [isCollapsed]);
+  };
 
   let basePath = "/metrology";
   if (pathname.includes("/chemistry")) basePath = "/chemistry";
@@ -111,6 +122,11 @@ export default function DashboardSidebar() {
     },
   ].filter(Boolean);
   
+  // Conditionally render based on initial load state
+  if (isInitialLoad) {
+    // Render a placeholder with the collapsed width to prevent expansion flicker
+    return <aside className={`bg-white border-r border-gray-200 h-full w-[72px] transition-all duration-300 ease-in-out`} aria-hidden="true"></aside>; 
+  }
 
   return (
     <aside 
@@ -127,7 +143,7 @@ export default function DashboardSidebar() {
             Dashboard
           </span>
           <button 
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={handleToggleCollapse}
             className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-50"
           >
             <ChevronLeft className={`w-5 h-5 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`} />

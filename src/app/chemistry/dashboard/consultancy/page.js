@@ -4,7 +4,7 @@ import { useState } from 'react';
 import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
-import { FaSearch, FaFilter, FaCalendar, FaTimes, FaDownload, FaChevronDown, FaCheck, FaRegFile } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaTimes, FaDownload, FaCheck, FaRegFile } from 'react-icons/fa';
 
 const ConsultationModal = ({ isOpen, onClose, consultation, onAccept, onDecline }) => {
   if (!isOpen) return null;

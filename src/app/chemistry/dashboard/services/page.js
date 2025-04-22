@@ -252,8 +252,8 @@ const handleModalCancel = () => {
             </div>
 
             {/* Scrollable Table Section */}
-            <div className="flex-1 overflow-hidden p-5 pt-0">
-              <div className="bg-white rounded-lg shadow h-full flex flex-col ">
+            <div className="flex-1 overflow-auto p-5">
+              <div className="bg-white rounded-lg shadow h-full flex flex-col border-gray-200">
                 <div className="overflow-auto">
                   <table className="min-w-full">
                     <thead className="bg-gray-50 sticky top-0">
@@ -266,9 +266,9 @@ const handleModalCancel = () => {
                         <th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
+                    <tbody>
                       {services.map((service) => (
-                        <tr key={service.id}>
+                        <tr key={service.id} className="border-b">
                           <td className="w-1/4 px-6 py-4">
                             {editingId === service.id ? (
                               <div className="space-y-1">
@@ -364,7 +364,7 @@ const handleModalCancel = () => {
                               </span>
                             )}
                           </td>
-                          <td className="w-24 px-6 py-4 text-sm">
+                          <td className="w-24 px-6 py-4">
                             <div className="flex gap-2 justify-center">
                               {editingId === service.id ? (
                                 <>

@@ -5,9 +5,9 @@ import DashboardNav from "@/app/components/shared/DashboardNav";
 import DashboardSidebar from "@/app/components/shared/DashboardSidebar";
 import AdminLayout from "@/app/components/shared/AdminLayout";
 import Link from "next/link";
-import { FaCalendar, FaClock, FaCheckCircle, FaFlask, FaBook, FaCubes, FaBacteria } from 'react-icons/fa';
+import { FaCalendar, FaClock, FaCheckCircle, FaFlask, FaBook, FaCubes } from 'react-icons/fa';
 
-export default function MicrobiologyDashboard() {
+export default function MetrologyDashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState(0);
@@ -16,16 +16,16 @@ export default function MicrobiologyDashboard() {
 
   // Sample appointment data
   const appointmentData = {
-    "2025-03-24": { microbiology: true, consultancy: true },
-    "2025-03-25": { microbiology: true },
-    "2025-03-26": { microbiology: true },
+    "2025-03-24": { chemistry: true, consultancy: true },
+    "2025-03-25": {},
+    "2025-03-26": { chemistry: true },
     "2025-03-27": { consultancy: true },
-    "2025-03-28": { microbiology: true, consultancy: true },
+    "2025-03-28": { chemistry: true, consultancy: true },
   };
   
   // Sample data for the graph
   const weeklyData = {
-    microbiology: [10, 12, 15, 18, 14, 16, 20],
+    chemistry: [12, 15, 8, 20, 14, 18, 24],
     consultancy: [8, 10, 12, 15, 9, 11, 15],
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   };
@@ -123,7 +123,7 @@ export default function MicrobiologyDashboard() {
           <main className="flex-1 bg-gray-100 p-4">
             <div className="grid grid-cols-1 lg:grid-cols-[40%,1fr] gap-4 h-[calc(100vh-7rem)]">
               {/* Left Section - Calendar */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col  border border-gray-200">
+              <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col border border-gray-200">
                 {/* Calendar Header */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">{currentMonth}</h2>
@@ -172,8 +172,8 @@ export default function MicrobiologyDashboard() {
                         <span>{dayObj.day}</span>
                         {dayObj.appointments && (
                           <div className="flex gap-0.5 mt-1">
-                            {dayObj.appointments.microbiology && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-teal-500" title="Microbiology Test"></div>
+                            {dayObj.appointments.chemistry && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-violet-500" title="Chemistry Test"></div>
                             )}
                             {dayObj.appointments.consultancy && (
                               <div className="w-1.5 h-1.5 rounded-full bg-green-500" title="Consultancy"></div>
@@ -189,8 +189,8 @@ export default function MicrobiologyDashboard() {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-around">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-                      <span className="text-xs text-gray-600">Microbiology</span>
+                      <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                      <span className="text-xs text-gray-600">Chemistry</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -204,22 +204,22 @@ export default function MicrobiologyDashboard() {
               <div className="space-y-4">
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Microbiology Tests */}
-                  <div className="bg-gradient-to-br from-teal-700 to-teal-500 rounded-xl p-3 flex flex-col justify-between shadow-md  border border-gray-200">
+                  {/* Chemistry Tests */}
+                  <div className="bg-gradient-to-br from-violet-700 to-violet-400 rounded-xl p-3 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-sm text-white">Microbiology Tests</h3>
-                        <p className="text-2xl font-bold text-white mt-2">20</p>
+                        <h3 className="text-sm text-white">Chemistry Tests</h3>
+                        <p className="text-2xl font-bold text-white mt-2">24</p>
                       </div>
                       <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-lg">
-                        <FaBacteria className="h-4 w-4 text-white" />
+                        <FaFlask className="h-4 w-4 text-white" />
                       </div>
                     </div>
-                    <p className="text-xs text-teal-100 mt-2">8 Pending • 5 Today</p>
+                    <p className="text-xs text-blue-100 mt-2">12 Pending • 8 Today</p>
                   </div>
                   
                   {/* Consultancy */}
-                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl p-3 flex flex-col justify-between shadow-mb border border-gray-200">
+                  <div className="bg-gradient-to-br from-green-700 to-green-500 rounded-xl p-3 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-sm text-white">Consultancy</h3>
@@ -233,61 +233,63 @@ export default function MicrobiologyDashboard() {
                   </div>
                 </div>
 
-                {/* Recent Activity */}
+                {/* Graph Section */}
+                <div className="mt-6  border border-gray-200 bg-white">
+                  <div className="flex justify-between items-center mb-4 p-4 n  ">
+                    <h3 className="text-sm font-semibold">Weekly Appointment Trends</h3>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                        <span>Chemistry</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span>Consultancy</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    {weeklyData.labels.map((label, index) => (
+                      <div key={label} className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-full flex items-end justify-center gap-0.5 h-[100px]">
+                          <div 
+                            className="w-2 bg-violet-500 rounded-t"
+                            style={{ height: `${(weeklyData.chemistry[index] / 24) * 100}%` }}
+                          ></div>
+                          <div 
+                            className="w-2 bg-green-500 rounded-t"
+                            style={{ height: `${(weeklyData.consultancy[index] / 24) * 100}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-xs text-gray-500">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Today's Schedule */}
                 <div className="bg-white rounded-xl shadow-sm p-4  border border-gray-200">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                    <Link href="/microbiology/dashboard/calendar" className="text-sm text-blue-600 hover:text-blue-700">
-                      View All
-                    </Link>
+                    <h3 className="text-sm font-semibold">Today&apos;s Schedule</h3>
+                    <span className="text-xs text-gray-500">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
                   </div>
-                  <div className="space-y-4">
-                    {/* Activity Items */}
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 flex items-center justify-center bg-teal-100 rounded-lg">
-                        <FaBacteria className="h-4 w-4 text-teal-600" />
-                      </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-2 bg-blue-50 rounded-lg">
+                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                       <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900">Water Analysis Test</h4>
-                            <p className="text-xs text-gray-500">Sample ID: MB-2025-0324</p>
-                          </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor('pending')}`}>
-                            Pending
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                          <FaCalendar className="h-3 w-3" />
-                          <span>March 24, 2025</span>
-                          <FaClock className="h-3 w-3 ml-2" />
-                          <span>09:00 AM</span>
-                        </div>
+                        <p className="text-sm font-medium">Thermal Analysis - Dr. Emily Chen</p>
+                        <p className="text-xs text-gray-500">9:00 AM • Chemistry Test</p>
                       </div>
                     </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 flex items-center justify-center bg-green-100 rounded-lg">
-                        <FaBook className="h-4 w-4 text-green-600" />
-                      </div>
+                    <div className="flex items-center gap-3 p-2 bg-green-50 rounded-lg">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
                       <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900">Research Consultation</h4>
-                            <p className="text-xs text-gray-500">Ref: CON-2025-0324</p>
-                          </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor('in progress')}`}>
-                            In Progress
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                          <FaCalendar className="h-3 w-3" />
-                          <span>March 24, 2025</span>
-                          <FaClock className="h-3 w-3 ml-2" />
-                          <span>02:00 PM</span>
-                        </div>
+                        <p className="text-sm font-medium">Research Consultation - Prof. Rodriguez</p>
+                        <p className="text-xs text-gray-500">11:30 AM • Consultancy</p>
                       </div>
                     </div>
+                   
                   </div>
                 </div>
               </div>

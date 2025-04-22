@@ -342,7 +342,7 @@ export default function CalendarPage() {
 
             <div className="flex gap-6">
               {/* Calendar Section */}
-              <div className="bg-white rounded-xl shadow-sm w-[400px]">
+              <div className="bg-white rounded-xl shadow-sm w-[400px] border border-gray-200">
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-bold">{currentMonth}</h2>
@@ -417,7 +417,7 @@ export default function CalendarPage() {
               </div>
 
               {/* Appointments Table Section */}
-              <div className="flex-1 bg-white rounded-xl shadow-sm">
+              <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -460,7 +460,7 @@ export default function CalendarPage() {
                     <tbody className="divide-y divide-gray-100">
                       {appointments.map((appointment, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-teal-600">MB-{1000 + index}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-violet-600">MB-{1000 + index}</td>
                           <td className="px-6 py-4 text-sm text-gray-500">{appointment.requestDate}</td>
                           <td className="px-6 py-4 text-sm text-gray-900">{appointment.organization}</td>
                           <td className="px-6 py-4">

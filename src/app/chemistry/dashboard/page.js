@@ -235,7 +235,7 @@ export default function MetrologyDashboard() {
 
                 {/* Graph Section */}
                 <div className="mt-6  border border-gray-200 bg-white">
-                  <div className="flex justify-between items-center mb-4 p-4">
+                  <div className="flex justify-between items-center mb-4 p-4 n  ">
                     <h3 className="text-sm font-semibold">Weekly Appointment Trends</h3>
                     <div className="flex items-center gap-4 text-xs text-gray-500">
                       <div className="flex items-center gap-2">

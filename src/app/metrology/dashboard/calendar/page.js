@@ -158,8 +158,8 @@ export default function CalendarPage() {
               {/* Right Side - Info and Table */}
               <div className="flex-1 space-y-5">
                 {/* Date and Stats */}
-                <div className="bg-gradient-to-br from-gray-700 to-gray-600 rounded-xl drop-shadow-md p-6">  
-                  <h2 className="text-xl text-white font-semibold mb-6">
+                <div className="bg-gray-200  rounded-xl drop-shadow-sm p-6 border-gray-300">  
+                  <h2 className="text-xl font-semibold mb-6">  
                     {format(selectedDate, 'EEEE, MMMM d, yyyy')}
                   </h2>
                   <div className="grid grid-cols-3 gap-6">

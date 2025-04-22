@@ -217,8 +217,9 @@ export default function ServicesPage() {
                 </button>
               </div>
 
-              <div className="flex gap-4 items-center inline-block">
-                <div className="relative">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-4 items-center">
+                  <div className = "relative">
                   <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
@@ -240,7 +241,8 @@ export default function ServicesPage() {
                   <option>Culture and Sensitivity</option>
                   <option>Sterility Testing</option>
                 </select>
-                <div className="text-gray-600 inline-block flex">
+                </div>
+                <div className="text-gray-600 ">
                 <span>Total Tests: {totalTests}</span>
                 <span className="mx-2">|</span>
                 <span>Active: {activeTests}</span>

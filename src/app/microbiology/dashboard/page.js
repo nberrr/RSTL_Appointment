@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react';
 import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
-import Link from "next/link";
-import { FaCalendar, FaClock, FaCheckCircle, FaFlask, FaBook, FaCubes } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaCalendar, FaTimes, FaDownload, FaChevronDown, FaCheck, FaRegFile, FaFlask, FaBook, FaClock, FaVial } from 'react-icons/fa';
 
-export default function MetrologyDashboard() {
+export default function MicrobiologyDashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState(0);
@@ -230,6 +229,34 @@ export default function MetrologyDashboard() {
                       </div>
                     </div>
                     <p className="text-xs text-green-100 mt-2">5 Pending • 3 Today</p>
+                  </div>
+
+                  {/* Shelf Life Tests */}
+                  <div className="bg-gradient-to-br from-amber-600 to-amber-400 rounded-xl p-3 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-sm text-white">Shelf Life Tests</h3>
+                        <p className="text-2xl font-bold text-white mt-2">18</p>
+                      </div>
+                      <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-lg">
+                        <FaClock className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-amber-100 mt-2">7 In Progress • 4 Due Today</p>
+                  </div>
+
+                  {/* Microbial Analysis */}
+                  <div className="bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl p-3 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-sm text-white">Microbial Analysis</h3>
+                        <p className="text-2xl font-bold text-white mt-2">32</p>
+                      </div>
+                      <div className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-lg">
+                        <FaVial className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-blue-100 mt-2">15 Active • 6 Completed</p>
                   </div>
                 </div>
 

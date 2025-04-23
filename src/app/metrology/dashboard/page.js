@@ -5,29 +5,68 @@ import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Link from "next/link";
-import { FaUsers, FaCalendar, FaClock } from 'react-icons/fa';
+import { FaUsers, FaCalendar, FaClock, FaFlask } from 'react-icons/fa';
+
+const getDemoDate = () => {
+  const demoDate = new Date(2025, 2, 24); // Month is 0-indexed
+  return demoDate;
+};
+
+const getInitialMonth = (date) => {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+};
+
+const generateInitialCalendarDays = (date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  
+  // First day of the month
+  const firstDayOfMonth = new Date(year, month, 1);
+  // Last day of the month
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  
+  // Day of week for the first day (0 = Sunday, 1 = Monday, etc.)
+  const firstDayWeekday = firstDayOfMonth.getDay();
+  
+  // Total days in month
+  const totalDays = lastDayOfMonth.getDate();
+  
+  // Create array for calendar
+  const days = [];
+  
+  // Add empty cells for days before the first day of month
+  for (let i = 0; i < firstDayWeekday; i++) {
+    days.push({ day: null, isCurrentMonth: false });
+  }
+  
+  // Add days of current month
+  for (let i = 1; i <= totalDays; i++) {
+    days.push({ day: i, isCurrentMonth: true });
+  }
+  
+  // Calculate needed rows to fit all days (standard 6 rows for most months)
+  const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
+  const totalCells = neededRows * 7;
+  
+  // Add empty cells for days after the last day of month
+  const remainingCells = totalCells - days.length;
+  for (let i = 0; i < remainingCells; i++) {
+    days.push({ day: null, isCurrentMonth: false });
+  }
+  
+  return days;
+};
 
 export default function MetrologyDashboard() {
+  const initialDate = getDemoDate();
   // Get the current date information
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState('');
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [currentDay, setCurrentDay] = useState(0);
-  const [calendarDays, setCalendarDays] = useState([]);
-  
-  // Initialize date information on client-side
-  useEffect(() => {
-    const now = new Date();
-    // Set current date to March 24, 2025 for demo purposes
-    const demoDate = new Date(2025, 2, 24); // Month is 0-indexed
-    setCurrentDate(demoDate);
-    setCurrentDay(24);
-    setSelectedDay(24);
-    
-    // Generate calendar days for current month
-    generateCalendarDays(demoDate);
-    updateMonthDisplay(demoDate);
-  }, []);
+  const [currentDate, setCurrentDate] = useState(initialDate);
+  const [currentMonth, setCurrentMonth] = useState(() => getInitialMonth(initialDate));
+  const [selectedDay, setSelectedDay] = useState(24);
+  const [currentDay, setCurrentDay] = useState(24);
+  const [calendarDays, setCalendarDays] = useState(() => generateInitialCalendarDays(initialDate));
   
   // Update the month display
   const updateMonthDisplay = (date) => {

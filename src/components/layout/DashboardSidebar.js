@@ -137,11 +137,11 @@ export default function DashboardSidebar() {
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
-          <span className={`text-base font-medium text-gray-900 transition-opacity duration-200 ${
+          <Link href="/admin/dashboard" className={`text-base font-medium text-gray-900 transition-opacity duration-200 ${
             isCollapsed ? 'opacity-0 w-0' : 'opacity-100'
           }`}>
             Dashboard
-          </span>
+          </Link>
           <button 
             onClick={handleToggleCollapse}
             className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-50"

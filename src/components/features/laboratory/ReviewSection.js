@@ -188,10 +188,11 @@ export default function ReviewSection({
                       <tbody key={type} className="bg-white divide-y divide-gray-200">
                         <tr>
                           <td colSpan={2} className="px-6 py-3 bg-blue-50 text-blue-700 font-semibold">
-                            {type === 'chemical' && 'Chemical Services'}
+                            {type === 'chemistry' && 'Chemical Analysis'}
+                            {type === 'chemical' && 'Chemical Analysis'}
                             {type === 'microbiology' && 'Microbiology Services'}
                             {type === 'shelflife' && 'Shelf Life Services'}
-                            {type !== 'chemical' && type !== 'microbiology' && type !== 'shelflife' && type}
+                            {type !== 'chemistry' && type !== 'chemical' && type !== 'microbiology' && type !== 'shelflife' && type}
                           </td>
                         </tr>
                         {services.map((service, serviceIndex) => (

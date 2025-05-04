@@ -1,11 +1,9 @@
 "use client";
-
-import React from 'react';
-import { useState } from 'react';
-import { FaSearch, FaDownload, FaEllipsisH, FaFilter, FaTimes } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
 import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
+import { FaSearch, FaDownload, FaEllipsisH, FaFilter, FaTimes } from 'react-icons/fa';
 
 const ConsultationModal = ({ isOpen, onClose, consultation }) => {
   if (!isOpen) return null;
@@ -23,8 +21,7 @@ const ConsultationModal = ({ isOpen, onClose, consultation }) => {
               <FaTimes className="w-5 h-5" />
             </button>
           </div>
-        </div>
-
+        </div> 
         <div className="p-6">
           <div className="flex items-center gap-6 mb-6">
             <div>
@@ -180,65 +177,43 @@ export default function ConsultancyReportsPage() {
   const [dateSort, setDateSort] = useState('newest');
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [consultancyData, setConsultancyData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data for completed consultancy appointments
-  const consultancyData = [
-    {
-      id: "CON-2024-003",
-      date: "April 8, 2024",
-      time: "10:00 AM",
-      client: "PharmaCorp Industries",
-      type: "Industry Research",
-      researcher: "Elena Gomez",
-      email: "elena.gomez@pharmacorp.com",
-      phone: "+63 912 345 6789",
-      position: "Senior Researcher",
-      status: "Completed",
-      researchTopic: "Novel Antibiotic Compounds from Marine Sources",
-      researchFile: "antibiotic_research_proposal.pdf",
-      notes: "Seeking consultation on chemical analysis methods for marine-derived compounds with potential antibiotic properties.",
-      outcome: "Analysis Complete"
-    },
-    {
-      id: "CON-2024-002",
-      date: "April 5, 2024",
-      time: "2:30 PM",
-      client: "Environmental Research Institute",
-      type: "Industry Research",
-      researcher: "Juan Dela Cruz",
-      email: "juan.cruz@eri.org",
-      phone: "+63 917 123 4567",
-      position: "Research Associate",
-      status: "Completed",
-      researchTopic: "Water Quality Assessment Methods",
-      researchFile: "water_quality_proposal.pdf",
-      notes: "Discussion of advanced analytical techniques for water quality assessment.",
-      outcome: "Research Plan Finalized"
-    },
-    {
-      id: "CON-2024-001",
-      date: "April 2, 2024",
-      time: "9:00 AM",
-      client: "National University",
-      type: "Thesis/Dissertation",
-      researcher: "Maria Santos",
-      email: "m.santos@university.edu",
-      phone: "+63 998 765 4321",
-      position: "Graduate Student",
-      status: "Completed",
-      researchTopic: "Soil Contamination Analysis",
-      researchFile: "thesis_proposal.pdf",
-      notes: "Review of methodology for soil contamination analysis in urban areas.",
-      outcome: "Methodology Approved"
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/microbiology/consultancy-appointments');
+        const json = await res.json();
+        if (json.success) {
+          setConsultancyData(json.data);
+        } else {
+          setConsultancyData([]);
+        }
+      } catch (error) {
+        setConsultancyData([]);
+      }
+      setLoading(false);
     }
-  ];
+    fetchData();
+  }, []);
 
-  // Sample statistics
+  // Compute stats from fetched data
   const stats = {
-    total: 45,
-    completed: 45,
-    thesisDissertation: 18,
-    industryResearch: 27
+    total: consultancyData.length,
+    accepted: consultancyData.filter(
+      c => c.status && (c.status.toLowerCase() === 'accepted' || c.status.toLowerCase() === 'completed')
+    ).length,
+    declined: consultancyData.filter(
+      c => c.status && c.status.toLowerCase() === 'declined'
+    ).length,
+    thesisDissertation: consultancyData.filter(
+      c => c.researchType && c.researchType.toLowerCase().includes('thesis')
+    ).length,
+    industryResearch: consultancyData.filter(
+      c => c.researchType && c.researchType.toLowerCase().includes('industry')
+    ).length,
   };
 
   const getStatusColor = (status) => {
@@ -259,15 +234,29 @@ export default function ConsultancyReportsPage() {
   const filteredData = consultancyData
     .filter(item => {
       const matchesSearch = 
-        item.researcher.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.id.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesFilter = filterType === 'all' || item.type.toLowerCase() === filterType.toLowerCase();
-      
+        (item.researcher && item.researcher.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.researchType && item.researchType.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.id && item.id.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesFilter = filterType === 'all' || (item.researchType && item.researchType.toLowerCase() === filterType.toLowerCase());
       return matchesSearch && matchesFilter;
     })
     .sort(sortByDate);
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="h-screen flex flex-col">
+          <DashboardNav />
+          <div className="flex flex-1 overflow-hidden">
+            <DashboardSidebar />
+            <main className="flex-1 bg-gray-100 p-6 flex items-center justify-center">
+              <div className="text-lg text-gray-600">Loading consultancy reports...</div>
+            </main>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -286,16 +275,25 @@ export default function ConsultancyReportsPage() {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-xl p-4  border border-gray-200 shadow-md">
-                <h3 className="text-sm font-medium text-gray-600 mb-2">Total Consultations</h3>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Accepted Consultations</h3>
                 <div className="flex justify-between items-end">
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.accepted}</p>
                   <div className="text-right">
-                    <p className="text-sm text-green-600">All Completed</p>
+                    <p className="text-sm text-green-600">Completed</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Declined Consultations</h3>
+                <div className="flex justify-between items-end">
+                  <p className="text-2xl font-bold text-red-600">{stats.declined}</p>
+                  <div className="text-right">
+                    <p className="text-sm text-red-600">Cancelled</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-600 mb-2">Research Types</h3>
                 <div className="flex justify-between items-end">
                   <div>
@@ -308,15 +306,10 @@ export default function ConsultancyReportsPage() {
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-600 mb-2">Completion Rate</h3>
-                <p className="text-2xl font-bold text-green-600">100%</p>
-                <p className="text-sm text-gray-600 mt-1">All consultations completed</p>
-              </div>
             </div>
 
             {/* Main Content */}
-            <div className="bg-white rounded-xl shadow-sm  border border-gray-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold">Consultation History</h2>
@@ -363,27 +356,29 @@ export default function ConsultancyReportsPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Research Topic</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Consultation Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Research Stage</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredData.map((consultation) => (
                       <tr key={consultation.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{consultation.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{consultation.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.researcher}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-full">
-                            {consultation.type}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.researchTopic}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.researchType}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.position}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consultation.date}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            consultation.status && (consultation.status.toLowerCase() === 'completed' || consultation.status.toLowerCase() === 'accepted')
+                              ? 'bg-green-100 text-green-800'
+                              : consultation.status && consultation.status.toLowerCase() === 'declined'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
                             {consultation.status}
                           </span>
                         </td>

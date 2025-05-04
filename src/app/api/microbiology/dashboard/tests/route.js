@@ -3,16 +3,16 @@ import { query } from '@/lib/db';
 
 export async function GET(request) {
   try {
-    // Get the service ID(s) for chemistry
+    // Get the service ID(s) for microbiology
     const serviceResult = await query(
-      `SELECT id FROM services WHERE category = 'chemistry'`
+      `SELECT id FROM services WHERE category = 'microbiology'`
     );
     if (serviceResult.rows.length === 0) {
-      return NextResponse.json({ success: false, message: 'Chemistry service not found' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'Microbiology service not found' }, { status: 404 });
     }
     const serviceIds = serviceResult.rows.map(row => row.id);
 
-    // Fetch chemistry appointments and join relevant tables
+    // Fetch microbiology appointments and join relevant tables
     const appointmentsResult = await query(`
       SELECT 
         a.id,
@@ -30,14 +30,16 @@ export async function GET(request) {
         ad.sample_type,
         ad.sample_quantity,
         ad.created_at as date_requested,
-        cd.analysis_requested,
-        cd.parameters,
-        cd.delivery_type,
-        cd.sample_quantity as chemistry_sample_quantity,
-        cd.created_at as chemistry_created_at,
-        cd.updated_at as chemistry_updated_at,
-        cd.id as chemistry_detail_id,
-        cd.analysis_requested as test_type,
+        md.analysis_requested,
+        md.parameters,
+        md.delivery_type,
+        md.sample_quantity as microbio_sample_quantity,
+        md.created_at as microbio_created_at,
+        md.updated_at as microbio_updated_at,
+        md.id as microbio_detail_id,
+        md.test_type,
+        md.organism_target,
+        md.sample_storage_condition,
         tr.result_data,
         tr.result_file_path,
         tr.conducted_by,
@@ -45,10 +47,11 @@ export async function GET(request) {
       FROM appointments a
       JOIN customers c ON a.customer_id = c.id
       JOIN appointment_details ad ON a.id = ad.appointment_id
-      JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id
+      JOIN microbiology_details md ON ad.id = md.appointment_detail_id
       LEFT JOIN test_results tr ON a.id = tr.appointment_id
+      WHERE a.service_id = ANY($1)
       ORDER BY a.appointment_date DESC, a.appointment_time DESC
-    `);
+    `, [serviceIds]);
 
     // Map database results to the structure expected by the frontend
     const formattedData = appointmentsResult.rows.map(apt => {
@@ -71,6 +74,8 @@ export async function GET(request) {
           priority: 'N/A', // Not available in schema
           description: apt.sample_description || '',
           laboratory: apt.analysis_requested || '',
+          organismTarget: apt.organism_target || '',
+          storageCondition: apt.sample_storage_condition || '',
         },
         testResults: {
           summary: apt.result_data ? JSON.stringify(apt.result_data) : '',
@@ -88,7 +93,7 @@ export async function GET(request) {
       data: formattedData
     });
   } catch (error) {
-    console.error('Error fetching chemistry test reports:', error);
+    console.error('Error fetching microbiology test reports:', error);
     return NextResponse.json(
       { success: false, message: error.message },
       { status: 500 }

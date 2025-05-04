@@ -164,12 +164,19 @@ export default function LaboratoryAppointmentForm() {
         [name]: value
       }));
     });
-
     // Remove error for the field being edited
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[name];
+        return newErrors;
+      });
+    }
+    // Re-validate this field immediately
+    if (name === 'sex' && value) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        if (newErrors.sex && value) delete newErrors.sex;
         return newErrors;
       });
     }
@@ -185,12 +192,19 @@ export default function LaboratoryAppointmentForm() {
       };
       return newAppointments;
     });
-
     // Remove error for the field being edited
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[name];
+        return newErrors;
+      });
+    }
+    // Re-validate this field immediately
+    if (name && value) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        if (newErrors[name] && value) delete newErrors[name];
         return newErrors;
       });
     }
@@ -633,7 +647,7 @@ export default function LaboratoryAppointmentForm() {
       }))
     );
     
-    // Call validateForm which now handles setting errors state ONLY on final submit validation
+    // Re-validate before submit
     if (!validateForm()) {
       return;
     }
@@ -645,73 +659,79 @@ export default function LaboratoryAppointmentForm() {
       const results = [];
       
       for (const appointment of appointments) {
-        const formData = {
-          // Common customer data (from first appointment)
-          name: appointment.clientName,
-          email: appointment.emailAddress,
-          contactNumber: appointment.phoneNumber,
-          companyName: appointment.organization,
-          sex: appointment.sex,
-          
-          // Common sample data
-          nameOfSamples: appointment.sampleName,
-          sampleType: appointment.sampleType || 'Not specified',
-          sampleQuantity: appointment.quantity,
-          sampleDescription: appointment.sampleDescription,
-          selectedDate: appointment.preferredDate,
-          
-          // Terms acceptance (hardcoded for now, should be added to the form)
-          terms: true,
-          
-          // Default values for required fields
-          sampleCondition: 'Normal',
-          replicates: 1
-        };
-        
-        // Determine endpoint based on service type
-        let endpoint = '';
-        
-        // Add service-specific data
-        if (appointment.currentServiceTab === 'chemical') {
-          endpoint = '/api/appointments/chemistry';
-          // Chemistry-specific fields
-          formData.analysisRequested = appointment.selectedServices.join(', ');
-          formData.parameters = 'Standard parameters';
-          formData.deliveryType = 'Standard';
-        } 
-        else if (appointment.currentServiceTab === 'microbiological') {
-          endpoint = '/api/appointments/microbiology';
-          // Microbiology-specific fields
-          formData.testType = appointment.selectedServices.join(', ');
-          formData.organismTarget = 'Standard targets';
-          formData.storageCondition = 'Room temperature';
-        } 
-        else if (appointment.currentServiceTab === 'shelflife') {
-          endpoint = '/api/appointments/shelf-life';
-          // Shelf life-specific fields
-          formData.productType = appointment.productName || 'Not specified';
-          formData.storageConditions = appointment.methodOfPreservation || 'Not specified';
-          formData.shelfLifeDuration = appointment.targetShelfLife || 'Not specified';
-          formData.packagingType = appointment.packagingMaterial || 'Not specified';
-          formData.modesOfDeterioration = appointment.modeOfDeterioration.join(', ');
-        }
-        
-        // Send the request
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
+        // Group selected services by category
+        const selectedServiceIds = appointment.selectedServices || [];
+        const servicesByCategory = {};
+        // Flatten all services by id for lookup
+        const allServicesFlat = Object.entries(servicesData).reduce((acc, [category, services]) => {
+          services.forEach(service => {
+            acc[service.id] = { ...service, serviceType: category };
+          });
+          return acc;
+        }, {});
+        // Group selected services by their category
+        selectedServiceIds.forEach(id => {
+          const service = allServicesFlat[id];
+          if (service) {
+            if (!servicesByCategory[service.serviceType]) servicesByCategory[service.serviceType] = [];
+            servicesByCategory[service.serviceType].push(service);
+          }
         });
-        
-        const result = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(result.message || 'Failed to submit appointment');
+        // For each category, send to the correct endpoint
+        for (const [category, services] of Object.entries(servicesByCategory)) {
+          let endpoint = '';
+          const formData = {
+            // Common customer data (from first appointment)
+            name: appointment.clientName,
+            email: appointment.emailAddress,
+            contactNumber: appointment.phoneNumber,
+            companyName: appointment.organization,
+            sex: appointment.sex,
+            // Common sample data
+            nameOfSamples: appointment.sampleName,
+            sampleType: appointment.sampleType || 'Not specified',
+            sampleQuantity: appointment.quantity,
+            sampleDescription: appointment.sampleDescription,
+            selectedDate: appointment.preferredDate,
+            // Terms acceptance (hardcoded for now, should be added to the form)
+            terms: true,
+            // Default values for required fields
+            sampleCondition: 'Normal',
+            replicates: 1
+          };
+          if (category === 'chemistry') {
+            endpoint = '/api/appointments/chemistry';
+            formData.analysisRequested = services.map(s => s.name).join(', ');
+            formData.parameters = 'Standard parameters';
+            formData.deliveryType = 'Standard';
+          } else if (category === 'microbiology') {
+            endpoint = '/api/appointments/microbiology';
+            formData.testType = services.map(s => s.name).join(', ');
+            formData.organismTarget = 'Standard targets';
+            formData.storageCondition = 'Room temperature';
+          } else if (category === 'shelf_life') {
+            endpoint = '/api/appointments/shelf-life';
+            formData.productType = appointment.productName || 'Not specified';
+            formData.storageConditions = appointment.methodOfPreservation || 'Not specified';
+            formData.shelfLifeDuration = appointment.targetShelfLife || 'Not specified';
+            formData.packagingType = appointment.packagingMaterial || 'Not specified';
+            formData.modesOfDeterioration = appointment.modeOfDeterioration.join(', ');
+          } else {
+            continue; // skip unknown categories
+          }
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to submit appointment');
+          }
+          results.push(result);
         }
-        
-        results.push(result);
       }
       
       // All appointments submitted successfully
@@ -744,6 +764,13 @@ export default function LaboratoryAppointmentForm() {
       };
     }
   }, [isSubmitting]);
+
+  // Re-validate on step change
+  useEffect(() => {
+    if (currentStep === 'review') {
+      validateForm();
+    }
+  }, [currentStep, appointments]);
 
   // console.log("Rendering LaboratoryAppointmentForm"); // Removed log
 

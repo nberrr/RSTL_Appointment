@@ -13,6 +13,11 @@ const InlineError = ({ message }) => {
   );
 };
 
+const validateQuantity = (value) => {
+  // Require at least one digit in the string
+  return /\d/.test(value);
+};
+
 export default function SampleDetails({ 
   appointment, 
   onChange, 
@@ -95,6 +100,9 @@ export default function SampleDetails({
             disabled={disabled}
           />
           <InlineError message={errors.quantity} />
+          {errors.quantityFormat && (
+            <p className="mt-1 text-sm text-red-600">{errors.quantityFormat}</p>
+          )}
         </div>
         
         <div>

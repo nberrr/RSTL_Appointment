@@ -1,7 +1,6 @@
 "use client";
 
-import React from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaSearch, FaDownload, FaEllipsisH, FaFilter, FaTimes } from 'react-icons/fa';
 import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
@@ -13,109 +12,48 @@ export default function ChemistryReportsPage() {
   const [dateSort, setDateSort] = useState('newest');
   const [selectedSample, setSelectedSample] = useState(null);
   const [activeTab, setActiveTab] = useState('sample-details');
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data for completed appointments
-  const appointments = [
-    {
-      id: "AP-1001",
-      client: {
-        name: "Dr. Emily Chen",
-        email: "emily.chen@biotech.com",
-        phone: "+1 (555) 123-4567",
-        organization: "BioTech Research Inc.",
-        sex: "Female",
-        submissionTimestamp: "3/15/2025, 9:23:45 AM"
-      },
-      sample: "Polymer Composite A-42",
-      sampleDetails: {
-        name: "Polymer Composite A-42",
-        type: "Polymer",
-        numSamples: 3,
-        dateRequested: "2025-03-10",
-        priority: "High",
-        description: "Heat-resistant polymer composite for aerospace applications",
-        laboratory: "Thermal Analysis Lab"
-      },
-      testResults: {
-        summary: "All tests passed. Material meets specifications for heat resistance up to 450°C.",
-        technician: "Robert Johnson",
-        completedDate: "2025-03-15"
-      },
-      testType: "Thermal Analysis",
-      date: "3/15/2025",
-      status: "Completed"
-    },
-    {
-      id: "AP-1002",
-      client: {
-        name: "Prof. Michael Rodriguez",
-        email: "rodriguez@ucal.edu",
-        phone: "+1 (555) 234-5678",
-        organization: "University of California",
-        sex: "Male",
-        submissionTimestamp: "3/18/2025, 2:05:00 PM"
-      },
-      sample: "Catalyst XR-7",
-      sampleDetails: {
-        name: "Catalyst XR-7",
-        type: "Catalyst",
-        numSamples: 2,
-        dateRequested: "2025-03-18",
-        priority: "Medium",
-        description: "Novel catalytic material for green chemistry applications",
-        laboratory: "Spectroscopy Lab"
-      },
-      testResults: {
-        summary: "Catalyst shows expected activity within specified parameters.",
-        technician: "Sarah Williams",
-        completedDate: "2025-03-20"
-      },
-      testType: "Spectroscopy",
-      date: "3/18/2025",
-      status: "Completed"
-    },
-    {
-      id: "AP-1005",
-      client: {
-        name: "Dr. Lisa Park",
-        email: "l.park@research.com",
-        phone: "+1 (555) 345-6789",
-        organization: "Environmental Research Labs",
-        sex: "Female",
-        submissionTimestamp: "3/25/2025, 10:15:00 AM"
-      },
-      sample: "Soil Sample LP-12",
-      sampleDetails: {
-        name: "Soil Sample LP-12",
-        type: "Environmental",
-        numSamples: 5,
-        dateRequested: "2025-03-25",
-        priority: "High",
-        description: "Soil samples from industrial site for contamination analysis",
-        laboratory: "Environmental Analysis Lab"
-      },
-      testResults: {
-        summary: "Contaminant levels within acceptable range per EPA guidelines.",
-        technician: "Mike Thompson",
-        completedDate: "2025-03-27"
-      },
-      testType: "Contaminant Screening",
-      date: "3/25/2025",
-      status: "Completed"
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/chemistry/dashboard/tests');
+        const json = await res.json();
+        if (json.success) {
+          setAppointments(json.data);
+        } else {
+          setAppointments([]);
+        }
+      } catch (error) {
+        setAppointments([]);
+      }
+      setLoading(false);
     }
-  ];
+    fetchData();
+  }, []);
 
-  // Sample data for completion stats
-  const completionStats = [
-    { name: "Thermal Analysis", count: 8 },
-    { name: "Spectroscopy", count: 6 },
-    { name: "HPLC Analysis", count: 5 },
-    { name: "Elemental Analysis", count: 3 },
-    { name: "Other Tests", count: 2 }
-  ];
+  // Compute stats
+  const completedCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'completed').length;
+  const declinedCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'declined').length;
+  const cancelledCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'cancelled').length;
+
+  // Compute completionStats by testType
+  const completionStatsObj = appointments.reduce((acc, a) => {
+    const type = a.testType || 'Other Tests';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
+  const completionStats = Object.entries(completionStatsObj).map(([name, count]) => ({ name, count }));
 
   const getStatusColor = (status) => {
-    return 'bg-green-100 text-green-800'; // All items are completed
+    if (!status) return 'bg-gray-100 text-gray-800';
+    const s = status.toLowerCase();
+    if (s === 'completed') return 'bg-green-100 text-green-800';
+    if (s === 'declined') return 'bg-red-100 text-red-800';
+    if (s === 'cancelled') return 'bg-gray-100 text-gray-800';
+    return 'bg-gray-100 text-gray-800';
   };
 
   const sortByDate = (a, b) => {
@@ -130,9 +68,7 @@ export default function ChemistryReportsPage() {
         item.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.sample.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.testType.toLowerCase().includes(searchTerm.toLowerCase());
-      
       const matchesFilter = filterType === 'all' || item.testType.toLowerCase() === filterType.toLowerCase();
-      
       return matchesSearch && matchesFilter;
     })
     .sort(sortByDate);
@@ -142,13 +78,29 @@ export default function ChemistryReportsPage() {
     setActiveTab('sample-details');
   };
 
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="h-screen flex flex-col">
+          <DashboardNav />
+          <div className="flex flex-1 overflow-hidden">
+            <DashboardSidebar />
+            <main className="flex-1 bg-gray-50 p-8 flex items-center justify-center">
+              <div className="text-lg text-gray-600">Loading chemistry test reports...</div>
+            </main>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="h-screen flex flex-col">
         <DashboardNav />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-50 p-8">
+          <main className="flex-1 bg-gray-50 p-8 flex flex-col min-h-0 overflow-hidden">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl font-semibold">Appointment History</h1>
               <button className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 border border-gray-200">
@@ -158,42 +110,44 @@ export default function ChemistryReportsPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm border border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Completed Tests</span>
+            <div className="mb-5 flex-shrink-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-0">
+                <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Completed Tests</span>
+                  </div>
+                  <p className="text-3xl font-bold">{completedCount}</p>
+                  <p className="text-sm text-gray-500">Last 30 days</p>
+                  <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
                 </div>
-                <p className="text-3xl font-bold">24</p>
-                <p className="text-sm text-gray-500">Last 30 days</p>
-                <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
-              </div>
-              
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm  border border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Declined Tests</span>
+                
+                <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm  border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Declined Tests</span>
+                  </div>
+                  <p className="text-3xl font-bold">{declinedCount}</p>
+                  <p className="text-sm text-gray-500">Last 30 days</p>
+                  <div className="absolute right-0 top-0 h-full w-1 bg-red-500"></div>
                 </div>
-                <p className="text-3xl font-bold">5</p>
-                <p className="text-sm text-gray-500">Last 30 days</p>
-                <div className="absolute right-0 top-0 h-full w-1 bg-red-500"></div>
-              </div>
-              
-              <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-msm  border border-gray-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">Cancelled Tests</span>
+                
+                <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-msm  border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">Cancelled Tests</span>
+                  </div>
+                  <p className="text-3xl font-bold">{cancelledCount}</p>
+                  <p className="text-sm text-gray-500">Last 30 days</p>
+                  <div className="absolute right-0 top-0 h-full w-1 bg-gray-500"></div>
                 </div>
-                <p className="text-3xl font-bold">8</p>
-                <p className="text-sm text-gray-500">Last 30 days</p>
-                <div className="absolute right-0 top-0 h-full w-1 bg-gray-500"></div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr,300px] gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr,300px] gap-6 flex-1 min-h-0 overflow-hidden">
               {/* Main Content */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200 ">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div className="p-6 border-b border-gray-200 flex-shrink-0">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <h2 className="text-lg font-semibold">Completed Appointments</h2>
                     <div className="flex flex-wrap items-center gap-4">
@@ -232,7 +186,7 @@ export default function ChemistryReportsPage() {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto flex-1 min-h-0 rounded-b-2xl" style={{ overflowY: 'auto' }}>
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50">
@@ -265,7 +219,7 @@ export default function ChemistryReportsPage() {
                           <td className="px-6 py-4 text-sm text-gray-500">{appointment.sample}</td>
                           <td className="px-6 py-4 text-sm text-gray-500">{appointment.sampleDetails.laboratory}</td>
                           <td className="px-6 py-4">
-                            <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
+                            <span className={getStatusColor(appointment.status)}>
                               {appointment.status}
                             </span>
                           </td>
@@ -285,7 +239,7 @@ export default function ChemistryReportsPage() {
               </div>
 
               {/* Completion Stats */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex-shrink-0 max-h-[60vh] overflow-y-auto">
                 <h2 className="text-lg font-semibold mb-4">Completion Stats</h2>
                 <div className="space-y-4">
                   {completionStats.map((stat) => (
@@ -297,7 +251,7 @@ export default function ChemistryReportsPage() {
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className="bg-green-500 h-2 rounded-full"
-                          style={{ width: `${(stat.count / 8) * 100}%` }}
+                          style={{ width: `${(stat.count / Math.max(...completionStats.map(s => s.count), 1)) * 100}%` }}
                         ></div>
                       </div>
                     </div>

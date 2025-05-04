@@ -7,7 +7,7 @@ export async function POST(request) {
     const formData = await request.json();
     
     // Validate required fields
-    const requiredFields = ['name', 'email', 'contactNumber', 'nameOfSamples', 'sampleType', 'sampleQuantity', 'sampleDescription', 'selectedDate'];
+    const requiredFields = ['name', 'email', 'contactNumber', 'sex', 'nameOfSamples', 'sampleType', 'sampleQuantity', 'sampleDescription', 'selectedDate'];
     
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -23,10 +23,10 @@ export async function POST(request) {
     
     // 1. Insert customer data and get customer_id
     const customerResult = await query(
-      `INSERT INTO customers (name, email, contact_number, company_name)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO customers (name, email, contact_number, company_name, sex)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [formData.name, formData.email, formData.contactNumber, formData.companyName || null]
+      [formData.name, formData.email, formData.contactNumber, formData.companyName || null, formData.sex]
     );
     const customerId = customerResult.rows[0].id;
     

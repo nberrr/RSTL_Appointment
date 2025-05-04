@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaPlus, FaSearch, FaCheck, FaTimes, FaTrash } from 'react-icons/fa';
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardNav from "@/components/layout/DashboardNav";
@@ -28,176 +28,204 @@ function ToggleSwitch({ enabled, onChange, activeColor = "bg-blue-600", inactive
 
 export default function ServicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('All Test Types');
+  const [filterType, setFilterType] = useState('all');
   const [editingId, setEditingId] = useState(null);
   const [editedService, setEditedService] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState(null);
-  const [modalType, setModalType] = useState(null); // 'save', 'cancel', 'emptySave', 'emptyCancel'
+  const [modalType, setModalType] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data for services
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      sampleType: 'Petroleum',
-      description: 'Crude oil and refined petroleum products',
-      testType: 'Density Testing',
-      testDescription: 'Measurement of density at standard temperature',
-      pricing: 2500,
-      appointment: 'Allowed',
-      status: 'Active'
-    },
-    {
-      id: 2,
-      sampleType: 'Water',
-      description: 'Potable and non-potable water samples',
-      testType: 'Chemical Analysis',
-      testDescription: 'Full chemical composition analysis including pH, minerals, and contaminants',
-      pricing: 3500,
-      appointment: 'Allowed',
-      status: 'Active'
-    },
-    {
-      id: 3,
-      sampleType: 'Soil',
-      description: 'Agricultural and construction soil samples',
-      testType: 'Composition Analysis',
-      testDescription: 'Analysis of soil composition, nutrients, and contaminants',
-      pricing: 4000,
-      appointment: 'Not Allowed',
-      status: 'Active'
-    },
-    {
-      id: 4,
-      sampleType: 'Gas',
-      description: 'Natural gas and industrial gas samples',
-      testType: 'Purity Testing',
-      testDescription: 'Measurement of gas purity and composition',
-      pricing: 3000,
-      appointment: 'Allowed',
-      status: 'Active'
-    },
-    {
-      id: 5,
-      sampleType: 'Metals',
-      description: 'Various metal alloys and compounds',
-      testType: 'Hardness Testing',
-      testDescription: 'Measurement of metal hardness and structural integrity',
-      pricing: 5000,
-      appointment: 'Allowed',
-      status: 'Inactive'
+  // Fetch services on component mount
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/chemistry/services');
+      const data = await response.json();
+      
+      if (data.success) {
+        setServices(data.data.map(service => ({
+          id: service.id,
+          testType: service.test_type || '',
+          testDescription: service.test_description || '',
+          pricing: parseFloat(service.pricing) || 0,
+          appointment: service.appointment || 'Allowed',
+          status: service.active ? 'Active' : 'Inactive'
+        })));
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      setError('Failed to fetch services');
+      console.error('Error fetching services:', error);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const handleEdit = (service) => {
-  setEditingId(service.id);
-  setEditedService({ ...service });
-};
+    setEditingId(service.id);
+    setEditedService({ 
+      ...service,
+      pricing: parseFloat(service.pricing) || 0
+    });
+  };
 
-const handleSave = () => {
-  if (
-    !editedService.sampleType.trim() ||
-    !editedService.description.trim() ||
-    !editedService.testType.trim() ||
-    !editedService.testDescription.trim()
-  ) {
-    setModalType('emptySave');
-    setModalMessage('Are you sure you want to save service without information?');
-    return;
-  }
+  const handleAddNew = () => {
+    const newService = {
+      id: 'new',
+      testType: '',
+      testDescription: '',
+      pricing: 0,
+      appointment: 'Allowed',
+      status: 'Active'
+    };
+    setEditedService(newService);
+    setEditingId('new');
+  };
 
-  setModalType('save');
-  setModalMessage('Are you sure you want to save changes?');
-};
+  const handleChange = (field, value) => {
+    setEditedService(prev => ({ ...prev, [field]: value }));
+  };
 
-const handleCancel = () => {
-  if (!editedService.sampleType.trim() &&
-      !editedService.description.trim() &&
-      !editedService.testType.trim() &&
-      !editedService.testDescription.trim()) {
-    setModalType('emptyCancel');
-    setModalMessage('This new service is empty. Delete it?');
-  } else {
-    setModalType('cancel');
-    setModalMessage('Are you sure you want to cancel changes?');
-  }
-};
+  const handleSaveService = async () => {
+    if (!editedService.testType?.trim() || !editedService.testDescription?.trim()) {
+      setModalType('emptySave');
+      setModalMessage('Are you sure you want to save service without information?');
+      return;
+    }
 
-const handleAddNew = () => {
-  setModalType('add');
-  setModalMessage('Are you sure you want to add a new service?');
-};
+    try {
+      const response = await fetch('/api/chemistry/services', {
+        method: editingId === 'new' ? 'POST' : 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: editingId === 'new' ? undefined : editingId,
+          testType: editedService.testType.trim(),
+          testDescription: editedService.testDescription.trim(),
+          pricing: parseFloat(editedService.pricing) || 0,
+          appointment: editedService.appointment,
+          active: editedService.status === 'Active'
+        }),
+      });
 
-const handleChange = (field, value) => {
-  setEditedService({ ...editedService, [field]: value });
-};
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchServices();
+        setEditingId(null);
+        setEditedService(null);
+        setModalType(null);
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      setError('Failed to save service');
+      console.error('Error saving service:', error);
+    }
+  };
 
-const activeTests = services.filter(service => service.status === 'Active').length;
-const totalTests = services.length;
-
-const handleDeleteClick = (service) => {
-  setServiceToDelete(service);
-  setDeleteModal(true);
-};
-
-const handleDeleteConfirm = () => {
-  setServices(services.filter(service => service.id !== serviceToDelete.id));
-  setDeleteModal(false);
-  setServiceToDelete(null);
-};
-
-const handleDeleteCancel = () => {
-  setDeleteModal(false);
-  setServiceToDelete(null);
-};
-
-const handleModalConfirm = () => {
-  switch (modalType) {
-    case 'save':
-      setServices(services.map(service => 
-        service.id === editingId ? editedService : service
-        
-      ));
+  const handleCancelEdit = () => {
+    if (
+      editingId === 'new' && 
+      !editedService.testType?.trim() && 
+      !editedService.testDescription?.trim()
+    ) {
+      // If it's a new service and empty, just cancel without confirmation
       setEditingId(null);
       setEditedService(null);
-      break;
-    case 'emptySave':
-      setServices(services.map(service => 
-        service.id === editingId ? editedService : service
-      ));
-      break;
-    case 'cancel':
-      setEditingId(null);
-      setEditedService(null);
-      break;
-    case 'emptyCancel':
-      setServices(services.filter(service => service.id !== editingId));
-      setEditingId(null);
-      setEditedService(null);
-      break;
-    case 'add':
-      const newService = {
-        id: services.length + 1,
-        sampleType: '',
-        description: '',
-        testType: '',
-        testDescription: '',
-        pricing: 0,
-        appointment: 'Allowed',
-        status: 'Active'
-      };
-      setServices([newService, ...services]);
-      setEditingId(newService.id);
-      setEditedService({ ...newService });
-      break;
-  }
-  setModalType(null);
-};
+      setModalType(null);
+    } else {
+      setModalType('cancel');
+      setModalMessage('Are you sure you want to cancel changes?');
+    }
+  };
 
-const handleModalCancel = () => {
-  setModalType(null);
-};
+  const handleDeleteClick = (service) => {
+    setServiceToDelete(service);
+    setDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await fetch(`/api/chemistry/services?id=${serviceToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        await fetchServices();
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      setError('Failed to delete service');
+      console.error('Error deleting service:', error);
+    } finally {
+      setDeleteModal(false);
+      setServiceToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal(false);
+    setServiceToDelete(null);
+  };
+
+  const handleModalConfirm = () => {
+    switch (modalType) {
+      case 'save':
+      case 'emptySave':
+        handleSaveService();
+        break;
+      case 'cancel':
+      case 'emptyCancel':
+        setEditingId(null);
+        setEditedService(null);
+        setModalType(null);
+        break;
+    }
+  };
+
+  const handleModalCancel = () => {
+    setModalType(null);
+  };
+
+  const activeTests = services.filter(service => service.status === 'Active').length;
+  const totalTests = services.length;
+
+  const filteredServices = services.filter(service => {
+    const matchesSearch = 
+      service.testType?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === 'all' || service.testType?.toLowerCase() === filterType.toLowerCase();
+    return matchesSearch && matchesFilter;
+  });
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="h-screen flex flex-col">
+          <DashboardNav />
+          <div className="flex flex-1 overflow-hidden">
+            <DashboardSidebar />
+            <main className="flex-1 bg-gray-50 p-8 flex items-center justify-center">
+              <div className="text-lg text-gray-600">Loading chemistry services...</div>
+            </main>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -206,6 +234,18 @@ const handleModalCancel = () => {
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
           <main className="flex-1 bg-gray-100 flex flex-col overflow-hidden">
+            {error && (
+              <div className="p-4 bg-red-100 text-red-700 mb-4">
+                {error}
+                <button 
+                  onClick={() => setError(null)}
+                  className="ml-2 text-red-500 hover:text-red-700"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            )}
+
             {/* Fixed Header Section */}
             <div className="p-5 space-y-6">
               <div className="flex justify-between items-center">
@@ -225,7 +265,7 @@ const handleModalCancel = () => {
                     <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="text"
-                      placeholder="Search sample or test type..."
+                      placeholder="Search test type..."
                       className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -236,12 +276,10 @@ const handleModalCancel = () => {
                     onChange={(e) => setFilterType(e.target.value)}
                     className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option>All Test Types</option>
-                    <option>Density Testing</option>
-                    <option>Chemical Analysis</option>
-                    <option>Composition Analysis</option>
-                    <option>Purity Testing</option>
-                    <option>Hardness Testing</option>
+                    <option value="all">All Test Types</option>
+                    {Array.from(new Set(services.map(s => s.testType))).map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="text-gray-600">
@@ -252,48 +290,24 @@ const handleModalCancel = () => {
               </div>
             </div>
 
-            {/* Scrollable Table Section */}
+            {/* Scrollable Table */}
             <div className="flex-1 overflow-auto p-5">
               <div className="bg-white rounded-lg shadow h-full flex flex-col border-gray-200">
                 <div className="overflow-auto">
                   <table className="min-w-full">
                     <thead className="bg-gray-50 sticky top-0">
                       <tr className="border-b">
-                        <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type of Sample</th>
-                        <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type of Test</th>
+                        <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type of Test</th>
                         <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pricing (₱)</th>
                         <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Appointment</th>
                         <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="w-24 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {services.map((service) => (
-                        <tr key={service.id} className="border-b">
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredServices.map((service) => (
+                        <tr key={service.id} className="hover:bg-gray-50">
                           <td className="w-1/4 px-6 py-4">
-                            {editingId === service.id ? (
-                              <div className="space-y-1">
-                                <input
-                                  type="text"
-                                  className="w-full px-2 py-1 border rounded text-sm"
-                                  value={editedService.sampleType}
-                                  onChange={(e) => handleChange('sampleType', e.target.value)}
-                                />
-                                <textarea
-                                  className="w-full px-2 py-1 border rounded text-sm resize-none"
-                                  value={editedService.description}
-                                  onChange={(e) => handleChange('description', e.target.value)}
-                                  rows="2"
-                                />
-                              </div>
-                            ) : (
-                              <div className="min-h-[70px]">
-                                <div className="text-sm font-medium text-gray-900">{service.sampleType}</div>
-                                <div className="text-sm text-gray-500">{service.description}</div>
-                              </div>
-                            )}
-                          </td>
-                          <td className="w-1/3 px-6 py-4">
                             {editingId === service.id ? (
                               <div className="space-y-1">
                                 <input
@@ -301,12 +315,14 @@ const handleModalCancel = () => {
                                   className="w-full px-2 py-1 border rounded text-sm"
                                   value={editedService.testType}
                                   onChange={(e) => handleChange('testType', e.target.value)}
+                                  placeholder="Enter test type"
                                 />
                                 <textarea
                                   className="w-full px-2 py-1 border rounded text-sm resize-none"
                                   value={editedService.testDescription}
                                   onChange={(e) => handleChange('testDescription', e.target.value)}
                                   rows="2"
+                                  placeholder="Enter test description"
                                 />
                               </div>
                             ) : (
@@ -321,11 +337,15 @@ const handleModalCancel = () => {
                               <input
                                 type="number"
                                 className="w-24 px-2 py-1 border rounded text-sm"
-                                value={editedService.pricing}
-                                onChange={(e) => handleChange('pricing', parseInt(e.target.value))}
+                                value={editedService.pricing || 0}
+                                onChange={(e) => handleChange('pricing', parseFloat(e.target.value) || 0)}
+                                min="0"
+                                step="0.01"
                               />
                             ) : (
-                              <span className="text-sm text-gray-900">{service.pricing.toLocaleString()}</span>
+                              <span className="text-sm text-gray-900">
+                                {typeof service.pricing === 'number' ? service.pricing.toLocaleString() : '0'}
+                              </span>
                             )}
                           </td>
                           <td className="w-32 px-6 py-4">
@@ -370,13 +390,13 @@ const handleModalCancel = () => {
                               {editingId === service.id ? (
                                 <>
                                   <button 
-                                    onClick={handleSave}
+                                    onClick={handleSaveService}
                                     className="text-green-600 hover:text-green-800"
                                   >
                                     <FaCheck className="w-5 h-5" />
                                   </button>
                                   <button 
-                                    onClick={handleCancel}
+                                    onClick={handleCancelEdit}
                                     className="text-red-600 hover:text-red-800"
                                   >
                                     <FaTimes className="w-5 h-5" />
@@ -404,6 +424,71 @@ const handleModalCancel = () => {
                           </td>
                         </tr>
                       ))}
+                      {editingId === 'new' && (
+                        <tr className="hover:bg-gray-50">
+                          <td className="w-1/4 px-6 py-4">
+                            <div className="space-y-1">
+                              <input
+                                type="text"
+                                className="w-full px-2 py-1 border rounded text-sm"
+                                value={editedService.testType}
+                                onChange={(e) => handleChange('testType', e.target.value)}
+                                placeholder="Enter test type"
+                              />
+                              <textarea
+                                className="w-full px-2 py-1 border rounded text-sm resize-none"
+                                value={editedService.testDescription}
+                                onChange={(e) => handleChange('testDescription', e.target.value)}
+                                rows="2"
+                                placeholder="Enter test description"
+                              />
+                            </div>
+                          </td>
+                          <td className="w-32 px-6 py-4">
+                            <input
+                              type="number"
+                              className="w-24 px-2 py-1 border rounded text-sm"
+                              value={editedService.pricing || 0}
+                              onChange={(e) => handleChange('pricing', parseFloat(e.target.value) || 0)}
+                              min="0"
+                              step="0.01"
+                            />
+                          </td>
+                          <td className="w-32 px-6 py-4">
+                            <div className="flex items-center justify-center w-full">
+                              <ToggleSwitch
+                                enabled={editedService.appointment === 'Allowed'}
+                                onChange={(enabled) => handleChange('appointment', enabled ? 'Allowed' : 'Not Allowed')}
+                              />
+                            </div>
+                          </td>
+                          <td className="w-32 px-6 py-4">
+                            <div className="flex items-center justify-center w-full">
+                              <ToggleSwitch
+                                enabled={editedService.status === 'Active'}
+                                onChange={(enabled) => handleChange('status', enabled ? 'Active' : 'Inactive')}
+                                activeColor="bg-green-600"
+                              />
+                            </div>
+                          </td>
+                          <td className="w-24 px-6 py-4">
+                            <div className="flex gap-2 justify-center">
+                              <button 
+                                onClick={handleSaveService}
+                                className="text-green-600 hover:text-green-800"
+                              >
+                                <FaCheck className="w-5 h-5" />
+                              </button>
+                              <button 
+                                onClick={handleCancelEdit}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <FaTimes className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -416,7 +501,7 @@ const handleModalCancel = () => {
                 <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Delete</h3>
                   <p className="text-gray-600 mb-6">
-                    Are you sure you want to delete the test &quot;{serviceToDelete?.testType}&quot; for {serviceToDelete?.sampleType}? 
+                    Are you sure you want to delete the test &quot;{serviceToDelete?.testType}&quot;? 
                     This action cannot be undone.
                   </p>
                   <div className="flex justify-end gap-4">
@@ -452,13 +537,9 @@ const handleModalCancel = () => {
                     </button>
                     <button
                       onClick={handleModalConfirm}
-                      className={`px-4 py-2 rounded-lg font-medium ${
-                        modalType === 'emptyCancel' || modalType === 'delete'
-                          ? 'bg-red-600 text-white hover:bg-red-700'
-                          : 'bg-green-600 text-white hover:bg-green-700'
-                      }`}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
-                      {modalType === 'emptySave' ? 'Yes' : 'Confirm'}
+                      Confirm
                     </button>
                   </div>
                 </div>
@@ -469,4 +550,4 @@ const handleModalCancel = () => {
       </div>
     </AdminLayout>
   );
-} 
+}

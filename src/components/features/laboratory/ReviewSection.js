@@ -23,53 +23,35 @@ export default function ReviewSection({
     if (selectedServiceIds.length === 0 && !Object.values(shelfLifeServices).some(Boolean)) {
       return [];
     }
-    
+
     if (!servicesData) {
-      console.log("No servicesData available");
       return [];
     }
-    
-    const allServicesDetails = [];
-    
-    // Loop through standard service types
-    Object.keys(servicesData).forEach(tabKey => {
-      // Skip shelf life tab here, handle separately
-      if (tabKey === 'shelflife') return; 
 
-      const tabData = servicesData[tabKey];
-      if (tabData && tabData.categories) {
-        tabData.categories.forEach(category => {
-          if (category.services) {
-            category.services.forEach(service => {
-              if (selectedServiceIds.includes(service.id)) {
-                allServicesDetails.push({
-                  ...service,
-                  serviceType: tabKey
-                });
-              }
-            });
-          }
-        });
+    const allServicesDetails = [];
+
+    // Helper to flatten all services by category
+    const allServicesFlat = Object.entries(servicesData).reduce((acc, [category, services]) => {
+      services.forEach(service => {
+        acc[service.id] = { ...service, serviceType: category };
+      });
+      return acc;
+    }, {});
+
+    // Add selected standard services
+    selectedServiceIds.forEach(id => {
+      if (allServicesFlat[id]) {
+        allServicesDetails.push(allServicesFlat[id]);
       }
     });
-    
-    // Handle shelf life services checkboxes
-    Object.entries(shelfLifeServices).forEach(([key, isSelected]) => {
-      if (isSelected && servicesData.shelflife && servicesData.shelflife.categories) {
-        const serviceId = key.replace(/([A-Z])/g, '-$1').toLowerCase(); // Adjusted key conversion
-        
-        servicesData.shelflife.categories.forEach(category => {
-          if (category.services) {
-            const service = category.services.find(s => s.id === serviceId);
-            // Avoid duplicates if already added via selectedServices (unlikely but possible)
-            if (service && !allServicesDetails.some(s => s.id === service.id)) { 
-              allServicesDetails.push({
-                ...service,
-                serviceType: 'shelflife'
-              });
-            }
-          }
-        });
+
+    // Add selected shelf life services
+    Object.entries(shelfLifeServices).forEach(([id, isSelected]) => {
+      if (isSelected && allServicesFlat[id]) {
+        // Avoid duplicates
+        if (!allServicesDetails.some(s => s.id === id)) {
+          allServicesDetails.push(allServicesFlat[id]);
+        }
       }
     });
 
@@ -80,8 +62,7 @@ export default function ReviewSection({
   const calculateTotalPriceForAppointment = (appointment) => {
     const services = getSelectedServicesDetailsForAppointment(appointment);
     return services.reduce((total, service) => {
-      const priceString = service.price || '₱0';
-      const priceNumber = parseFloat(priceString.replace(/[₱,]/g, '')) || 0;
+      const priceNumber = typeof service.price === 'number' ? service.price : parseFloat((service.price || '0').toString().replace(/[₱,]/g, '')) || 0;
       return total + priceNumber;
     }, 0);
   };
@@ -145,15 +126,25 @@ export default function ReviewSection({
                     {renderSection("Quantity", appointment.quantity)}
                     {renderSection("Preferred Date", formatDate(appointment.preferredDate))}
                     {renderSection("Sample Description", appointment.sampleDescription)}
-                    
-                    {appointment.shelfLifeDetails && (
-                      <Fragment>
-                        {renderSection("Storage Temperature", appointment.shelfLifeDetails.storageTemperature)}
-                        {renderSection("Storage Condition", appointment.shelfLifeDetails.storageCondition)}
-                        {renderSection("Shelf Life Duration", appointment.shelfLifeDetails.shelfLifeDuration)}
-                      </Fragment>
-                    )}
                   </dl>
+                  {Object.values(appointment.shelfLifeServices || {}).some(Boolean) && (
+                    <div className="mt-6">
+                      <h5 className="text-md font-semibold text-blue-700 mb-2">Shelf Life Study Details</h5>
+                      <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                        {renderSection("Objective of Study", appointment.objectiveOfStudy)}
+                        {renderSection("Product Name", appointment.productName)}
+                        {renderSection("Net Weight", appointment.netWeight)}
+                        {renderSection("Brand Name", appointment.brandName)}
+                        {renderSection("Existing Market", appointment.existingMarket)}
+                        {renderSection("Production Type", appointment.productionType)}
+                        {renderSection("Method of Preservation", appointment.methodOfPreservation)}
+                        {renderSection("Product Ingredients", appointment.productIngredients)}
+                        {renderSection("Packaging Material", appointment.packagingMaterial)}
+                        {renderSection("Target Shelf Life", appointment.targetShelfLife)}
+                        {renderSection("Modes of Deterioration", (appointment.modeOfDeterioration || []).filter(Boolean).join(', '))}
+                      </dl>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -186,19 +177,37 @@ export default function ReviewSection({
                     Services for Appointment #{index + 1} (Sample: {appointment.sampleName || 'N/A'})
                   </h4>
                   <table className="min-w-full divide-y divide-gray-200">
-                    {/* Optional: Add thead back if desired per table */}
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {servicesForThisAppointment.map((service, serviceIndex) => (
-                        <tr key={serviceIndex}>
-                          <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
-                            {service.name}
-                          </td>
-                          <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">
-                            {service.price}
+                    {Object.entries(
+                      servicesForThisAppointment.reduce((acc, service) => {
+                        const type = service.serviceType || 'Other';
+                        if (!acc[type]) acc[type] = [];
+                        acc[type].push(service);
+                        return acc;
+                      }, {})
+                    ).map(([type, services]) => (
+                      <tbody key={type} className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td colSpan={2} className="px-6 py-3 bg-blue-50 text-blue-700 font-semibold">
+                            {type === 'chemical' && 'Chemical Services'}
+                            {type === 'microbiology' && 'Microbiology Services'}
+                            {type === 'shelflife' && 'Shelf Life Services'}
+                            {type !== 'chemical' && type !== 'microbiology' && type !== 'shelflife' && type}
                           </td>
                         </tr>
-                      ))}
-                      {/* Subtotal for this appointment */} 
+                        {services.map((service, serviceIndex) => (
+                          <tr key={serviceIndex}>
+                            <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                              {service.name}
+                            </td>
+                            <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 text-right">
+                              {service.price}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    ))}
+                    {/* Subtotal for this appointment */} 
+                    <tbody className="bg-gray-50">
                       <tr className="bg-gray-50">
                         <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                           Subtotal

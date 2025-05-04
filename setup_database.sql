@@ -127,7 +127,7 @@ CREATE TABLE appointment_details (
     name_of_samples VARCHAR(255),
     sample_type VARCHAR(100),
     sample_condition VARCHAR(100),
-    sample_quantity INTEGER,
+    sample_quantity VARCHAR(100),
     number_of_replicates INTEGER,
     terms_accepted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -157,7 +157,7 @@ CREATE TABLE chemistry_details (
     analysis_requested TEXT,
     parameters TEXT,
     delivery_type VARCHAR(100),
-    sample_quantity INTEGER,
+    sample_quantity VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -169,7 +169,7 @@ CREATE TABLE microbiology_details (
     test_type VARCHAR(100),
     organism_target VARCHAR(100),
     sample_storage_condition VARCHAR(100),
-    sample_quantity INTEGER,
+    sample_quantity VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

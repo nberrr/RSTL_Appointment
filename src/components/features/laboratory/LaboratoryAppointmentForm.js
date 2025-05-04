@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 // Import components
 import ContactInformation from './ContactInformation';
@@ -12,10 +13,57 @@ import ShelfLifeDetails from './ShelfLifeDetails';
 import ReviewSection from './ReviewSection';
 import { SubmissionStatus, DeleteConfirmModal } from './Notifications';
 
-// Import services data
-import { servicesData } from './servicesData';
+// Progress Stepper Component
+const ProgressStepper = ({ currentStep, isShelfLifeSelected }) => {
+  const steps = [
+    { id: 'contact', label: 'Contact Info' },
+    { id: 'sample', label: 'Sample Details' },
+    ...(isShelfLifeSelected ? [{ id: 'shelflife', label: 'Shelf Life' }] : []),
+    { id: 'review', label: 'Review' }
+  ];
 
-// Add a loading overlay component at the top of the file, before the main component
+  return (
+    <div className="w-full py-6">
+      <div className="flex items-center justify-center">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            <div className={`flex items-center justify-center ${
+              currentStep === step.id 
+                ? 'text-white bg-blue-600'
+                : steps.indexOf({ id: currentStep }) > index
+                  ? 'text-white bg-green-500'
+                  : 'text-gray-500 bg-gray-200'
+              } rounded-full h-8 w-8 transition-colors duration-200`}>
+              {steps.indexOf({ id: currentStep }) > index ? (
+                <CheckCircleIcon className="h-6 w-6" />
+              ) : (
+                <span className="text-sm font-medium">{index + 1}</span>
+              )}
+            </div>
+            <span className={`ml-2 text-sm font-medium ${
+              currentStep === step.id 
+                ? 'text-blue-600'
+                : steps.indexOf({ id: currentStep }) > index
+                  ? 'text-green-500'
+                  : 'text-gray-500'
+            }`}>
+              {step.label}
+            </span>
+            {index < steps.length - 1 && (
+              <div className={`h-0.5 w-12 mx-4 ${
+                steps.indexOf({ id: currentStep }) > index
+                  ? 'bg-green-500'
+                  : 'bg-gray-200'
+              }`} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Loading Overlay Component
 const LoadingOverlay = ({ isVisible }) => {
   if (!isVisible) return null;
   
@@ -43,6 +91,7 @@ export default function LaboratoryAppointmentForm() {
     emailAddress: '',
     phoneNumber: '',
     organization: '',
+    sex: '',
     sampleName: '',
     sampleType: '',
     quantity: '',
@@ -53,11 +102,7 @@ export default function LaboratoryAppointmentForm() {
     selectedServices: [],
     searchQuery: '',
     currentServiceTab: 'chemical',
-    shelfLifeServices: {
-      microbiologicalAnalysis: false,
-      physiologicalAnalysis: false,
-      sensoryAnalysis: false
-    },
+    shelfLifeServices: {},
     
     // Shelf Life Details
     objectiveOfStudy: '',
@@ -82,11 +127,34 @@ export default function LaboratoryAppointmentForm() {
   const [currentStep, setCurrentStep] = useState('contact');
   const [bookedDates, setBookedDates] = useState([]);
   const [isSelectingService, setIsSelectingService] = useState(false);
+  const [servicesData, setServicesData] = useState({});
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState(null);
 
   // Add useEffect to log errors state changes
   useEffect(() => {
     console.log("Errors state updated:", errors);
   }, [errors]);
+
+  // Fetch services on mount
+  useEffect(() => {
+    async function fetchServices() {
+      setServicesLoading(true);
+      try {
+        const res = await fetch('/api/services');
+        const json = await res.json();
+        if (json.success) {
+          setServicesData(json.data);
+        } else {
+          setServicesError(json.message || 'Failed to load services');
+        }
+      } catch (error) {
+        setServicesError(error.message || 'Failed to load services');
+      }
+      setServicesLoading(false);
+    }
+    fetchServices();
+  }, []);
 
   // Handle contact info change
   const handleContactInfoChange = (name, value) => {
@@ -131,49 +199,37 @@ export default function LaboratoryAppointmentForm() {
   // Handle date selection
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    
+
+    // Format as YYYY-MM-DD in local time
+    const pad = n => n.toString().padStart(2, '0');
+    const localDateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
     // Update preferred date for all appointments
     setAppointments(prev => 
       prev.map(appointment => ({
         ...appointment,
-        preferredDate: date.toISOString().split('T')[0]
+        preferredDate: localDateString
       }))
     );
   };
 
   // Handle service selection
   const handleServiceSelection = (serviceId) => {
-    // Set the flag to prevent other effects from triggering during service selection
-    setIsSelectingService(true);
-    
     setAppointments(prev => {
       const newAppointments = [...prev];
-      const currentAppointment = newAppointments[currentAppointmentIndex];
-      
+      const current = newAppointments[currentAppointmentIndex];
+      let updatedSelected;
+      if (current.selectedServices.includes(serviceId)) {
+        updatedSelected = current.selectedServices.filter(id => id !== serviceId);
+      } else {
+        updatedSelected = [...current.selectedServices, serviceId];
+      }
       newAppointments[currentAppointmentIndex] = {
-        ...currentAppointment,
-        selectedServices: currentAppointment.selectedServices.includes(serviceId)
-          ? currentAppointment.selectedServices.filter(id => id !== serviceId)
-          : [...currentAppointment.selectedServices, serviceId]
+        ...current,
+        selectedServices: updatedSelected
       };
-      
       return newAppointments;
     });
-    
-    // Remove service-related errors when a service is selected
-    if (errors.services || errors.selectedServices) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.services;
-        delete newErrors.selectedServices;
-        return newErrors;
-      });
-    }
-    
-    // Reset the flag after a short delay to allow the state updates to complete
-    setTimeout(() => {
-      setIsSelectingService(false);
-    }, 100);
   };
 
   // Handle service tab change
@@ -208,26 +264,20 @@ export default function LaboratoryAppointmentForm() {
   };
 
   // Handle shelf life service change
-  const handleShelfLifeServiceChange = (serviceName) => {
-    // Set the flag to prevent validation during service selection
-    setIsSelectingService(true);
-    
+  const handleShelfLifeServiceChange = (serviceId) => {
     setAppointments(prev => {
       const newAppointments = [...prev];
+      const current = newAppointments[currentAppointmentIndex];
+      const updatedShelfLife = {
+        ...current.shelfLifeServices,
+        [serviceId]: !current.shelfLifeServices[serviceId]
+      };
       newAppointments[currentAppointmentIndex] = {
-        ...newAppointments[currentAppointmentIndex],
-        shelfLifeServices: {
-          ...newAppointments[currentAppointmentIndex].shelfLifeServices,
-          [serviceName]: !newAppointments[currentAppointmentIndex].shelfLifeServices[serviceName]
-        }
+        ...current,
+        shelfLifeServices: updatedShelfLife
       };
       return newAppointments;
     });
-    
-    // Reset the flag after a short delay
-    setTimeout(() => {
-      setIsSelectingService(false);
-    }, 100);
   };
 
   // Handle search query change
@@ -325,11 +375,7 @@ export default function LaboratoryAppointmentForm() {
       selectedServices: [],
       searchQuery: '',
       currentServiceTab: 'chemical',
-      shelfLifeServices: {
-        microbiologicalAnalysis: false,
-        physiologicalAnalysis: false,
-        sensoryAnalysis: false
-      },
+      shelfLifeServices: {},
       objectiveOfStudy: '',
       productName: '',
       netWeight: '',
@@ -379,13 +425,28 @@ export default function LaboratoryAppointmentForm() {
   // Validation functions
   const validateContactInfo = () => {
     const newErrors = {};
-    if (!appointments[0].clientName) newErrors.clientName = 'Please enter client name';
-    if (!appointments[0].emailAddress) newErrors.emailAddress = 'Please enter your email address';
-    if (!appointments[0].phoneNumber) newErrors.phoneNumber = 'Please enter your phone number';
-    if (!appointments[0].organization) newErrors.organization = 'Please enter your organization name';
+    const currentAppointment = appointments[currentAppointmentIndex];
+
+    if (!currentAppointment.clientName?.trim()) {
+      newErrors.clientName = 'Client name is required';
+    }
+    if (!currentAppointment.emailAddress?.trim()) {
+      newErrors.emailAddress = 'Email address is required';
+    } else if (!/\S+@\S+\.\S+/.test(currentAppointment.emailAddress)) {
+      newErrors.emailAddress = 'Please enter a valid email address';
+    }
+    if (!currentAppointment.phoneNumber?.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    }
+    if (!currentAppointment.sex?.trim()) {
+      newErrors.sex = 'Please select your sex';
+    }
     
-    // DON'T setErrors here
-    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }; // Return error object
+    // Return validation result object
+    return { 
+      isValid: Object.keys(newErrors).length === 0, 
+      errors: newErrors 
+    };
   };
 
   const validateSampleDetails = () => {
@@ -393,20 +454,20 @@ export default function LaboratoryAppointmentForm() {
     const currentAppointment = appointments[currentAppointmentIndex];
 
     if (!currentAppointment.sampleName) newErrors.sampleName = 'Please enter sample name';
-    if (!currentAppointment.quantity) newErrors.quantity = 'Please enter quantity';
+    if (!currentAppointment.quantity) {
+      newErrors.quantity = 'Please enter quantity';
+    } else if (!/\d/.test(currentAppointment.quantity)) {
+      newErrors.quantityFormat = 'Quantity must include at least one number (e.g., "4 liters", "500g")';
+    }
     if (!currentAppointment.preferredDate) newErrors.preferredDate = 'Please select a preferred date';
     if (!currentAppointment.sampleDescription) newErrors.sampleDescription = 'Please enter sample description';
 
-    // Check if services are selected based on the tab
-    if (currentAppointment.currentServiceTab === 'chemical' || currentAppointment.currentServiceTab === 'microbiological') {
-      if (currentAppointment.selectedServices.length === 0) {
-        newErrors.services = `Please select at least one ${currentAppointment.currentServiceTab} service`;
-      }
-    } else if (currentAppointment.currentServiceTab === 'shelflife') {
-      // For shelf life, check if any checkbox is selected
-      if (!Object.values(currentAppointment.shelfLifeServices).some(val => val === true)) {
-        newErrors.shelfLifeServices = 'Please select at least one shelf life testing service';
-      }
+    // Only require at least one service selected across all labs
+    const anyServiceSelected =
+      (currentAppointment.selectedServices && currentAppointment.selectedServices.length > 0) ||
+      (currentAppointment.shelfLifeServices && Object.values(currentAppointment.shelfLifeServices).some(val => val === true));
+    if (!anyServiceSelected) {
+      newErrors.services = 'Please select at least one service before continuing.';
     }
 
     // DON'T setErrors here
@@ -438,7 +499,7 @@ export default function LaboratoryAppointmentForm() {
   const validateForm = () => {
     const contactValidation = validateContactInfo();
     if (!contactValidation.isValid) {
-        setErrors(prev => ({ ...prev, ...contactValidation.errors })); // Ensure errors are set
+      setErrors(contactValidation.errors);
         return false;
     }
 
@@ -469,7 +530,6 @@ export default function LaboratoryAppointmentForm() {
     }
     
     setErrors(combinedErrors); // Set all collected errors at the end
-
     return allAppointmentsValid;
   };
 
@@ -482,8 +542,6 @@ export default function LaboratoryAppointmentForm() {
         validationResult = validateContactInfo();
         setErrors(validationResult.errors);
         if (validationResult.isValid) {
-          // Log state right before changing step
-          // console.log("Appointments state before setting step to sample:", appointments); // Remove log
           setCurrentStep('sample');
         }
         break;
@@ -493,8 +551,7 @@ export default function LaboratoryAppointmentForm() {
         );
 
         if (emptyTabIndex !== -1 && appointments.length > 1) {
-          // console.warn(`Attempted to proceed with empty Appointment ${emptyTabIndex + 1}`); // Removed log
-          setErrors(prev => ({ ...prev, global: `Please fill out Appointment ${emptyTabIndex + 1} or remove it.` })); // Example global error
+          setErrors(prev => ({ ...prev, global: `Please fill out Appointment ${emptyTabIndex + 1} or remove it.` }));
           return;
         }
 
@@ -578,7 +635,6 @@ export default function LaboratoryAppointmentForm() {
     
     // Call validateForm which now handles setting errors state ONLY on final submit validation
     if (!validateForm()) {
-      // showAlertMessage is already called inside validateForm if invalid
       return;
     }
     
@@ -591,10 +647,11 @@ export default function LaboratoryAppointmentForm() {
       for (const appointment of appointments) {
         const formData = {
           // Common customer data (from first appointment)
-          name: appointments[0].clientName,
-          email: appointments[0].emailAddress,
-          contactNumber: appointments[0].phoneNumber,
-          companyName: appointments[0].organization,
+          name: appointment.clientName,
+          email: appointment.emailAddress,
+          contactNumber: appointment.phoneNumber,
+          companyName: appointment.organization,
+          sex: appointment.sex,
           
           // Common sample data
           nameOfSamples: appointment.sampleName,
@@ -664,56 +721,7 @@ export default function LaboratoryAppointmentForm() {
         appointmentIds: results.map(r => r.appointmentId)
       });
       
-      // Reset form after successful submission
-      if (results.length > 0) {
-        // Keep only contact information in the first appointment
-        const contactInfo = {
-          clientName: appointments[0].clientName,
-          emailAddress: appointments[0].emailAddress,
-          phoneNumber: appointments[0].phoneNumber,
-          organization: appointments[0].organization,
-        };
-        
-        setAppointments([{
-          id: 1,
-          // Keep contact information
-          ...contactInfo,
-          // Reset all other fields
-          sampleName: '',
-          sampleType: '',
-          quantity: '',
-          preferredDate: '',
-          sampleDescription: '',
-          selectedServices: [],
-          searchQuery: '',
-          currentServiceTab: 'chemical',
-          shelfLifeServices: {
-            microbiologicalAnalysis: false,
-            physiologicalAnalysis: false,
-            sensoryAnalysis: false
-          },
-          objectiveOfStudy: '',
-          productName: '',
-          netWeight: '',
-          brandName: '',
-          existingMarket: '',
-          productionType: '',
-          methodOfPreservation: '',
-          productIngredients: '',
-          packagingMaterial: '',
-          targetShelfLife: '',
-          modeOfDeterioration: [''],
-          existingPermitsFile: null,
-          productImageFile: null,
-          hasAttemptedSubmit: false
-        }]);
-        
-        setCurrentAppointmentIndex(0);
-        setCurrentStep('contact');
-      }
-      
     } catch (error) {
-      // console.error('Submission error:', error); // Keep error logging for now
       setSubmissionStatus({
         success: false,
         message: error.message || 'An error occurred during submission. Please try again.'
@@ -740,7 +748,23 @@ export default function LaboratoryAppointmentForm() {
   // console.log("Rendering LaboratoryAppointmentForm"); // Removed log
 
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Laboratory Testing Services</h1>
+          <p className="mt-2 text-lg text-gray-600">Schedule your laboratory testing appointment</p>
+        </div>
+
+        {/* Progress Stepper */}
+        <ProgressStepper 
+          currentStep={currentStep} 
+          isShelfLifeSelected={appointments.some(app => 
+            Object.values(app.shelfLifeServices).some(value => value)
+          )} 
+        />
+
+        {/* Modals */}
       {showDeleteModal && (
         <DeleteConfirmModal
           show={showDeleteModal}
@@ -749,79 +773,73 @@ export default function LaboratoryAppointmentForm() {
         />
       )}
       {isSubmitting && <LoadingOverlay isVisible={isSubmitting} />}
-
-      {/* Navigation / Stepper */}
-      <div className="mb-10 px-16 hidden md:block">
-        <div className="flex justify-center items-center gap-6 mb-12">
-          <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep === 'contact' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-            }`}>
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <span className={`ml-3 text-sm font-medium ${
-              currentStep === 'contact' ? 'text-blue-600' : 'text-gray-400'
-            }`}>Contact Information</span>
-          </div>
-          <div className="w-24 h-0.5 bg-gray-200"></div>
-          <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep === 'sample' || currentStep === 'shelflife' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-            }`}>
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
-            <span className={`ml-3 text-sm font-medium ${
-              currentStep === 'sample' || currentStep === 'shelflife' ? 'text-blue-600' : 'text-gray-400'
-            }`}>Sample Details</span>
-          </div>
-          <div className="w-24 h-0.5 bg-gray-200"></div>
-          
-          <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              currentStep === 'review' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'
-            }`}>
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <span className={`ml-3 text-sm font-medium ${
-              currentStep === 'review' ? 'text-blue-600' : 'text-gray-400'
-            }`}>Review & Submit</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Submission Status Message */}
       {submissionStatus && (
-        <SubmissionStatus status={submissionStatus} onClose={() => setSubmissionStatus(null)} />
+          <SubmissionStatus
+            status={submissionStatus}
+            onClose={() => {
+              setSubmissionStatus(null);
+              // Only reset the form if submission was successful
+              if (submissionStatus.success) {
+                setCurrentStep('contact');
+                setErrors({});
+                setSelectedDate(null);
+                setAppointments([{
+                  id: 1,
+                  clientName: '',
+                  emailAddress: '',
+                  phoneNumber: '',
+                  organization: '',
+                  sex: '',
+                  sampleName: '',
+                  sampleType: '',
+                  quantity: '',
+                  preferredDate: '',
+                  sampleDescription: '',
+                  selectedServices: [],
+                  searchQuery: '',
+                  currentServiceTab: 'chemical',
+                  shelfLifeServices: {},
+                  objectiveOfStudy: '',
+                  productName: '',
+                  netWeight: '',
+                  brandName: '',
+                  existingMarket: '',
+                  productionType: '',
+                  methodOfPreservation: '',
+                  productIngredients: '',
+                  packagingMaterial: '',
+                  targetShelfLife: '',
+                  modeOfDeterioration: [''],
+                  existingPermitsFile: null,
+                  productImageFile: null,
+                  hasAttemptedSubmit: false
+                }]);
+              }
+            }}
+          />
       )}
       
-      {/* Form Container */}
-      <div className="bg-gray-50 p-6 sm:p-8 rounded-lg shadow-sm border border-gray-200">
+        {/* Main Form Container */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+          {/* Form Content */}
+          <div className="p-8">
         {/* Contact Information Section */}
         {currentStep === 'contact' && (
-          <>
             <ContactInformation
-              contactInfo={appointments[0]} // Always use the first appointment for contact info
+                contactInfo={appointments[0]}
               onContactInfoChange={handleContactInfoChange}
               errors={errors}
               onNext={handleNextStep}
               disabled={isSubmitting}
             />
-          </>
         )}
 
         {/* Sample Details and Service Selection Section */}
-        {(currentStep === 'sample' || currentStep === 'shelflife') && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        {currentStep === 'sample' && (
+              <div className="space-y-8">
             {/* Appointment Tabs */}
-            <div className="flex flex-wrap items-center border-b border-gray-200 pb-4 mb-6">
+                <div className="flex flex-wrap items-center gap-2 pb-4 border-b border-gray-200">
               {appointments.map((appointment, index) => {
-                // Determine the label: use sampleName if available, otherwise default
                 const tabLabel = (appointment.sampleName && appointment.sampleName.trim())
                                  ? appointment.sampleName.trim()
                                  : `Appointment ${index + 1}`;
@@ -831,58 +849,47 @@ export default function LaboratoryAppointmentForm() {
                     key={index}
                     type="button"
                     onClick={() => setCurrentAppointmentIndex(index)}
-                    className={`px-4 py-2 mr-2 mb-2 rounded-lg text-sm font-medium border transition-colors max-w-[150px] sm:max-w-[200px] ${
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       index === currentAppointmentIndex
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            ? 'bg-blue-600 text-white shadow-md transform scale-105'
+                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                        } disabled:opacity-50 disabled:cursor-not-allowed max-w-[200px] truncate`}
                     disabled={isSubmitting}
                     title={tabLabel}
                   >
-                    {/* Use flexbox to align label and delete icon */}
-                    <div className="flex items-center justify-between w-full">
-                      {/* Display the dynamic label, truncated */} 
-                      <span className="truncate block mr-2"> {/* Added right margin */}
-                        {tabLabel}
-                      </span>
+                        <span className="flex items-center gap-2">
+                          <span className="truncate">{tabLabel}</span>
                       {appointments.length > 1 && (
-                        <span
-                          role="button"
-                          tabIndex={0}
+                            <button
                           onClick={(e) => {
-                            console.log(`Delete clicked for index: ${index}, label: ${tabLabel}`); // Add log
-                            e.stopPropagation(); // Prevent tab selection
+                                e.stopPropagation();
                             handleDeleteAppointment(index);
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              console.log(`Delete keydown for index: ${index}, label: ${tabLabel}`); // Add log
-                              e.stopPropagation(); // Prevent tab selection
-                              handleDeleteAppointment(index);
-                            }
-                          }}
-                          className="text-gray-400 hover:text-red-500 inline-block flex-shrink-0 cursor-pointer"
-                          aria-label={`Delete ${tabLabel}`} // Use dynamic label in aria-label
+                              className="p-1 hover:bg-red-100 rounded-full"
+                              disabled={isSubmitting}
                         >
-                          <XMarkIcon className="h-4 w-4 inline-block" />
-                        </span>
+                              <XMarkIcon className="h-4 w-4 text-red-500" />
+                            </button>
                       )}
-                    </div>
+                        </span>
                   </button>
                 );
               })}
+                  
               <button
                 type="button"
                 onClick={addNewAppointment}
-                className="px-4 py-2 mr-2 mb-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 disabled={isSubmitting}
               >
-                <PlusIcon className="h-4 w-4 inline-block mr-1" /> Add Appointment
+                    <PlusIcon className="h-4 w-4" />
+                    Add Appointment
               </button>
             </div>
 
+                {/* Form Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left side: Calendar */}
+                  {/* Calendar */}
               <div className="lg:col-span-1">
                 <AppointmentCalendar 
                   selectedDate={selectedDate} 
@@ -892,8 +899,8 @@ export default function LaboratoryAppointmentForm() {
                 />
               </div>
 
-              {/* Right side: Sample details and services */}
-              <div className="lg:col-span-2">
+                  {/* Details */}
+                  <div className="lg:col-span-2 space-y-8">
                 <SampleDetails
                   appointment={appointments[currentAppointmentIndex]}
                   onChange={handleAppointmentChange}
@@ -901,7 +908,6 @@ export default function LaboratoryAppointmentForm() {
                   disabled={isSubmitting}
                 />
 
-                {/* Testing Services Section */}
                 <ServiceSelection
                   appointment={appointments[currentAppointmentIndex]}
                   onServiceTabChange={handleServiceTabChange}
@@ -910,35 +916,39 @@ export default function LaboratoryAppointmentForm() {
                   onSearchChange={handleSearchChange}
                   onContinueToShelfLife={handleContinueToShelfLife}
                   servicesData={servicesData}
+                  servicesLoading={servicesLoading}
+                  servicesError={servicesError}
                   errors={errors}
                   disabled={isSubmitting}
                 />
+                  </div>
+                </div>
 
-                <div className="flex justify-between mt-8">
+                {/* Navigation Buttons */}
+                <div className="flex justify-between pt-8 border-t border-gray-200">
                   <button
                     type="button"
                     onClick={handlePreviousStep}
-                    className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isSubmitting}
                   >
-                    Back to Contact Information
+                    Back
                   </button>
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isSubmitting}
                   >
-                    Continue to Review
+                    Continue
                   </button>
-                </div>
-              </div>
             </div>
           </div>
         )}
 
-        
+            {/* Shelf Life Details Section */}
         {currentStep === 'shelflife' && (
+          <>
           <ShelfLifeDetails
             appointment={appointments[currentAppointmentIndex]}
             onChange={handleAppointmentChange}
@@ -949,15 +959,29 @@ export default function LaboratoryAppointmentForm() {
             errors={errors}
             disabled={isSubmitting}
           />
+            <div className="flex justify-between pt-8 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={handlePreviousStep}
+                className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
+              >
+                Back to Sample Details
+              </button>
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
+              >
+                Continue to Review
+              </button>
+            </div>
+          </>
         )}
 
         {/* Review Section */}
         {currentStep === 'review' && (
-          <>
-            {/* Removed logs for review section props */}
-            {/* {console.log("Current appointment in review:", appointments[currentAppointmentIndex])} */}
-            {/* {console.log("All appointments:", appointments)} */}
-            {/* {console.log("Service data:", servicesData)} */}
             <ReviewSection
               servicesData={servicesData}
               errors={errors}
@@ -966,8 +990,9 @@ export default function LaboratoryAppointmentForm() {
               onSubmit={handleSubmit}
               allAppointments={appointments}
             />
-          </>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -164,19 +164,19 @@ const ConsultationModal = ({ isOpen, onClose, consultation, onAccept, onDecline 
         <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 rounded-b-lg border-t flex-shrink-0">
            {consultation?.status === 'pending' && (
               <>
-                 <button
+            <button
                     onClick={onDecline} // This should likely open the DeclineModal
                     className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 flex items-center gap-2 rounded-lg hover:bg-red-50"
-                    >
-                    <FaTimes className="w-4 h-4" />
-                    Decline
-                    </button>
-                    <button
-                    onClick={onAccept}
-                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2"
-                    >
-                    <FaCheck className="w-4 h-4" />
-                    Accept
+            >
+              <FaTimes className="w-4 h-4" />
+              Decline
+            </button>
+            <button
+              onClick={onAccept}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2"
+            >
+              <FaCheck className="w-4 h-4" />
+              Accept
                     </button>
               </>
            )}
@@ -187,7 +187,7 @@ const ConsultationModal = ({ isOpen, onClose, consultation, onAccept, onDecline 
             >
                 Close
             </button>
-        </div>
+          </div>
 
       </div>
     </div>
@@ -196,7 +196,7 @@ const ConsultationModal = ({ isOpen, onClose, consultation, onAccept, onDecline 
 
 
 const DeclineModal = ({ isOpen, onClose, onConfirm }) => {
-   const [reason, setReason] = useState('');
+  const [reason, setReason] = useState('');
 
   if (!isOpen) return null;
 
@@ -399,7 +399,7 @@ export default function ConsultancyPage() {
           <DashboardSidebar />
           {/* Main content area with two columns */}
           <main className="flex-1 bg-gray-100 p-4 lg:p-6 flex flex-col md:flex-row gap-6">
-
+           
             {/* Left Column: Accepted Appointments List */}
             <div className="w-full md:w-1/3 lg:w-1/4 flex-shrink-0">
               <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 h-full flex flex-col">
@@ -408,7 +408,7 @@ export default function ConsultancyPage() {
                   <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                     {acceptedAppointments.length} Total
                   </span>
-                </div>
+              </div>
                 <div className="flex-1 overflow-y-auto space-y-3 pr-1"> {/* Added pr-1 for scrollbar spacing */}
                   {loading && <p className="text-gray-500 text-sm p-4 text-center">Loading...</p>}
                   {error && <p className="text-red-500 text-sm p-4 text-center">Error loading list.</p>}
@@ -430,9 +430,9 @@ export default function ConsultancyPage() {
                   ) : (
                     !loading && !error && <p className="text-sm text-gray-400 italic p-4 text-center">No accepted appointments.</p>
                   )}
+                      </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
             {/* Right Column: Main Appointments Table */}
             <div className="flex-1 flex flex-col gap-4 min-w-0"> {/* Ensure right column can shrink */}
@@ -443,13 +443,13 @@ export default function ConsultancyPage() {
                   <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-grow justify-end">
                       {/* Search Input */}
                       <div className="relative w-full sm:w-56"> {/* Adjusted width */}
-                          <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                        <input
+                          type="text"
+                          placeholder="Search..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-9 pr-4 py-2 w-full border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          />
+                        />
                           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       </div>
                       {/* Filter Dropdown */}
@@ -465,10 +465,10 @@ export default function ConsultancyPage() {
                             <option value="Accepted">Accepted</option>
                             <option value="Declined">Declined</option>
                             {/* Add other statuses if needed */}
-                          </select>
+                    </select>
                            <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5 pointer-events-none" />
                            <FaChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-3 h-3 pointer-events-none" />
-                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -488,8 +488,8 @@ export default function ConsultancyPage() {
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Research Type</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                          </tr>
-                        </thead>
+                              </tr>
+                            </thead>
                         <tbody className="divide-y divide-gray-100">{/* Ensure conditional fragments immediately follow tbody */}
                           {filteredAppointments.length > 0 ? <>{/* Ensure fragment has no extra space */}
                               {filteredAppointments.map((appointment, index) => {
@@ -501,35 +501,35 @@ export default function ConsultancyPage() {
                                     <td className="px-4 py-3 text-sm text-gray-900 ">
                                       <div className="font-medium">{appointment.name}</div>
                                       <div className="text-xs text-gray-500">{appointment.organization}</div>
-                                    </td>
+                          </td>
                                     <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{appointment.researchType}</td>
                                     <td className="px-4 py-3 text-sm whitespace-nowrap">
                                       <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${statusColors.dotClass}`}></span>
-                                        {appointment.status}
-                                      </span>
-                                    </td>
+                              {appointment.status}
+                            </span>
+                          </td>
                                     <td className="px-4 py-3 text-sm whitespace-nowrap">
                                       {appointment.status === 'pending' ? (
                                         <div className="flex items-center gap-2">
-                                          <button
+                                <button
                                             onClick={(e) => { e.stopPropagation(); handleAccept(appointment); }}
                                             className="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded"
-                                          >
+                                >
                                             <FaCheck size={11} /> Accept
-                                          </button>
-                                          <button
+                                </button>
+                                <button
                                              onClick={(e) => { e.stopPropagation(); handleDeclineClick(appointment); }}
                                              className="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-800 rounded hover:bg-red-50"
-                                          >
+                                >
                                             <FaTimes size={11} /> Decline
-                                          </button>
-                                        </div>
+                                </button>
+                              </div>
                                       ) : (
                                         <span className="text-gray-400 text-xs italic"></span>
-                                      )}
-                                    </td>
-                                  </tr>
+                            )}
+                          </td>
+                        </tr>
                                 );
                               })}
                             </> : <>{/* Ensure fragment has no extra space */}
@@ -537,8 +537,8 @@ export default function ConsultancyPage() {
                                   <td colSpan="6" className="px-4 py-6 text-center text-sm text-gray-500">No appointments found matching your criteria.</td>
                               </tr>
                             </>}
-                        </tbody>
-                      </table>
+                    </tbody>
+                  </table>
                     </>}
                 </div>
               </div>

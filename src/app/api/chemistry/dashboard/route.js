@@ -3,15 +3,15 @@ import { query } from '@/lib/db';
 
 export async function GET(request) {
   try {
-    // Get the service ID for microbiology
+    // Get the service ID for chemistry
     const serviceResult = await query(
-      `SELECT id FROM services WHERE category = 'microbiology' LIMIT 1`
+      `SELECT id FROM services WHERE category = 'chemistry' LIMIT 1`
     );
     const serviceId = serviceResult.rows[0].id;
 
-    // Fetch all microbiology service names
+    // Fetch all chemistry service names
     const chemServicesResult = await query(
-      `SELECT name FROM services WHERE category = 'microbiology'`
+      `SELECT name FROM services WHERE category = 'chemistry'`
     );
     const chemServiceNames = chemServicesResult.rows.map(row => row.name);
 
@@ -40,7 +40,7 @@ export async function GET(request) {
       GROUP BY appointment_date
     `, [serviceId]);
 
-    // Get recent appointments (only those with microbiology details)
+    // Get recent appointments (only those with chemistry details)
     const recentAppointments = await query(`
       SELECT 
         a.id,
@@ -52,29 +52,29 @@ export async function GET(request) {
       FROM appointments a
       JOIN customers c ON a.customer_id = c.id
       JOIN appointment_details ad ON a.id = ad.appointment_id
-      JOIN microbiology_details cd ON ad.id = cd.appointment_detail_id
+      JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id
       ORDER BY a.appointment_date DESC
       LIMIT 5
     `);
 
-    // Filter analysis_requested for microbiology-only tests
+    // Filter analysis_requested for chemistry-only tests
     recentAppointments.rows.forEach(apt => {
       const allRequested = (apt.analysis_requested || '').split(',').map(s => s.trim());
       apt.analysis_requested = allRequested.filter(name => chemServiceNames.includes(name)).join(', ');
     });
 
-    // Get analysis types distribution (only those with microbiology details)
+    // Get analysis types distribution (only those with chemistry details)
     const analysisTypes = await query(`
       SELECT 
         cd.analysis_requested,
         COUNT(*) as count
-      FROM microbiology_details cd
+      FROM chemistry_details cd
       GROUP BY cd.analysis_requested
       ORDER BY count DESC
       LIMIT 5
     `);
 
-    // Filter analysisTypes for microbiology-only tests
+    // Filter analysisTypes for chemistry-only tests
     analysisTypes.rows.forEach(type => {
       const allRequested = (type.analysis_requested || '').split(',').map(s => s.trim());
       type.analysis_requested = allRequested.filter(name => chemServiceNames.includes(name)).join(', ');
@@ -90,7 +90,7 @@ export async function GET(request) {
       }
     });
   } catch (error) {
-    console.error('Error fetching microbiology dashboard data:', error);
+    console.error('Error fetching chemistry dashboard data:', error);
     return NextResponse.json(
       { success: false, message: error.message },
       { status: 500 }

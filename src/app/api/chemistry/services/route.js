@@ -12,6 +12,7 @@ export async function GET(request) {
         COALESCE(s.price, 0) as pricing,
         s.active,
         s.category,
+        s.sample_type,
         cd.delivery_type as appointment
       FROM services s
       LEFT JOIN chemistry_details cd ON cd.appointment_detail_id = s.id
@@ -39,7 +40,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { testType, testDescription, pricing, appointment } = data;
+    const { testType, testDescription, pricing, appointment, sampleType } = data;
 
     // Validate required fields
     if (!testType || !testDescription || !pricing) {
@@ -55,20 +56,15 @@ export async function POST(request) {
     try {
       // Insert into services table
       const serviceResult = await query(
-        `INSERT INTO services (name, description, category, price, active)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO services (name, description, category, price, active, sample_type)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id`,
-        [testType, testDescription, 'chemistry', pricing, true]
+        [testType, testDescription, 'chemistry', pricing, true, sampleType || 'Uncategorized']
       );
 
       const serviceId = serviceResult.rows[0].id;
 
-      // Insert into chemistry_details table
-      await query(
-        `INSERT INTO chemistry_details (appointment_detail_id, delivery_type)
-         VALUES ($1, $2)`,
-        [serviceId, appointment || 'Allowed']
-      );
+      // Do NOT insert into chemistry_details here
 
       // Commit transaction
       await query('COMMIT');
@@ -95,7 +91,7 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const data = await request.json();
-    const { id, testType, testDescription, pricing, appointment, active } = data;
+    const { id, testType, testDescription, pricing, appointment, active, sampleType } = data;
 
     if (!id) {
       return NextResponse.json(
@@ -111,9 +107,9 @@ export async function PUT(request) {
       // Update services table
       await query(
         `UPDATE services 
-         SET name = $1, description = $2, price = $3, active = $4
-         WHERE id = $5 AND category = 'chemistry'`,
-        [testType, testDescription, pricing, active, id]
+         SET name = $1, description = $2, price = $3, active = $4, sample_type = $5
+         WHERE id = $6 AND category = 'chemistry'`,
+        [testType, testDescription, pricing, active, sampleType || 'Uncategorized', id]
       );
 
       // Update chemistry_details table

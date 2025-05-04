@@ -11,7 +11,8 @@ export async function GET(request) {
         description,
         COALESCE(price, 0) as price,
         active,
-        category
+        category,
+        sample_type
       FROM services
       WHERE active = TRUE
       ORDER BY category, name

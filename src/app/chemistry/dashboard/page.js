@@ -6,15 +6,15 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Link from "next/link";
 import { FaCalendar, FaClock, FaCheckCircle, FaFlask, FaBook, FaCubes } from 'react-icons/fa';
-import DashboardStats from "@/components/shared/DashboardStats";
 import DashboardCalendar from "@/components/shared/DashboardCalendar";
 import DashboardRecentAppointments from "@/components/shared/DashboardRecentAppointments";
 import DashboardDayAppointments from "@/components/shared/DashboardDayAppointments";
+import DashboardStats from "@/components/shared/DashboardStats";
 
 export default function ChemistryDashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState('');
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentDay, setCurrentDay] = useState(0);
   const [calendarDays, setCalendarDays] = useState([]);
   const [dashboardData, setDashboardData] = useState({
@@ -97,7 +97,6 @@ export default function ChemistryDashboard() {
     const firstDayWeekday = firstDayOfMonth.getDay();
     const totalDays = lastDayOfMonth.getDate();
     const days = [];
-    
     // Create appointment lookup map
     const appointmentMap = {};
     appointments.forEach(apt => {
@@ -110,27 +109,23 @@ export default function ChemistryDashboard() {
         };
       }
     });
-    
     for (let i = 0; i < firstDayWeekday; i++) {
-      days.push({ day: null, isCurrentMonth: false });
+      days.push({ day: null, isCurrentMonth: false, date: null });
     }
-    
     for (let i = 1; i <= totalDays; i++) {
       days.push({ 
         day: i, 
         isCurrentMonth: true,
-        appointments: appointmentMap[i] || null
+        appointments: appointmentMap[i] || null,
+        date: new Date(year, month, i)
       });
     }
-    
     const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
     const totalCells = neededRows * 7;
     const remainingCells = totalCells - days.length;
-    
     for (let i = 0; i < remainingCells; i++) {
-      days.push({ day: null, isCurrentMonth: false });
+      days.push({ day: null, isCurrentMonth: false, date: null });
     }
-    
     setCalendarDays(days);
   };
   
@@ -175,15 +170,15 @@ export default function ChemistryDashboard() {
   }, []);
 
   useEffect(() => {
-    if (selectedDay && currentDate) {
-      const year = currentDate.getFullYear();
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-      const day = selectedDay.toString().padStart(2, '0');
+    if (selectedDay && selectedDay instanceof Date && !isNaN(selectedDay)) {
+      const year = selectedDay.getFullYear();
+      const month = (selectedDay.getMonth() + 1).toString().padStart(2, '0');
+      const day = selectedDay.getDate().toString().padStart(2, '0');
       fetchAppointmentsForDay(`${year}-${month}-${day}`);
     } else {
       setSelectedDayAppointments([]); // Clear if no valid day/date
     }
-  }, [selectedDay, currentDate, fetchAppointmentsForDay]);
+  }, [selectedDay, fetchAppointmentsForDay]);
 
   const statConfig = [
     {
@@ -218,14 +213,12 @@ export default function ChemistryDashboard() {
         <DashboardNav />
         <div className="flex flex-1 overflow-hidden">
           <DashboardSidebar />
-          <main className="flex-1 bg-gray-100 p-4">
-            <div>
+          <main className="flex-1 bg-gray-100 p-4 flex flex-col">
+            <div className="flex-1 flex flex-col">
               {/* Stats Overview - Shared Component */}
               <DashboardStats stats={dashboardData.stats} statConfig={statConfig} />
-
-              {/* Main Grid - Changed to 3 columns */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
+              {/* Main Grid - 3 columns, third column split vertically and fills height */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full flex-1">
                 {/* Column 1: Calendar */}
                 <DashboardCalendar
                   currentMonth={currentMonth}
@@ -238,7 +231,6 @@ export default function ChemistryDashboard() {
                   setSelectedDay={setSelectedDay}
                   getStatusColor={getStatusColor}
                 />
-
                 {/* Column 2: Recent Appointments */}
                 <DashboardRecentAppointments
                   recentAppointments={dashboardData.recentAppointments}
@@ -246,37 +238,39 @@ export default function ChemistryDashboard() {
                   error={error}
                   getStatusColor={getStatusColor}
                 />
-
-                {/* Column 3: Split Horizontally */}
-                <div className="min-w-0 flex flex-col gap-4">
-                  {/* Top Section: Appointments for Selected Day */}
-                  <DashboardDayAppointments
-                    selectedDay={selectedDay}
-                    currentMonth={currentMonth}
-                    selectedDayAppointments={selectedDayAppointments}
-                    loadingSelectedDay={loadingSelectedDay}
-                    getStatusColor={getStatusColor}
-                  />
-                  {/* Bottom Section: Popular Analysis Types (Remains the same) */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 flex-shrink-0">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Analysis Types</h3>
-                    <div className="space-y-3">
-                      {loading && <p className="text-sm text-gray-500">Loading...</p>}
-                      {error && <p className="text-sm text-red-500">Error loading analysis types.</p>}
-                      {!loading && !error && dashboardData.analysisTypes.length > 0 ? (
-                        dashboardData.analysisTypes.slice(0, 5).map((analysis, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
-                            <span className="text-sm font-medium text-gray-900">{analysis.count} tests</span>
-                          </div>
-                        ))
-                      ) : (
-                        !loading && !error && <p className="text-sm text-gray-400 italic">No analysis data available.</p>
-                      )}
+                {/* Column 3: Vertically center Popular Analysis Types */}
+                <div className="flex flex-col h-full flex-1 gap-4">
+                  {/* Top: Appointments for Selected Day */}
+                  <div className="flex-1 flex flex-col h-full">
+                    <DashboardDayAppointments
+                      selectedDay={selectedDay}
+                      currentMonth={currentMonth}
+                      selectedDayAppointments={selectedDayAppointments}
+                      loadingSelectedDay={loadingSelectedDay}
+                      getStatusColor={getStatusColor}
+                    />
+                  </div>
+                  {/* Centered: Popular Analysis Types */}
+                  <div className="flex-1 flex flex-col h-full">
+                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 w-full h-full flex flex-col">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Popular Analysis Types</h3>
+                      <div className="space-y-3 flex-1">
+                        {loading && <p className="text-sm text-gray-500 text-center">Loading...</p>}
+                        {error && <p className="text-sm text-red-500 text-center">Error loading analysis types.</p>}
+                        {!loading && !error && dashboardData.analysisTypes.length > 0 ? (
+                          dashboardData.analysisTypes.slice(0, 5).map((analysis, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                              <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
+                              <span className="text-sm font-medium text-gray-900">{analysis.count} tests</span>
+                            </div>
+                          ))
+                        ) : (
+                          !loading && !error && <p className="text-sm text-gray-400 italic text-center">No analysis data available.</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </main>

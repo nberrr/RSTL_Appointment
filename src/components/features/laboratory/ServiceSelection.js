@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 
 export default function ServiceSelection({ 
   appointment, 
@@ -17,6 +18,7 @@ export default function ServiceSelection({
   disabled = false
 }) {
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [expandedSampleType, setExpandedSampleType] = useState(null);
 
   if (servicesLoading) {
     return <div className="p-8 text-center text-gray-500">Loading services...</div>;
@@ -136,8 +138,41 @@ export default function ServiceSelection({
                 disabled={disabled}
               />
             </div>
-            {currentServices.map((service) => (
-              <label key={service.id} className={`flex items-start p-4 bg-white rounded-lg shadow-sm ${disabled ? 'opacity-75' : ''}`}>
+            {/* Group services by sample_type */}
+            {Object.entries(
+              currentServices
+                .filter(service => !!service.sample_type)
+                .filter(service => {
+                  const q = (appointment.searchQuery || '').toLowerCase();
+                  return (
+                    service.name?.toLowerCase().includes(q) ||
+                    service.description?.toLowerCase().includes(q)
+                  );
+                })
+                .reduce((acc, service) => {
+                  const sampleType = service.sample_type;
+                  if (!acc[sampleType]) acc[sampleType] = [];
+                  acc[sampleType].push(service);
+                  return acc;
+                }, {})
+            ).map(([sampleType, services]) => (
+              <div key={sampleType} className="mb-4 border rounded-lg bg-white">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-4 py-3 text-left text-lg font-semibold text-blue-700 hover:bg-blue-50 focus:outline-none"
+                  onClick={() => setExpandedSampleType(expandedSampleType === sampleType ? null : sampleType)}
+                >
+                  <span>{sampleType}</span>
+                  {expandedSampleType === sampleType ? (
+                    <ChevronDownIcon className="h-5 w-5" />
+                  ) : (
+                    <ChevronRightIcon className="h-5 w-5" />
+                  )}
+                </button>
+                {expandedSampleType === sampleType && (
+                  <div className="p-4 space-y-2">
+                    {services.map((service) => (
+                      <label key={service.id} className={`flex items-start p-4 bg-gray-50 rounded-lg shadow-sm ${disabled ? 'opacity-75' : ''}`}>
                 <div className="flex items-center h-5">
                   <input
                     type="checkbox"
@@ -155,6 +190,10 @@ export default function ServiceSelection({
                   <p className="text-sm text-gray-500">{service.description}</p>
                 </div>
               </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}

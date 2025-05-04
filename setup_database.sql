@@ -70,7 +70,8 @@ CREATE TABLE services (
     duration_minutes INTEGER,
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    sample_type VARCHAR(100)
 );
 
 -- Create AppointmentConstraints table (primarily for metrology)
@@ -346,5 +347,95 @@ VALUES
 ('Bacterial Testing', 'microbiology', 'Testing for bacterial contamination in food samples', 2000.00, 240),
 ('Shelf Life Study', 'shelf_life', 'Comprehensive shelf life determination for food products', 5000.00, 480),
 ('Research Consultation', 'research', 'Consultation on research methodologies and experimental design', 1500.00, 120);
+
+-- Insert CHEMICAL TESTS
+INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES
+-- FOOD
+('Alcohol by volume of distilled liquor', 'chemistry', 'Food', 390.00, 60),
+('Alcohol by volume of distilled liquor', 'chemistry', 'Food', 390.00, 60),
+('Ash', 'chemistry', 'Food', 650.00, 60),
+('Boil Reducing', 'chemistry', 'Food', 570.00, 60),
+('Color', 'chemistry', 'Food', 650.00, 60),
+('Crude Fiber', 'chemistry', 'Food', 1_080.00, 60),
+('Dietary Fiber', 'chemistry', 'Food', 1_800.00, 60),
+('Energy in kcal of oils and fats as olec/lauric', 'chemistry', 'Food', 1_200.00, 60),
+('Free Fatty Acid (oil)', 'chemistry', 'Food', 1_500.00, 60),
+('Free Fatty Acid with sample preparation', 'chemistry', 'Food', 1_500.00, 60),
+('Minerals in Food per analysis', 'chemistry', 'Food', 1_500.00, 60),
+('Sodium (Na), Calcium (Ca), Iron (Fe), Potassium (K), Magnesium (Mg), Manganese (Mn), Zinc (Zn)', 'chemistry', 'Food', 1_500.00, 60),
+('Moisture', 'chemistry', 'Food', 500.00, 60),
+('Nitrate', 'chemistry', 'Food', 800.00, 60),
+('Nitrites', 'chemistry', 'Food', 800.00, 60),
+('Nutrition Facts Computation and Drafting (Daily Value)', 'chemistry', 'Food', 1_500.00, 60),
+('Nutrition Facts Computation and Drafting (REIN)', 'chemistry', 'Food', 1_500.00, 60),
+('Permanganate Oxidation No.', 'chemistry', 'Food', 1_200.00, 60),
+('Peroxide Value of oils and fats', 'chemistry', 'Food', 650.00, 60),
+('Peroxide Value of food with sample preparation', 'chemistry', 'Food', 1_200.00, 60),
+('Protein', 'chemistry', 'Food', 1_525.00, 60),
+('Refractive Index', 'chemistry', 'Food', 1_000.00, 60),
+('Salt as NaCl', 'chemistry', 'Food', 800.00, 60),
+('Saponification Value of oils', 'chemistry', 'Food', 1_200.00, 60),
+('Titratable acidity of vinegars as acetic acid', 'chemistry', 'Food', 1_000.00, 60),
+('Total Carbohydrates by computation', 'chemistry', 'Food', 1_200.00, 60),
+('Total Fat', 'chemistry', 'Food', 1_200.00, 60),
+('Total Soluble Solids', 'chemistry', 'Food', 1_000.00, 60),
+('Trace Metals (Cd, Cu, Pb, Ni)', 'chemistry', 'Food', 1_200.00, 60),
+('Water Activity', 'chemistry', 'Food', 1_200.00, 60),
+-- WATER AND WASTEWATER
+('Alkalinity', 'chemistry', 'Water and Wastewater', 1_500.00, 60),
+('Biochemical Oxygen Demand', 'chemistry', 'Water and Wastewater', 1_500.00, 60),
+('Calcium (Ca), Hardness', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Color', 'chemistry', 'Water and Wastewater', 750.00, 60),
+('Chloride', 'chemistry', 'Water and Wastewater', 800.00, 60),
+('Conductivity', 'chemistry', 'Water and Wastewater', 750.00, 60),
+('Dissolved Oxygen', 'chemistry', 'Water and Wastewater', 900.00, 60),
+('Magnesium (Mg) by computation', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Nitrates', 'chemistry', 'Water and Wastewater', 800.00, 60),
+('Oil and Grease', 'chemistry', 'Water and Wastewater', 1_800.00, 60),
+('pH', 'chemistry', 'Water and Wastewater', 500.00, 60),
+('Residual Chlorine', 'chemistry', 'Water and Wastewater', 1_000.00, 60),
+('Salinity', 'chemistry', 'Water and Wastewater', 800.00, 60),
+('Sulfate', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Total Dissolved Solids', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Total Hardness', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Total Suspended Solids', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Turbidity', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+('Trace Metals (Cd, Ca, Cu, Fe, Pb, Mg, Mn, Ni, K, Na, Zn)', 'chemistry', 'Water and Wastewater', 1_200.00, 60),
+-- PLANT AND PLANT EXTRACTS
+('Distillation using rotary evaporator (per 50mL)', 'chemistry', 'Plant and Plant Extracts', 1_500.00, 60),
+('Qualitative Phytochemical Analysis', 'chemistry', 'Plant and Plant Extracts', 1_500.00, 60),
+-- PACKAGES
+('Nutrition Facts Analysis', 'chemistry', 'Packages', 14_610.00, 60),
+('Physical & Chemical Quality for Drinking Water', 'chemistry', 'Packages', 16_000.00, 60);
+
+-- Insert MICROBIOLOGICAL TESTS
+INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES
+-- FOOD
+('Aerobic Plate Count (Conventional)', 'microbiology', 'Food', 650.00, 60),
+('Aerobic Plate Count (Petrifilm)', 'microbiology', 'Food', 650.00, 60),
+('Coliform Count (Petrifilm)', 'microbiology', 'Food', 650.00, 60),
+('Commercial Sterility Test (low acid only)', 'microbiology', 'Food', 1_000.00, 60),
+('Escherichia coli Count', 'microbiology', 'Food', 1_000.00, 60),
+('Salmonella Detection', 'microbiology', 'Food', 1_500.00, 60),
+('Staphylococcus aureus Count (Petrifilm)', 'microbiology', 'Food', 1_000.00, 60),
+('Yeast and Mold Count (Conventional)', 'microbiology', 'Food', 1_000.00, 60),
+('Rapid Yeast and Mold Count (Petrifilm)', 'microbiology', 'Food', 1_000.00, 60),
+-- WATER AND WASTEWATER
+('Heterotrophic Plate Count', 'microbiology', 'Water and Wastewater', 650.00, 60),
+('MPN of Total Coliform', 'microbiology', 'Water and Wastewater', 1_000.00, 60),
+('MPN of Total Coliform - confirmed test for Thermotolerant (Fecal Coliform)', 'microbiology', 'Water and Wastewater', 1_000.00, 60),
+('MPN of Total Coliform - confirmed test for E. coli', 'microbiology', 'Water and Wastewater', 1_000.00, 60),
+-- PLANT EXTRACTS
+('Antimicrobial activity against E. coli', 'microbiology', 'Plant Extracts', 600.00, 60),
+('Antimicrobial activity against S. aureus', 'microbiology', 'Plant Extracts', 600.00, 60),
+-- OTHERS
+('Surface Swab', 'microbiology', 'Others', 550.00, 60),
+-- PACKAGES
+('PACKAGE A: Heterotrophic Plate Count + Coliform Count', 'microbiology', 'Packages', 1_700.00, 60),
+('PACKAGE B: Heterotrophic Plate Count + Coliform Count + Fecal Coliform Count + E. coli Count', 'microbiology', 'Packages', 2_000.00, 60),
+('PACKAGE C: Heterotrophic Plate Count + Coliform Count + Fecal Coliform Count', 'microbiology', 'Packages', 1_200.00, 60),
+('PACKAGE D: Coliform Count + E. coli Count (Colilert-18)', 'microbiology', 'Packages', 1_200.00, 60),
+('PACKAGE E: Heterotrophic Plate Count + Coliform Count + E. coli Count (Colilert-18)', 'microbiology', 'Packages', 1_200.00, 60),
+('PACKAGE F: Coliform Count + E. coli Count (Colilert-18)', 'microbiology', 'Packages', 1_200.00, 60);
 
 COMMIT;

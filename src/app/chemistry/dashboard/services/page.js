@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaCheck, FaTimes, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaCheck, FaTimes, FaTrash, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
@@ -26,6 +26,16 @@ function ToggleSwitch({ enabled, onChange, activeColor = "bg-blue-600", inactive
   );
 }
 
+// Sample type options
+const SAMPLE_TYPE_OPTIONS = [
+  'Food',
+  'Water and Wastewater',
+  'Plant and Plant Extracts',
+  'Packages',
+  'Others',
+  'Uncategorized'
+];
+
 export default function ServicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
@@ -38,6 +48,9 @@ export default function ServicesPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [groupedServices, setGroupedServices] = useState({});
+  const [expandedSampleType, setExpandedSampleType] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Fetch services on component mount
   useEffect(() => {
@@ -57,8 +70,25 @@ export default function ServicesPage() {
           testDescription: service.test_description || '',
           pricing: parseFloat(service.pricing) || 0,
           appointment: service.appointment || 'Allowed',
-          status: service.active ? 'Active' : 'Inactive'
+          status: service.active ? 'Active' : 'Inactive',
+          sampleType: service.sample_type || 'Uncategorized',
         })));
+        // Group by sampleType
+        const grouped = {};
+        data.data.forEach(service => {
+          const sampleType = service.sample_type || 'Uncategorized';
+          if (!grouped[sampleType]) grouped[sampleType] = [];
+          grouped[sampleType].push({
+            id: service.id,
+            testType: service.test_type || '',
+            testDescription: service.test_description || '',
+            pricing: parseFloat(service.pricing) || 0,
+            appointment: service.appointment || 'Allowed',
+            status: service.active ? 'Active' : 'Inactive',
+            sampleType: sampleType,
+          });
+        });
+        setGroupedServices(grouped);
       } else {
         setError(data.message);
       }
@@ -85,10 +115,12 @@ export default function ServicesPage() {
       testDescription: '',
       pricing: 0,
       appointment: 'Allowed',
-      status: 'Active'
+      status: 'Active',
+      sampleType: 'Uncategorized',
     };
     setEditedService(newService);
     setEditingId('new');
+    setShowAddModal(true);
   };
 
   const handleChange = (field, value) => {
@@ -114,7 +146,8 @@ export default function ServicesPage() {
           testDescription: editedService.testDescription.trim(),
           pricing: parseFloat(editedService.pricing) || 0,
           appointment: editedService.appointment,
-          active: editedService.status === 'Active'
+          active: editedService.status === 'Active',
+          sampleType: editedService.sampleType || 'Uncategorized',
         }),
       });
 
@@ -211,6 +244,17 @@ export default function ServicesPage() {
     return matchesSearch && matchesFilter;
   });
 
+  const handleAddModalSave = async () => {
+    await handleSaveService();
+    setShowAddModal(false);
+  };
+
+  const handleAddModalCancel = () => {
+    setEditingId(null);
+    setEditedService(null);
+    setShowAddModal(false);
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -294,8 +338,25 @@ export default function ServicesPage() {
             <div className="flex-1 overflow-auto p-5">
               <div className="bg-white rounded-lg shadow h-full flex flex-col border-gray-200">
                 <div className="overflow-auto">
+                  {/* Grouped by sample type, collapsible sections */}
+                  {Object.entries(groupedServices).map(([sampleType, servicesList]) => (
+                    <div key={sampleType} className="mb-6 border rounded-lg bg-gray-50">
+                      <button
+                        type="button"
+                        className="w-full flex items-center justify-between px-6 py-4 text-left text-xl font-semibold text-blue-700 hover:bg-blue-100 focus:outline-none rounded-t-lg"
+                        onClick={() => setExpandedSampleType(expandedSampleType === sampleType ? null : sampleType)}
+                      >
+                        <span>{sampleType}</span>
+                        {expandedSampleType === sampleType ? (
+                          <FaChevronDown className="h-5 w-5" />
+                        ) : (
+                          <FaChevronRight className="h-5 w-5" />
+                        )}
+                      </button>
+                      {expandedSampleType === sampleType && (
+                        <div className="p-0">
                   <table className="min-w-full">
-                    <thead className="bg-gray-50 sticky top-0">
+                            <thead className="bg-gray-100 sticky top-0">
                       <tr className="border-b">
                         <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type of Test</th>
                         <th className="w-32 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pricing (₱)</th>
@@ -305,7 +366,7 @@ export default function ServicesPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {filteredServices.map((service) => (
+                              {servicesList.map((service) => (
                         <tr key={service.id} className="hover:bg-gray-50">
                           <td className="w-1/4 px-6 py-4">
                             {editingId === service.id ? (
@@ -324,6 +385,15 @@ export default function ServicesPage() {
                                   rows="2"
                                   placeholder="Enter test description"
                                 />
+                                        <select
+                                          className="w-full px-2 py-1 border rounded text-sm mt-1"
+                                          value={editedService.sampleType || 'Uncategorized'}
+                                          onChange={(e) => handleChange('sampleType', e.target.value)}
+                                        >
+                                          {SAMPLE_TYPE_OPTIONS.map(option => (
+                                            <option key={option} value={option}>{option}</option>
+                                          ))}
+                                        </select>
                               </div>
                             ) : (
                               <div className="min-h-[70px]">
@@ -408,15 +478,13 @@ export default function ServicesPage() {
                                     onClick={() => handleEdit(service)}
                                     className="text-blue-600 hover:text-blue-800"
                                   >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
+                                            Edit
                                   </button>
                                   <button 
                                     onClick={() => handleDeleteClick(service)}
                                     className="text-red-600 hover:text-red-800"
                                   >
-                                    <FaTrash className="w-5 h-5" />
+                                            <FaTrash className="w-4 h-4" />
                                   </button>
                                 </>
                               )}
@@ -424,73 +492,12 @@ export default function ServicesPage() {
                           </td>
                         </tr>
                       ))}
-                      {editingId === 'new' && (
-                        <tr className="hover:bg-gray-50">
-                          <td className="w-1/4 px-6 py-4">
-                            <div className="space-y-1">
-                              <input
-                                type="text"
-                                className="w-full px-2 py-1 border rounded text-sm"
-                                value={editedService.testType}
-                                onChange={(e) => handleChange('testType', e.target.value)}
-                                placeholder="Enter test type"
-                              />
-                              <textarea
-                                className="w-full px-2 py-1 border rounded text-sm resize-none"
-                                value={editedService.testDescription}
-                                onChange={(e) => handleChange('testDescription', e.target.value)}
-                                rows="2"
-                                placeholder="Enter test description"
-                              />
+                            </tbody>
+                          </table>
                             </div>
-                          </td>
-                          <td className="w-32 px-6 py-4">
-                            <input
-                              type="number"
-                              className="w-24 px-2 py-1 border rounded text-sm"
-                              value={editedService.pricing || 0}
-                              onChange={(e) => handleChange('pricing', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="0.01"
-                            />
-                          </td>
-                          <td className="w-32 px-6 py-4">
-                            <div className="flex items-center justify-center w-full">
-                              <ToggleSwitch
-                                enabled={editedService.appointment === 'Allowed'}
-                                onChange={(enabled) => handleChange('appointment', enabled ? 'Allowed' : 'Not Allowed')}
-                              />
-                            </div>
-                          </td>
-                          <td className="w-32 px-6 py-4">
-                            <div className="flex items-center justify-center w-full">
-                              <ToggleSwitch
-                                enabled={editedService.status === 'Active'}
-                                onChange={(enabled) => handleChange('status', enabled ? 'Active' : 'Inactive')}
-                                activeColor="bg-green-600"
-                              />
-                            </div>
-                          </td>
-                          <td className="w-24 px-6 py-4">
-                            <div className="flex gap-2 justify-center">
-                              <button 
-                                onClick={handleSaveService}
-                                className="text-green-600 hover:text-green-800"
-                              >
-                                <FaCheck className="w-5 h-5" />
-                              </button>
-                              <button 
-                                onClick={handleCancelEdit}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <FaTimes className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
                       )}
-                    </tbody>
-                  </table>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -540,6 +547,80 @@ export default function ServicesPage() {
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
                       Confirm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add New Test Modal */}
+            {showAddModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Test</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      className="w-full px-2 py-1 border rounded text-sm"
+                      value={editedService.testType}
+                      onChange={(e) => handleChange('testType', e.target.value)}
+                      placeholder="Enter test type"
+                    />
+                    <textarea
+                      className="w-full px-2 py-1 border rounded text-sm resize-none"
+                      value={editedService.testDescription}
+                      onChange={(e) => handleChange('testDescription', e.target.value)}
+                      rows="2"
+                      placeholder="Enter test description"
+                    />
+                    <select
+                      className="w-full px-2 py-1 border rounded text-sm"
+                      value={editedService.sampleType || 'Uncategorized'}
+                      onChange={(e) => handleChange('sampleType', e.target.value)}
+                    >
+                      {SAMPLE_TYPE_OPTIONS.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      className="w-full px-2 py-1 border rounded text-sm"
+                      value={editedService.pricing || 0}
+                      onChange={(e) => handleChange('pricing', parseFloat(e.target.value) || 0)}
+                      min="0"
+                      step="0.01"
+                      placeholder="Enter price"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span>Appointment:</span>
+                      <ToggleSwitch
+                        enabled={editedService.appointment === 'Allowed'}
+                        onChange={(enabled) => handleChange('appointment', enabled ? 'Allowed' : 'Not Allowed')}
+                      />
+                      <span className="text-sm">{editedService.appointment}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span>Status:</span>
+                      <ToggleSwitch
+                        enabled={editedService.status === 'Active'}
+                        onChange={(enabled) => handleChange('status', enabled ? 'Active' : 'Inactive')}
+                        activeColor="bg-green-600"
+                      />
+                      <span className="text-sm">{editedService.status}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-4 mt-6">
+                    <button
+                      onClick={handleAddModalCancel}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddModalSave}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                    >
+                      Save
                     </button>
                   </div>
                 </div>

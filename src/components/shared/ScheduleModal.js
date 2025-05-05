@@ -121,8 +121,8 @@ export default function ScheduleModal({ isOpen, onClose, appointment, onStatusUp
                 )}
                 {appointment.status === 'in progress' && (
                   <button
-                    disabled
-                    className="px-3 py-1.5 text-xs bg-purple-500 text-white rounded-md hover:bg-purple-600 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => handleUpdate('completed')}
+                    className="px-3 py-1.5 text-xs bg-purple-500 text-white rounded-md hover:bg-purple-600 flex items-center gap-1"
                   >
                     <FaCheckCircle /> Mark Complete
                   </button>

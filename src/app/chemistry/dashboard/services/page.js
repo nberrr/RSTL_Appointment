@@ -36,6 +36,17 @@ const SAMPLE_TYPE_OPTIONS = [
   'Uncategorized'
 ];
 
+// Group services by sample type
+function groupBySampleType(services) {
+  const grouped = {};
+  services.forEach(service => {
+    const sampleType = service.sampleType || 'Uncategorized';
+    if (!grouped[sampleType]) grouped[sampleType] = [];
+    grouped[sampleType].push(service);
+  });
+  return grouped;
+}
+
 export default function ServicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
@@ -245,6 +256,8 @@ export default function ServicesPage() {
     return matchesSearch && matchesFilter;
   });
 
+  const groupedFilteredServices = groupBySampleType(filteredServices);
+
   const handleAddModalSave = async () => {
     await handleSaveService();
     setShowAddModal(false);
@@ -281,7 +294,7 @@ export default function ServicesPage() {
       }
       table={
         <ServicesGroupedTable
-          groupedServices={groupedServices}
+          groupedServices={groupedFilteredServices}
           expandedSampleType={expandedSampleType}
           setExpandedSampleType={setExpandedSampleType}
           editingId={editingId}

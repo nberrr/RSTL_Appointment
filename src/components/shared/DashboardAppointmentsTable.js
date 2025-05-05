@@ -33,7 +33,7 @@ export default function DashboardAppointmentsTable({
                 filteredAppointments.map((appointment) => {
                   const statusColors = getStatusColor(appointment.status);
                   return (
-                    <tr key={appointment.id} className="hover:bg-gray-50">
+                    <tr key={appointment.id} className="hover:bg-blue-50 hover:scale-[1.015] hover:shadow-md transition-all duration-200 group">
                       <td className="px-3 py-2 text-sm font-medium text-blue-600 whitespace-nowrap">{appointment.id}</td>
                       <td className="px-3 py-2 text-sm text-gray-900 whitespace-nowrap">{appointment.customer_name}</td>
                       {viewMode !== 'day' && <td className="px-3 py-2 text-sm text-gray-500 whitespace-nowrap">
@@ -44,7 +44,7 @@ export default function DashboardAppointmentsTable({
                       </td>}
                       <td className="px-3 py-2 text-sm text-gray-600 min-w-[150px]">{appointment.analysis_requested}</td>
                       <td className="px-3 py-2 text-sm whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass} transition-transform duration-150 group-hover:scale-110`}>
                           {appointment.status}
                         </span>
                       </td>

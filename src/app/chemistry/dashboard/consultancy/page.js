@@ -61,8 +61,8 @@ export default function ConsultancyPage() {
         body: JSON.stringify(bodyPayload),
       });
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Failed to update status (${response.status})`);
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Failed to update status (${response.status})`);
       }
       fetchConsultations();
     } catch (err) {
@@ -101,9 +101,9 @@ export default function ConsultancyPage() {
     if (filterStatus !== 'All' && apt.status?.toLowerCase() !== filterStatus.toLowerCase()) return false;
     const lowerSearchTerm = searchTerm.toLowerCase();
     if (searchTerm && !(
-      apt.name?.toLowerCase().includes(lowerSearchTerm) ||
-      apt.organization?.toLowerCase().includes(lowerSearchTerm) ||
-      apt.researchType?.toLowerCase().includes(lowerSearchTerm) ||
+        apt.name?.toLowerCase().includes(lowerSearchTerm) ||
+        apt.organization?.toLowerCase().includes(lowerSearchTerm) ||
+        apt.researchType?.toLowerCase().includes(lowerSearchTerm) ||
       apt.status?.toLowerCase().includes(lowerSearchTerm)
     )) return false;
     return true;

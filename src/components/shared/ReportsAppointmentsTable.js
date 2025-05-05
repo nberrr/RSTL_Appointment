@@ -18,8 +18,8 @@ export default function ReportsAppointmentsTable({ appointments, getStatusColor,
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {appointments.map((appointment) => (
-            <tr key={appointment.id} className="hover:bg-gray-50">
+          {appointments.map((appointment, index) => (
+            <tr key={appointment.id || index} className="hover:bg-blue-50 hover:border-l-4 hover:border-blue-400 transition-all duration-150 cursor-pointer" onClick={() => onViewDetails(appointment)}>
               <td className="px-6 py-4 text-sm font-medium text-blue-600">{appointment.id}</td>
               <td className="px-6 py-4 text-sm text-gray-500">{appointment.date}</td>
               <td className="px-6 py-4 text-sm text-gray-900">{appointment.client.organization}</td>
@@ -36,14 +36,14 @@ export default function ReportsAppointmentsTable({ appointments, getStatusColor,
               <td className="px-6 py-4 text-sm text-gray-500">{appointment.sample}</td>
               <td className="px-6 py-4 text-sm text-gray-500">{appointment.sampleDetails.laboratory}</td>
               <td className="px-6 py-4">
-                <span className={getStatusColor(appointment.status)}>
+                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status).bgClass} ${getStatusColor(appointment.status).textClass}`}>
                   {appointment.status}
                 </span>
               </td>
               <td className="px-6 py-4 text-sm text-gray-500">
                 <button 
-                  onClick={() => onViewDetails(appointment)}
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={e => { e.stopPropagation(); onViewDetails(appointment); }}
+                  className="text-gray-400 hover:text-gray-700"
                 >
                   <FaEllipsisH className="w-4 h-4" />
                 </button>

@@ -18,7 +18,7 @@ export default function AcceptedAppointmentsList({ acceptedAppointments, loading
             return (
               <div
                 key={apt.id}
-                className={`p-3 rounded-md border border-l-4 ${statusColors.bgClass.replace('bg-', 'border-')} ${statusColors.bgClass} cursor-pointer hover:shadow-md transition-shadow duration-150`}
+                className={`p-3 rounded-md border border-gray-200 bg-white transition-all duration-150 cursor-pointer hover:bg-gray-50`}
                 onClick={() => onViewDetails(apt)}
               >
                 <div className="flex justify-between items-start mb-1">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { FaFlask, FaRuler, FaBacteria, FaBook, FaClock } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import Taskbar from '@/components/shared/Taskbar';
 
 export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('today');
@@ -86,6 +87,9 @@ export default function AdminDashboard() {
               Select a laboratory service to view its dashboard
             </p>
           </div>
+
+          {/* Taskbar */}
+          <Taskbar actions={[{ label: 'Inquiries Sheet', href: '/admin/dashboard/inquiries' }]} />
 
           {/* Time Period Selector */}
           <div className="mb-8">

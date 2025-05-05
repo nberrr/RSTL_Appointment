@@ -63,22 +63,28 @@ export async function GET(request) {
       apt.analysis_requested = allRequested.filter(name => chemServiceNames.includes(name)).join(', ');
     });
 
-    // Get analysis types distribution (only those with chemistry details)
-    const analysisTypes = await query(`
-      SELECT 
-        cd.analysis_requested,
-        COUNT(*) as count
+    // Get all analysis_requested for chemistry details
+    const allAnalysis = await query(`
+      SELECT cd.analysis_requested
       FROM chemistry_details cd
-      GROUP BY cd.analysis_requested
-      ORDER BY count DESC
-      LIMIT 5
     `);
 
-    // Filter analysisTypes for chemistry-only tests
-    analysisTypes.rows.forEach(type => {
-      const allRequested = (type.analysis_requested || '').split(',').map(s => s.trim());
-      type.analysis_requested = allRequested.filter(name => chemServiceNames.includes(name)).join(', ');
+    // Count each individual test/service
+    const analysisCount = {};
+    allAnalysis.rows.forEach(row => {
+      const tests = (row.analysis_requested || '').split(',').map(s => s.trim());
+      tests.forEach(test => {
+        if (chemServiceNames.includes(test)) {
+          analysisCount[test] = (analysisCount[test] || 0) + 1;
+        }
+      });
     });
+
+    // Convert to array and sort by count
+    const analysisTypes = Object.entries(analysisCount)
+      .map(([analysis_requested, count]) => ({ analysis_requested, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
     return NextResponse.json({
       success: true,
@@ -86,7 +92,7 @@ export async function GET(request) {
         stats: statsResult.rows[0],
         appointments: appointmentsResult.rows,
         recentAppointments: recentAppointments.rows,
-        analysisTypes: analysisTypes.rows
+        analysisTypes: analysisTypes
       }
     });
   } catch (error) {

@@ -17,22 +17,20 @@ export default function ConsultancyReportsTable({ data, getStatusColor, onViewDe
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {data.map((consultation) => (
-            <tr key={consultation.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{displayValue(consultation.researchTopic)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{displayValue(consultation.researchType)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{displayValue(consultation.position)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{displayValue(consultation.date)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                <span className={getStatusColor(consultation.status)}>
-                  {displayValue(consultation.status)}
-                </span>
+        <tbody className="divide-y divide-gray-100">
+          {data.map((consultation, index) => (
+            <tr key={consultation.id || index} className="hover:bg-gray-50 hover:border-l-4 hover:border-blue-400 transition-all duration-150 cursor-pointer" onClick={() => onViewDetails(consultation)}>
+              <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{displayValue(consultation.researchTopic)}</td>
+              <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{displayValue(consultation.researchType)}</td>
+              <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{displayValue(consultation.position)}</td>
+              <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{displayValue(consultation.date)}</td>
+              <td className="px-6 py-4">
+                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consultation.status).bgClass} ${getStatusColor(consultation.status).textClass}`}>{displayValue(consultation.status)}</span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td className="px-6 py-4 text-sm text-gray-500">
                 <button 
-                  onClick={() => onViewDetails(consultation)}
-                  className="text-blue-600 hover:text-blue-900"
+                  onClick={e => { e.stopPropagation(); onViewDetails(consultation); }}
+                  className="text-gray-400 hover:text-gray-600"
                 >
                   <FaEllipsisH className="w-4 h-4" />
                 </button>

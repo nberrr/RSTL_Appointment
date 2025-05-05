@@ -130,10 +130,10 @@ export default function ConsultancyReportsPage() {
       }
     >
       <ConsultancyReportsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        consultation={selectedConsultation}
-      />
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          consultation={selectedConsultation}
+        />
     </ConsultancyReportsDashboardLayout>
   );
 } 

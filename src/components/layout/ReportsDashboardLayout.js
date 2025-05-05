@@ -19,10 +19,17 @@ export default function ReportsDashboardLayout({
           <main className="flex-1 bg-gray-50 p-8 flex flex-col min-h-0 overflow-hidden">
             {toolbar}
             {statsCards}
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr,300px] gap-6 flex-1 min-h-0 overflow-hidden">
-              {mainContent}
-              {sidePanel}
-            </div>
+            {/* Responsive layout: full width if no sidePanel, grid if sidePanel */}
+            {sidePanel ? (
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr,300px] gap-6 flex-1 min-h-0 overflow-hidden">
+                {mainContent}
+                {sidePanel}
+              </div>
+            ) : (
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {mainContent}
+              </div>
+            )}
           </main>
         </div>
       </div>

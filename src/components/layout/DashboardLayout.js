@@ -63,10 +63,10 @@ export default function DashboardLayout({
                           analysisTypes.slice(0, 5).map((analysis, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between transition-all duration-300 hover:border-l-4 hover:border-blue-400 hover:pl-2 hover:bg-blue-50 hover:scale-105 hover:shadow-md rounded cursor-pointer"
+                              className="flex items-center justify-between transition-all duration-300 hover:border-l-4 hover:border-blue-400 hover:pl-2 hover:bg-blue-50 hover:scale-105 hover:shadow-md rounded cursor-pointer group"
                             >
                               <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
-                              <span className="text-sm font-medium text-gray-900">{analysis.count} tests</span>
+                              <span className="text-sm font-medium text-gray-900 transition-transform duration-200 group-hover:scale-110">{analysis.count} tests</span>
                             </div>
                           ))
                         ) : (

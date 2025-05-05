@@ -11,7 +11,7 @@ export default function DashboardFilters({
   setSelectedDate
 }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0 transition-all duration-200 hover:scale-105 hover:shadow-lg">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">Filters</h3>
       <div className="flex flex-col gap-3">
         {selectedDate && (
@@ -19,7 +19,7 @@ export default function DashboardFilters({
             <span className="text-sm font-medium">Date: {format(selectedDate, 'MMM d')}</span>
             <button
               onClick={() => setSelectedDate(null)}
-              className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50"
+              className="px-2 py-1 text-xs border border-gray-300 rounded transition-all duration-150 hover:bg-blue-50 hover:text-blue-700"
             >
               Clear Date
             </button>

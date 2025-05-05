@@ -61,7 +61,7 @@ export default function ServicesGroupedTable({
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {servicesList.map((service) => (
-                      <tr key={service.id} className="hover:bg-gray-50">
+                      <tr key={service.id} className="hover:bg-blue-50 hover:border-l-4 hover:border-blue-400 transition-all duration-150 cursor-pointer">
                         <td className="w-1/4 px-6 py-4">
                           {editingId === service.id ? (
                             <div className="space-y-1">
@@ -147,13 +147,13 @@ export default function ServicesGroupedTable({
                               <>
                                 <button 
                                   onClick={onSave}
-                                  className="text-green-600 hover:text-green-800"
+                                  className="text-green-600 hover:text-green-800 transition-colors duration-150"
                                 >
                                   <FaCheck className="w-5 h-5" />
                                 </button>
                                 <button 
                                   onClick={onCancel}
-                                  className="text-red-600 hover:text-red-800"
+                                  className="text-red-600 hover:text-red-800 transition-colors duration-150"
                                 >
                                   <FaTimes className="w-5 h-5" />
                                 </button>
@@ -162,13 +162,13 @@ export default function ServicesGroupedTable({
                               <>
                                 <button 
                                   onClick={() => onEdit(service)}
-                                  className="text-blue-600 hover:text-blue-800"
+                                  className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
                                 >
                                   Edit
                                 </button>
                                 <button 
                                   onClick={() => onDeleteClick(service)}
-                                  className="text-red-600 hover:text-red-800"
+                                  className="text-red-600 hover:text-red-800 transition-colors duration-150"
                                 >
                                   <FaTrash className="w-4 h-4" />
                                 </button>

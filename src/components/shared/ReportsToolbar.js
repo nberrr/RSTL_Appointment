@@ -17,8 +17,8 @@ export default function ReportsToolbar({
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <button
-          className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 border border-gray-200"
           onClick={onExport}
+          className="ml-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm font-medium flex items-center gap-2 transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300"
         >
           <FaDownload className="w-4 h-4" />
           Export

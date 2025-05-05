@@ -3,33 +3,30 @@ import React from "react";
 export default function ReportsStatsCards({ completedCount, declinedCount, cancelledCount }) {
   return (
     <div className="mb-5 flex-shrink-0">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-0">
-        <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col items-start transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Completed Tests</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+            <span className="text-xs font-medium text-gray-500">Completed Tests</span>
           </div>
-          <p className="text-3xl font-bold">{completedCount}</p>
-          <p className="text-sm text-gray-500">Last 30 days</p>
-          <div className="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
+          <div className="text-2xl font-bold text-gray-900">{completedCount}</div>
+          <div className="text-xs text-gray-400 mt-1">Last 30 days</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-sm border border-gray-200">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col items-start transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Declined Tests</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+            <span className="text-xs font-medium text-gray-500">Declined Tests</span>
           </div>
-          <p className="text-3xl font-bold">{declinedCount}</p>
-          <p className="text-sm text-gray-500">Last 30 days</p>
-          <div className="absolute right-0 top-0 h-full w-1 bg-red-500"></div>
+          <div className="text-2xl font-bold text-gray-900">{declinedCount}</div>
+          <div className="text-xs text-gray-400 mt-1">Last 30 days</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 relative overflow-hidden shadow-msm border border-gray-200">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col items-start transition-colors duration-150 hover:bg-gray-50 hover:border-gray-300">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Cancelled Tests</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>
+            <span className="text-xs font-medium text-gray-500">Cancelled Tests</span>
           </div>
-          <p className="text-3xl font-bold">{cancelledCount}</p>
-          <p className="text-sm text-gray-500">Last 30 days</p>
-          <div className="absolute right-0 top-0 h-full w-1 bg-gray-500"></div>
+          <div className="text-2xl font-bold text-gray-900">{cancelledCount}</div>
+          <div className="text-xs text-gray-400 mt-1">Last 30 days</div>
         </div>
       </div>
     </div>

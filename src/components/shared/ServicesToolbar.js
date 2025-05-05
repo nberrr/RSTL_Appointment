@@ -17,7 +17,7 @@ export default function ServicesToolbar({
         <h1 className="text-2xl font-bold">{title}</h1>
         <button 
           onClick={onAdd}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-150 border border-green-600 hover:border-green-800"
         >
           <FaPlus className="w-4 h-4" />
           Add New Test

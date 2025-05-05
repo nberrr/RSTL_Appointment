@@ -22,7 +22,7 @@ import DashboardNav from "@/components/layout/DashboardNav";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
 import CalendarDashboardLayout from "@/components/layout/CalendarDashboardLayout";
-import CalendarMonthView from "@/components/shared/CalendarMonthView";
+import DashboardCalendar from "@/components/shared/DashboardCalendar";
 import DashboardQuickInfo from "@/components/shared/DashboardQuickInfo";
 import DashboardFilters from "@/components/shared/DashboardFilters";
 import DashboardAppointmentsTable from "@/components/shared/DashboardAppointmentsTable";
@@ -39,6 +39,11 @@ export default function ChemistryCalendarAndTable() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null); 
   const [viewMode, setViewMode] = useState('month'); // 'day', 'week', 'month', 'all'
+
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const [calendarDays, setCalendarDays] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(new Date());
+  const [currentDay, setCurrentDay] = useState(new Date().getDate());
 
   // Function to get status color (shared by modal and calendar/table)
   const getStatusColor = (status) => {
@@ -78,6 +83,54 @@ export default function ChemistryCalendarAndTable() {
   useEffect(() => {
     fetchAppointments();
   }, [fetchAppointments]);
+
+  // Generate calendarDays array for DashboardCalendar
+  const generateCalendarDays = (date, appointments = []) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const firstDayWeekday = firstDayOfMonth.getDay();
+    const totalDays = lastDayOfMonth.getDate();
+    const days = [];
+    // Create appointment lookup map
+    const appointmentMap = {};
+    appointments.forEach(apt => {
+      const aptDate = new Date(apt.appointment_date);
+      if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
+        const dayKey = aptDate.getDate();
+        if (!appointmentMap[dayKey]) {
+          appointmentMap[dayKey] = { count: 0, statuses: [] };
+        }
+        appointmentMap[dayKey].count += 1;
+        appointmentMap[dayKey].statuses.push(apt.status);
+      }
+    });
+    for (let i = 0; i < firstDayWeekday; i++) {
+      days.push({ day: null, isCurrentMonth: false, date: null });
+    }
+    for (let i = 1; i <= totalDays; i++) {
+      days.push({
+        day: i,
+        isCurrentMonth: true,
+        appointments: appointmentMap[i]
+          ? { count: appointmentMap[i].count, statuses: appointmentMap[i].statuses.join(', ') }
+          : null,
+        date: new Date(year, month, i)
+      });
+    }
+    const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
+    const totalCells = neededRows * 7;
+    const remainingCells = totalCells - days.length;
+    for (let i = 0; i < remainingCells; i++) {
+      days.push({ day: null, isCurrentMonth: false, date: null });
+    }
+    setCalendarDays(days);
+  };
+
+  useEffect(() => {
+    generateCalendarDays(currentMonth, appointments);
+  }, [currentMonth, appointments]);
 
   // --- Status Update Logic (remains the same) --- 
   const handleStatusUpdate = async (appointmentId, newStatus) => {
@@ -122,97 +175,6 @@ export default function ChemistryCalendarAndTable() {
 
   const prevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
-  };
-
-  // --- Calendar Rendering Functions --- 
-  const renderCalendarHeader = () => {
-    return (
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {format(currentMonth, 'MMMM yyyy')}
-        </h2>
-        <div className="flex gap-2">
-          <button onClick={prevMonth} className="p-1.5 hover:bg-gray-100 rounded-lg">&lt;</button>
-          <button onClick={() => { setCurrentMonth(new Date()); setSelectedDate(null); setViewMode('month'); }} className="px-3 py-1 text-xs hover:bg-gray-100 rounded-lg border">Today</button>
-          <button onClick={nextMonth} className="p-1.5 hover:bg-gray-100 rounded-lg">&gt;</button>
-        </div>
-      </div>
-    );
-  };
-
-  const renderCalendarDaysHeader = () => {
-    const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S']; // Use single letters for smaller view
-    return (
-      <div className="grid grid-cols-7 text-center text-xs font-medium text-gray-500 mb-1">
-        {/* Use index to ensure unique keys for duplicate day letters */}
-        {days.map((day, index) => <div key={`${day}-${index}`} className="py-1">{day}</div>)}
-      </div>
-    );
-  };
-
-  const renderCalendarCells = () => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
-
-    const rows = [];
-    let days = [];
-    let day = startDate;
-
-    while (day <= endDate) {
-      for (let i = 0; i < 7; i++) {
-        const cloneDay = day;
-        // Filter all fetched appointments for the current cell day
-        const dayAppointments = appointments.filter(apt => 
-          isSameDay(parseISO(apt.appointment_date), cloneDay)
-        );
-        
-        days.push(
-          <div
-            key={format(day, 'yyyy-MM-dd')}
-            day={cloneDay}
-            className={`
-              p-1 border border-gray-100 h-16 overflow-hidden flex flex-col items-center justify-start cursor-pointer 
-              ${!isSameMonth(day, monthStart) ? 'bg-gray-50 text-gray-400' : 'bg-white hover:bg-blue-50'}
-              ${isToday(day) ? 'border-blue-300 font-semibold' : ''}
-              ${selectedDate && isSameDay(day, selectedDate) && viewMode === 'day' ? 'bg-blue-100 ring-1 ring-blue-300' : ''}
-            `}
-            onClick={() => {
-              if (isSameMonth(cloneDay, monthStart)) {
-                  setSelectedDate(cloneDay); 
-                  setViewMode('day'); // Switch to day view when a date is clicked
-              } else {
-                  setCurrentMonth(cloneDay); // Navigate if clicking day outside current month
-                  setSelectedDate(cloneDay);
-                  setViewMode('day');
-              }
-            }}
-          >
-            <span className={`text-xs ${isToday(day) ? 'text-blue-600 font-bold' : ''}`}>
-              {format(day, 'd')}
-            </span>
-            {/* Appointment Dots (simplified for small view) */}
-            {dayAppointments.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-0.5 mt-1">
-                    {dayAppointments.slice(0, 4).map(apt => (
-                        <span key={apt.id} className={`w-1 h-1 rounded-full ${getStatusColor(apt.status).dotClass}`} title={apt.status}></span>
-                    ))}
-                    {dayAppointments.length > 4 && <span className="w-1 h-1 rounded-full bg-gray-400" title={`${dayAppointments.length - 4} more`}></span>}
-                </div>
-            )}
-          </div>
-        );
-        day = addDays(day, 1);
-      }
-      rows.push(
-        <div className="grid grid-cols-7" key={days.length > 0 ? format(days[0].props.day, 'yyyy-MM-dd-week') : `empty-row-${rows.length}`}>
-          {days}
-        </div>
-      );
-      days = [];
-    }
-    return <div className="border-t border-l border-gray-200">{rows}</div>;
   };
 
   // --- Filtering Logic for Table --- 
@@ -319,27 +281,20 @@ export default function ChemistryCalendarAndTable() {
     <CalendarDashboardLayout
       leftColumn={
         <>
-          <CalendarMonthView
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            appointments={appointments}
-            onDateSelect={(date) => {
-              if (date) {
-                setSelectedDate(date);
-                setViewMode('day');
-              }
-            }}
-            onMonthChange={(delta) => {
-              if (delta === 0) {
-                setCurrentMonth(new Date());
-                setSelectedDate(null);
-                setViewMode('month');
-              } else {
-                setCurrentMonth(addMonths(currentMonth, delta));
-              }
+          <DashboardCalendar
+            currentMonth={format(currentMonth, 'MMMM yyyy')}
+            weekdays={weekdays}
+            calendarDays={calendarDays}
+            selectedDay={selectedDay}
+            currentDay={currentDay}
+            goToPreviousMonth={prevMonth}
+            goToNextMonth={nextMonth}
+            setSelectedDay={(date) => {
+              setSelectedDay(date);
+              setSelectedDate(date);
+              setViewMode('day');
             }}
             getStatusColor={getStatusColor}
-            viewMode={viewMode}
           />
           <DashboardQuickInfo
             title={currentViewStats.title}
@@ -364,19 +319,17 @@ export default function ChemistryCalendarAndTable() {
                 {getTableTitle()}
                       </h3>
                       <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
-                          {(viewMode !== 'day' || !selectedDate) && (
                               <button 
-                    onClick={() => { setViewMode('day'); if (!selectedDate) setSelectedDate(new Date()); }}
+                    onClick={() => {
+                      setViewMode('day');
+                      if (!selectedDate) setSelectedDate(new Date());
+                    }}
                                   className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
                                   title="Day View (requires selecting a day on calendar)"
                     disabled={!selectedDate}
                               >
                                   Day
                               </button>
-                          )}
-                          {selectedDate && viewMode === 'day' && (
-                  <button className="px-3 py-1 text-xs rounded-md bg-gray-200 font-medium">Day</button>
-                          )}
                            <button 
                               onClick={() => setViewMode('week')}
                               className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}

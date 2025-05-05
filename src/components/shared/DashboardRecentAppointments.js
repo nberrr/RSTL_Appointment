@@ -11,10 +11,10 @@ export default function DashboardRecentAppointments({ recentAppointments = [], l
           {recentAppointments.slice(0, 5).map((apt, idx) => {
             const statusColor = getStatusColor(apt.status);
             return (
-              <div key={idx} className="bg-gray-50 rounded-lg p-3 shadow border flex flex-col gap-1 transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-105 hover:border-l-4 hover:border-blue-400 cursor-pointer">
+              <div key={idx} className="bg-gray-50 rounded-lg p-3 shadow border flex flex-col gap-1 transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-105 hover:border-l-4 hover:border-blue-400 cursor-pointer group">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-800 text-sm">{apt.client_name || apt.name || apt.customer_name || 'N/A'}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${statusColor ? statusColor.bgClass + ' ' + statusColor.textClass : 'bg-gray-200 text-gray-700'}`}>{apt.status || 'Pending'}</span>
+                  <span className={`text-xs px-2 py-1 rounded-full transition-transform duration-200 group-hover:scale-110 ${statusColor ? statusColor.bgClass + ' ' + statusColor.textClass : 'bg-gray-200 text-gray-700'}`}>{apt.status || 'Pending'}</span>
                 </div>
                 {apt.analysis_requested && <div className="text-xs text-gray-600">Analysis: {apt.analysis_requested}</div>}
                 {apt.appointment_date && <div className="text-xs text-gray-500">Date: {apt.appointment_date}</div>}

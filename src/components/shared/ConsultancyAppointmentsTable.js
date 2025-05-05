@@ -72,7 +72,7 @@ export default function ConsultancyAppointmentsTable({
                   filteredAppointments.map((appointment, index) => {
                     const statusColors = getStatusColor(appointment.status);
                     return (
-                      <tr key={appointment.id || index} className="hover:bg-gray-50 cursor-pointer" onClick={() => onViewDetails(appointment)}>
+                      <tr key={appointment.id || index} className="hover:bg-gray-50 hover:border-l-4 hover:border-blue-400 transition-all duration-150 cursor-pointer" onClick={() => onViewDetails(appointment)}>
                         <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{appointment.date}</td>
                         <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{appointment.time}</td>
                         <td className="px-4 py-3 text-sm text-gray-900 ">
@@ -97,7 +97,7 @@ export default function ConsultancyAppointmentsTable({
                               </button>
                               <button
                                 onClick={e => { e.stopPropagation(); onDecline(appointment); }}
-                                className="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-800 rounded hover:bg-red-50"
+                                className="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-medium text-red-600 hover:text-white hover:bg-red-600 rounded"
                               >
                                 <FaTimes size={11} /> Decline
                               </button>

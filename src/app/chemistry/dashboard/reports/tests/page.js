@@ -5,9 +5,7 @@ import ReportsDashboardLayout from '@/components/layout/ReportsDashboardLayout';
 import ReportsToolbar from '@/components/shared/ReportsToolbar';
 import ReportsStatsCards from '@/components/shared/ReportsStatsCards';
 import ReportsAppointmentsTable from '@/components/shared/ReportsAppointmentsTable';
-import ReportsCompletionStats from '@/components/shared/ReportsCompletionStats';
 import SampleDetailsModal from '@/components/shared/SampleDetailsModal';
-import { FaDownload } from 'react-icons/fa';
 
 export default function ChemistryReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,14 +39,6 @@ export default function ChemistryReportsPage() {
   const completedCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'completed').length;
   const declinedCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'declined').length;
   const cancelledCount = appointments.filter(a => a.status && a.status.toLowerCase() === 'cancelled').length;
-
-  // Compute completionStats by testType
-  const completionStatsObj = appointments.reduce((acc, a) => {
-    const type = a.testType || 'Other Tests';
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {});
-  const completionStats = Object.entries(completionStatsObj).map(([name, count]) => ({ name, count }));
 
   const getStatusColor = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800';
@@ -128,9 +118,7 @@ export default function ChemistryReportsPage() {
           onViewDetails={handleViewDetails}
         />
       }
-      sidePanel={
-        <ReportsCompletionStats completionStats={completionStats} />
-      }
+      sidePanel={null}
     >
       <SampleDetailsModal
         isOpen={!!selectedSample}

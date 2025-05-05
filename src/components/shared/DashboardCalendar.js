@@ -37,9 +37,9 @@ export default function DashboardCalendar({
           return (
             <button
               key={idx}
-              className={`aspect-square min-h-[48px] w-full flex flex-col items-center justify-center rounded-full text-sm relative
+              className={`aspect-square min-h-[48px] w-full flex flex-col items-center justify-center rounded-md text-sm relative
                 ${dayObj.isCurrentMonth ? 'bg-blue-50' : 'bg-gray-100'}
-                ${selectedDay && dayObj.date && selectedDay instanceof Date && dayObj.date.toDateString() === selectedDay.toDateString() ? 'ring-2 ring-blue-500' : ''}
+                ${selectedDay && dayObj.date && selectedDay instanceof Date && dayObj.date.toDateString() === selectedDay.toDateString() ? 'ring-2 ring-blue-500 animate-selected-ring' : ''}
                 ${dayObj.day === currentDay ? 'font-bold text-blue-700' : ''}
                 ${hasAppointments && statusColor ? `border-4 ${statusColor.bgClass}` : ''}
                 transition-all duration-200 hover:bg-blue-100 hover:scale-110 hover:ring-2 hover:ring-blue-300 hover:shadow-lg cursor-pointer`}
@@ -52,7 +52,7 @@ export default function DashboardCalendar({
               <div className="flex space-x-0.5 mt-1">
                 {statusList.map((status, i) => {
                   const color = getStatusColor(status);
-                  return <span key={i} className={`w-2 h-2 rounded-full ${color ? color.dotClass : 'bg-gray-300'}`}></span>;
+                  return <span key={i} className={`w-2 h-2 rounded-full ${color ? color.dotClass : 'bg-gray-300'} transition-transform duration-200 group-hover:scale-125`}></span>;
                 })}
               </div>
             </button>

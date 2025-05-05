@@ -6,6 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 export default function ResearchConsultation() {
     const [formData, setFormData] = useState({
         fullName: '',
+        sex: '',
         emailAddress: '',
         contactNumber: '',
         institution: '',
@@ -64,6 +65,7 @@ export default function ResearchConsultation() {
 
         // Personal Information validation
         if (!formData.fullName) newErrors.fullName = 'Please enter your full name';
+        if (!formData.sex) newErrors.sex = 'Please select your sex';
         if (!formData.emailAddress) newErrors.emailAddress = 'Please enter your email address';
         if (!formData.contactNumber) newErrors.contactNumber = 'Please enter your contact number';
         if (!formData.institution) newErrors.institution = 'Please enter your institution';
@@ -112,6 +114,7 @@ export default function ResearchConsultation() {
                     // Reset form
                     setFormData({
                         fullName: '',
+                        sex: '',
                         emailAddress: '',
                         contactNumber: '',
                         institution: '',
@@ -245,6 +248,24 @@ export default function ResearchConsultation() {
                                     />
                                     {errors.fullName && (
                                         <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm text-gray-700">Sex</label>
+                                    <select
+                                        name="sex"
+                                        value={formData.sex}
+                                        onChange={handleChange}
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.sex ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                                    >
+                                        <option value="">Select</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    {errors.sex && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.sex}</p>
                                     )}
                                 </div>
 

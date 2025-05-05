@@ -196,6 +196,8 @@ CREATE TABLE research_consultation_details (
     consultation_type VARCHAR(100),
     research_stage VARCHAR(100),
     additional_requirements TEXT,
+    uploaded_research_paper VARCHAR(255),
+    consultation_details TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -339,15 +341,6 @@ INSERT INTO users (name, email, password, role, lab_access)
 VALUES ('Administrator', 'admin@rstl.gov', '$2a$10$JERhJYGmwNB6aVdpoXWEfO3h2Le3d0xNn4AkKtrkQpk6LuZuaHX9m', 'admin', 'all');
 -- Note: The password here is hashed. The original password is 'admin123'
 
--- Create some initial services
-INSERT INTO services (name, category, description, price, duration_minutes)
-VALUES 
-('Flow Meter Calibration', 'metrology', 'Calibration of flow meters for accurate measurement', 2500.00, 120),
-('Water Analysis', 'chemistry', 'Complete analysis of water samples for potability and contamination', 1800.00, 180),
-('Bacterial Testing', 'microbiology', 'Testing for bacterial contamination in food samples', 2000.00, 240),
-('Shelf Life Study', 'shelf_life', 'Comprehensive shelf life determination for food products', 5000.00, 480),
-('Research Consultation', 'research', 'Consultation on research methodologies and experimental design', 1500.00, 120);
-
 -- Insert CHEMICAL TESTS
 INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES
 -- FOOD
@@ -438,4 +431,93 @@ INSERT INTO services (name, category, sample_type, price, duration_minutes) VALU
 ('PACKAGE E: Heterotrophic Plate Count + Coliform Count + E. coli Count (Colilert-18)', 'microbiology', 'Packages', 1_200.00, 60),
 ('PACKAGE F: Coliform Count + E. coli Count (Colilert-18)', 'microbiology', 'Packages', 1_200.00, 60);
 
+-- Insert RESEARCH CONSULTATION
+INSERT INTO services (name, category, description, price, duration_minutes, active, sample_type)
+VALUES ('Research Consultation', 'research', 'Consultation on research methodologies and experimental design', 1500.00, 120, true, 'N/A');
+
+-- Insert METROLOGY TESTS
+INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES
+('Flow Meter Calibration', 'metrology', 'Liquid', 2500.00, 120),
+('Volume Verification', 'metrology', 'Liquid', 1800.00, 90),
+('Truck Tank Calibration', 'metrology', 'Liquid', 3000.00, 180);
+
+-- DUMMY CUSTOMERS
+-- Note: sex is VARCHAR(10), so use 'Male' or 'Female' only
+INSERT INTO customers (name, email, contact_number, sex, company_name) VALUES
+('Alice Chem', 'alice.chem@example.com', '09170000001', 'Female', 'ChemCorp'),
+('Bob Bio', 'bob.bio@example.com', '09170000002', 'Male', 'BioInc'),
+('Charlie Metro', 'charlie.metro@example.com', '09170000003', 'Male', 'MetroTrucks'),
+('Diana Shelf', 'diana.shelf@example.com', '09170000004', 'Female', 'ShelfFoods'),
+('Eve Chem', 'eve.chem@example.com', '09170000005', 'Female', 'ChemCorp'),
+('Frank Bio', 'frank.bio@example.com', '09170000006', 'Male', 'BioInc'),
+('Grace Metro', 'grace.metro@example.com', '09170000007', 'Female', 'MetroTrucks'),
+('Hank Shelf', 'hank.shelf@example.com', '09170000008', 'Male', 'ShelfFoods'),
+('Ivy Chem', 'ivy.chem@example.com', '09170000009', 'Female', 'ChemCorp'),
+('Jack Bio', 'jack.bio@example.com', '09170000010', 'Male', 'BioInc'),
+('Kara Metro', 'kara.metro@example.com', '09170000011', 'Female', 'MetroTrucks'),
+('Leo Shelf', 'leo.shelf@example.com', '09170000012', 'Male', 'ShelfFoods'),
+('Mona Chem', 'mona.chem@example.com', '09170000013', 'Female', 'ChemCorp'),
+('Ned Bio', 'ned.bio@example.com', '09170000014', 'Male', 'BioInc'),
+('Olive Metro', 'olive.metro@example.com', '09170000015', 'Female', 'MetroTrucks');
+
+-- DUMMY APPOINTMENTS, DETAILS, AND LAB-SPECIFIC DETAILS
+-- Chemistry
+DO $$
+DECLARE i INT := 1; _apt_id INT; _det_id INT;
+BEGIN
+  WHILE i <= 15 LOOP
+    INSERT INTO appointments (customer_id, service_id, appointment_date, status)
+    VALUES (i, 1, TO_DATE('2025-05-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    INSERT INTO appointment_details (appointment_id, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
+    VALUES (_apt_id, 'Sample desc '||i, 'Sample '||i, 'Water', 'Normal', '10', 2, true) RETURNING id INTO _det_id;
+    INSERT INTO chemistry_details (appointment_detail_id, analysis_requested, parameters, delivery_type, sample_quantity)
+    VALUES (_det_id, 'Analysis '||i, 'Param '||i, 'Standard', '10');
+    i := i + 1;
+  END LOOP;
+END$$;
+
+-- Microbiology
+DO $$
+DECLARE i INT := 1; _apt_id INT; _det_id INT;
+BEGIN
+  WHILE i <= 15 LOOP
+    INSERT INTO appointments (customer_id, service_id, appointment_date, status)
+    VALUES (i, 54, TO_DATE('2025-06-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    INSERT INTO appointment_details (appointment_id, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
+    VALUES (_apt_id, 'Bio desc '||i, 'BioSample '||i, 'Food', 'Chilled', '5', 1, true) RETURNING id INTO _det_id;
+    INSERT INTO microbiology_details (appointment_detail_id, test_type, organism_target, sample_storage_condition, sample_quantity)
+    VALUES (_det_id, 'TestType '||i, 'E. coli', 'Chilled', '5');
+    i := i + 1;
+  END LOOP;
+END$$;
+
+-- Metrology
+DO $$
+DECLARE i INT := 1; _apt_id INT; _det_id INT;
+BEGIN
+  WHILE i <= 15 LOOP
+    INSERT INTO appointments (customer_id, service_id, appointment_date, status)
+    VALUES (i, 1, TO_DATE('2025-07-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    INSERT INTO appointment_details (appointment_id, plate_number, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
+    VALUES (_apt_id, 'ABC'||i, 'Metro desc '||i, 'MetroSample '||i, 'Liquid', 'Normal', '20', 1, true) RETURNING id INTO _det_id;
+    INSERT INTO metrology_details (appointment_detail_id, type_of_test, number_of_liters, instrument_type, truck_plate_number, manager_name, manager_contact, manager_approval_date, liquid_carried_liters)
+    VALUES (_det_id, 'Type '||i, 100+i, 'Instrument '||i, 'ABC'||i, 'Manager '||i, '0917'||LPAD(i::text, 7, '0'), TO_DATE('2025-07-'||LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 100.0+i);
+    i := i + 1;
+  END LOOP;
+END$$;
+
+-- Shelf Life
+DO $$
+DECLARE i INT := 1; _apt_id INT; _det_id INT;
+BEGIN
+  WHILE i <= 15 LOOP
+    INSERT INTO appointments (customer_id, service_id, appointment_date, status)
+    VALUES (i, 4, TO_DATE('2025-08-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    INSERT INTO appointment_details (appointment_id, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
+    VALUES (_apt_id, 'Shelf desc '||i, 'ShelfSample '||i, 'Packaged', 'Ambient', '15', 3, true) RETURNING id INTO _det_id;
+    INSERT INTO shelf_life_details (appointment_detail_id, product_type, storage_conditions, shelf_life_duration, packaging_type, modes_of_deterioration)
+    VALUES (_det_id, 'Product '||i, 'Cool, dry', 12+i, 'Plastic', 'Moisture, Mold');
+    i := i + 1;
+END LOOP;
+END$$;
 COMMIT;

@@ -7,7 +7,7 @@ export async function POST(request) {
     const formData = await request.json();
     
     // Validate required fields
-    const requiredFields = ['name', 'email', 'contactNumber', 'sex', 'researchTopic', 'consultationType', 'researchStage', 'selectedDate'];
+    const requiredFields = ['fullName', 'sex', 'emailAddress', 'contactNumber', 'institution', 'typeOfResearch', 'yearLevel', 'researchTitle', 'consultationDetails', 'selectedDate'];
     
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -26,7 +26,7 @@ export async function POST(request) {
       `INSERT INTO customers (name, email, contact_number, company_name, sex)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [formData.name, formData.email, formData.contactNumber, formData.companyName || null, formData.sex]
+      [formData.fullName, formData.emailAddress, formData.contactNumber, formData.institution || null, formData.sex]
     );
     const customerId = customerResult.rows[0].id;
     
@@ -66,14 +66,16 @@ export async function POST(request) {
     await query(
       `INSERT INTO research_consultation_details (
          appointment_detail_id, research_topic, consultation_type,
-         research_stage, additional_requirements
+         research_stage, additional_requirements, uploaded_research_paper, consultation_details
        )
-       VALUES ($1, $2, $3, $4, $5)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         appointmentDetailId,
         formData.researchTitle,
         formData.typeOfResearch,
         formData.yearLevel,
+        null, // additional_requirements (not present in form)
+        (formData.selectedFiles && formData.selectedFiles.length > 0) ? formData.selectedFiles[0].name : null,
         formData.consultationDetails
       ]
     );

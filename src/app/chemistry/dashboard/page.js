@@ -10,6 +10,7 @@ import DashboardCalendar from "@/components/shared/DashboardCalendar";
 import DashboardRecentAppointments from "@/components/shared/DashboardRecentAppointments";
 import DashboardDayAppointments from "@/components/shared/DashboardDayAppointments";
 import DashboardStats from "@/components/shared/DashboardStats";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 
 export default function ChemistryDashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -208,77 +209,30 @@ export default function ChemistryDashboard() {
   ];
 
   return (
-    <AdminLayout>
-      <div className="h-screen flex flex-col">
-        <DashboardNav />
-        <div className="flex flex-1 overflow-hidden">
-          <DashboardSidebar />
-          <main className="flex-1 bg-gray-100 p-4 flex flex-col">
-            <div className="flex-1 flex flex-col">
-              {/* Stats Overview - Shared Component */}
-              <DashboardStats stats={dashboardData.stats} statConfig={statConfig} />
-              {/* Main Grid - 3 columns, third column split vertically and fills height */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full flex-1">
-                {/* Column 1: Calendar */}
-                <DashboardCalendar
-                  currentMonth={currentMonth}
-                  weekdays={weekdays}
-                  calendarDays={calendarDays}
-                  selectedDay={selectedDay}
-                  currentDay={currentDay}
-                  goToPreviousMonth={goToPreviousMonth}
-                  goToNextMonth={goToNextMonth}
-                  setSelectedDay={setSelectedDay}
-                  getStatusColor={getStatusColor}
-                />
-                {/* Column 2: Recent Appointments */}
-                <DashboardRecentAppointments
-                  recentAppointments={dashboardData.recentAppointments}
-                  loading={loading}
-                  error={error}
-                  getStatusColor={getStatusColor}
-                />
-                {/* Column 3: Vertically center Popular Analysis Types */}
-                <div className="flex flex-col h-full flex-1 gap-4">
-                  {/* Top: Appointments for Selected Day */}
-                  <div className="flex-1 flex flex-col h-full">
-                    <DashboardDayAppointments
-                      selectedDay={selectedDay}
-                      currentMonth={currentMonth}
-                      selectedDayAppointments={selectedDayAppointments}
-                      loadingSelectedDay={loadingSelectedDay}
-                      getStatusColor={getStatusColor}
-                    />
-                  </div>
-                  {/* Centered: Popular Analysis Types */}
-                  <div className="flex-1 flex flex-col h-full">
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 w-full h-full flex flex-col">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Popular Analysis Types</h3>
-                      <div className="space-y-3 flex-1">
-                        {loading && <p className="text-sm text-gray-500 text-center">Loading...</p>}
-                        {error && <p className="text-sm text-red-500 text-center">Error loading analysis types.</p>}
-                        {!loading && !error && dashboardData.analysisTypes.length > 0 ? (
-                          dashboardData.analysisTypes.slice(0, 5).map((analysis, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between transition-all duration-300 hover:border-l-4 hover:border-blue-400 hover:pl-2 hover:bg-blue-50 hover:scale-105 hover:shadow-md rounded cursor-pointer"
-                            >
-                              <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
-                              <span className="text-sm font-medium text-gray-900">{analysis.count} tests</span>
-                            </div>
-                          ))
-                        ) : (
-                          !loading && !error && <p className="text-sm text-gray-400 italic text-center">No analysis data available.</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
-    </AdminLayout>
+    <DashboardLayout
+      stats={dashboardData.stats}
+      statConfig={statConfig}
+      calendarProps={{
+        currentMonth,
+        weekdays,
+        calendarDays,
+        selectedDay,
+        currentDay,
+        goToPreviousMonth,
+        goToNextMonth,
+        setSelectedDay,
+        getStatusColor,
+      }}
+      recentAppointments={dashboardData.recentAppointments}
+      loading={loading}
+      error={error}
+      selectedDayAppointments={selectedDayAppointments}
+      loadingSelectedDay={loadingSelectedDay}
+      dayAppointmentsProps={{
+        selectedDay,
+        currentMonth,
+      }}
+      analysisTypes={dashboardData.analysisTypes}
+    />
   );
 } 

@@ -3,9 +3,58 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { FaFlask, FaRuler, FaBacteria, FaBook, FaClock } from 'react-icons/fa';
+import { FaFlask, FaRuler, FaBacteria, FaBook, FaClock, FaInfoCircle, FaTachometerAlt, FaEnvelopeOpenText } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import Taskbar from '@/components/shared/Taskbar';
+import { Card, Button, StatusBadge, Tabs } from '@/components/ui';
+import DashboardNav from '@/components/layout/DashboardNav';
+
+// AdminSidebar component
+function AdminSidebar({ current }) {
+  const nav = [
+    { label: 'Dashboard', href: '/admin/dashboard', icon: <FaTachometerAlt className="w-5 h-5" /> },
+    { label: 'Inquiries Sheet', href: '/admin/dashboard/inquiries', icon: <FaEnvelopeOpenText className="w-5 h-5" /> },
+  ];
+  return (
+    <aside className="fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 shadow-sm flex flex-col z-30" aria-label="Admin sidebar">
+      <div className="h-16 flex items-center px-6 border-b border-gray-100">
+        <span className="text-xl font-bold text-blue-600 tracking-tight">Admin</span>
+      </div>
+      <div className="px-6 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Navigation</div>
+      <nav className="flex-1 py-2 px-2 space-y-2">
+        {nav.map(item => (
+          <Link key={item.href} href={item.href} className={`relative flex items-center gap-3 px-4 py-2 rounded-lg text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-200 ${current === item.href ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-blue-50'}`}
+            aria-current={current === item.href ? 'page' : undefined}>
+            {/* Active indicator bar */}
+            <span className={`absolute left-0 top-0 h-full w-1 rounded-r-lg transition-all ${current === item.href ? 'bg-blue-500' : 'bg-transparent'}`}></span>
+            {item.icon}
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </aside>
+  );
+}
+
+// Enhanced Tabs with pill style and animated underline
+function EnhancedTabs({ activeTab, onChange, tabs }) {
+  return (
+    <div className="flex space-x-2 px-4 py-3">
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          className={`relative px-5 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 ${activeTab === tab.id ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-blue-50'}`}
+          aria-current={activeTab === tab.id ? 'page' : undefined}
+        >
+          {tab.label}
+          {activeTab === tab.id && (
+            <span className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 w-2/3 h-1 bg-blue-400 rounded-full animate-pulse"></span>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('today');
@@ -16,6 +65,12 @@ export default function AdminDashboard() {
     shelfLife: { appointments: 0, pending: 0, completed: 0 }
   });
   const [loading, setLoading] = useState(true);
+
+  const periodTabs = [
+    { id: 'today', label: 'Today' },
+    { id: 'week', label: 'This Week' },
+    { id: 'month', label: 'This Month' },
+  ];
 
   useEffect(() => {
     fetchStats();
@@ -78,94 +133,87 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Laboratory Services Dashboard</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Select a laboratory service to view its dashboard
-            </p>
+      <div className="min-h-screen bg-gray-50 flex">
+        <AdminSidebar current="/admin/dashboard" />
+        <div className="flex-1 ml-56">
+          <div className="sticky top-0 z-40">
+            <DashboardNav />
           </div>
-
-          {/* Taskbar */}
-          <Taskbar actions={[{ label: 'Inquiries Sheet', href: '/admin/dashboard/inquiries' }]} />
-
-          {/* Time Period Selector */}
-          <div className="mb-8">
-            <div className="bg-white rounded-lg p-4 shadow-sm">
-              <div className="flex space-x-4">
-                {['today', 'week', 'month'].map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => setSelectedPeriod(period)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${
-                      selectedPeriod === period
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    {period.charAt(0).toUpperCase() + period.slice(1)}
-                  </button>
-                ))}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+            {/* Header */}
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Laboratory Services Dashboard</h1>
+                <p className="text-base text-gray-500 flex items-center gap-2">
+                  <FaInfoCircle className="text-blue-400" />
+                  Select a laboratory service to view its dashboard
+                </p>
               </div>
+              {/* User avatar/profile menu placeholder */}
+              <button className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="User menu">
+                <span className="inline-block w-8 h-8 bg-blue-200 text-blue-700 font-bold rounded-full flex items-center justify-center">A</span>
+                <span className="hidden md:inline text-sm font-medium text-gray-700">Admin</span>
+              </button>
             </div>
-          </div>
+            <div className="border-b border-gray-200 mb-8" aria-hidden="true"></div>
 
-          {/* Service Cards */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <Link key={service.id} href={service.href}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden h-full cursor-pointer"
-                >
-                  <div className="p-6">
-                    <div className="flex items-center mb-6">
-                      <div className={`${service.color} p-4 rounded-lg`}>
-                        <div className="text-white">{service.icon}</div>
+            {/* Time Period Selector */}
+            <Card className="mb-8 p-0">
+              <EnhancedTabs
+                activeTab={selectedPeriod}
+                onChange={setSelectedPeriod}
+                tabs={periodTabs}
+              />
+            </Card>
+
+            {/* Service Cards Section */}
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800">Services Overview</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {services.map((service) => (
+                <Link key={service.id} href={service.href} className="focus:outline-none group">
+                  <Card className="relative transition-all duration-200 hover:shadow-xl hover:scale-[1.025] hover:border-blue-400 cursor-pointer group focus:ring-2 focus:ring-blue-200">
+                    {/* Floating Pending badge */}
+                    {service.stats?.pending > 0 && (
+                      <span className="absolute top-4 right-4 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow z-10 animate-pulse">
+                        {service.stats.pending} Pending
+                      </span>
+                    )}
+                    <div className="flex items-center p-6 pb-2">
+                      <div className={`rounded-full p-4 ${service.color} shadow-md flex items-center justify-center transition-transform duration-200 group-hover:scale-110`}>
+                        <span className="text-white text-2xl">{service.icon}</span>
                       </div>
-                      <div className="ml-4">
-                        <h3 className="text-xl font-semibold text-gray-900">{service.name}</h3>
+                      <div className="ml-4 flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{service.name}</h3>
                         <p className="text-sm text-gray-500 mt-1">{service.description}</p>
                       </div>
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg></span>
                     </div>
-                    <div className="mt-4">
-                      {loading ? (
-                        <div className="flex justify-center">
-                          <div className="animate-pulse flex space-x-4">
-                            <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                            <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                            <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                          <div>
-                            <p className="text-2xl font-semibold text-gray-900">
-                              {service.stats?.appointments || 0}
-                            </p>
-                            <p className="text-sm text-gray-500">Total</p>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-semibold text-yellow-500">
-                              {service.stats?.pending || 0}
-                            </p>
-                            <p className="text-sm text-gray-500">Pending</p>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-semibold text-green-500">
-                              {service.stats?.completed || 0}
-                            </p>
-                            <p className="text-sm text-gray-500">Completed</p>
-                          </div>
-                        </div>
-                      )}
+                    <div className="grid grid-cols-3 gap-4 px-6 pb-6 pt-2 text-center">
+                      <div>
+                        <p className="text-2xl font-extrabold text-gray-900">
+                          {loading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : service.stats?.appointments || 0}
+                        </p>
+                        <p className="text-xs text-gray-500 font-medium">Total</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-extrabold text-yellow-500">
+                          {loading ? <span className="inline-block w-8 h-6 bg-gray-100 rounded animate-pulse" /> : service.stats?.pending || 0}
+                        </p>
+                        <p className="text-xs text-gray-500 font-medium">Pending</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-extrabold text-green-500">
+                          {loading ? <span className="inline-block w-8 h-6 bg-gray-100 rounded animate-pulse" /> : service.stats?.completed || 0}
+                        </p>
+                        <p className="text-xs text-gray-500 font-medium">Completed</p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </Link>
-            ))}
+                  </Card>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

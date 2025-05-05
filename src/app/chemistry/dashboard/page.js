@@ -259,7 +259,10 @@ export default function ChemistryDashboard() {
                         {error && <p className="text-sm text-red-500 text-center">Error loading analysis types.</p>}
                         {!loading && !error && dashboardData.analysisTypes.length > 0 ? (
                           dashboardData.analysisTypes.slice(0, 5).map((analysis, index) => (
-                            <div key={index} className="flex items-center justify-between">
+                            <div
+                              key={index}
+                              className="flex items-center justify-between transition-all duration-300 hover:border-l-4 hover:border-blue-400 hover:pl-2 hover:bg-blue-50 hover:scale-105 hover:shadow-md rounded cursor-pointer"
+                            >
                               <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
                               <span className="text-sm font-medium text-gray-900">{analysis.count} tests</span>
                             </div>

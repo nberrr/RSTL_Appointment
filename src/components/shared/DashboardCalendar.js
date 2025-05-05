@@ -41,7 +41,8 @@ export default function DashboardCalendar({
                 ${dayObj.isCurrentMonth ? 'bg-blue-50' : 'bg-gray-100'}
                 ${selectedDay && dayObj.date && selectedDay instanceof Date && dayObj.date.toDateString() === selectedDay.toDateString() ? 'ring-2 ring-blue-500' : ''}
                 ${dayObj.day === currentDay ? 'font-bold text-blue-700' : ''}
-                ${hasAppointments && statusColor ? `border-4 ${statusColor.bgClass}` : ''}`}
+                ${hasAppointments && statusColor ? `border-4 ${statusColor.bgClass}` : ''}
+                transition-all duration-200 hover:bg-blue-100 hover:scale-110 hover:ring-2 hover:ring-blue-300 hover:shadow-lg cursor-pointer`}
               style={hasAppointments && statusColor ? { borderColor: statusColor.dotClass.replace('bg-', 'var(--tw-') } : {}}
               disabled={!dayObj.isCurrentMonth}
               onClick={() => dayObj.isCurrentMonth && dayObj.date && setSelectedDay(dayObj.date)}

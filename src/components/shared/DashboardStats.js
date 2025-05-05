@@ -6,7 +6,7 @@ export default function DashboardStats({ stats = {}, statConfig = [] }) {
       {statConfig.map((stat, idx) => (
         <div
           key={stat.key}
-          className={`flex items-center bg-white rounded-xl shadow-sm p-4 border border-gray-200 ${stat.colorClass || ''}`}
+          className={`flex items-center bg-white rounded-xl shadow-sm p-4 border border-gray-200 transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-rotate-1 cursor-pointer ${stat.colorClass || ''}`}
         >
           <div className="mr-4 flex-shrink-0">
             {stat.icon}

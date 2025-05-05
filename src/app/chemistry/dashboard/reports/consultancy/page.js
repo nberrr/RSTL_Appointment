@@ -26,7 +26,7 @@ export default function ConsultancyReportsPage() {
         } else {
           setConsultancyData([]);
         }
-      } catch (error) {
+      } catch (error) {x``
         setConsultancyData([]);
       }
       setLoading(false);

@@ -10,8 +10,16 @@ export default function Navbar() {
   // Define main pages where the navbar should be visible
   const mainPages = ["/metrology", "/microbiology", "/chemistry", "/shelf-life"];
 
+  // Allow navbar on these metrology subpages
+  const allowedMetrologySubpages = [
+    '/metrology/appointment',
+    '/metrology/manager-registration'
+  ];
+
   // Check if the current path is a subpage (starts with but is not an exact match)
-  const isSubpage = mainPages.some((page) => pathname.startsWith(page) && pathname !== page);
+  const isSubpage =
+    mainPages.some((page) => pathname.startsWith(page) && pathname !== page) &&
+    !allowedMetrologySubpages.includes(pathname);
 
   // Hide navbar on subpages
   if (isSubpage) return null;

@@ -7,7 +7,7 @@ export async function POST(request) {
     const formData = await request.json();
     
     // Validate required fields
-    const requiredFields = ['name', 'email', 'contactNumber', 'sex', 'nameOfSamples', 'sampleType', 'sampleQuantity', 'sampleDescription', 'selectedDate'];
+    const requiredFields = ['name', 'email', 'contactNumber', 'sex', 'nameOfSamples', 'sampleDescription', 'selectedDate', 'plateNumber', 'typeOfTest', 'numberOfLiters', 'terms'];
     
     for (const field of requiredFields) {
       if (!formData[field]) {

@@ -36,6 +36,7 @@ export default function MetrologyAppointment() {
         if (!formData.contactNumber) newErrors.contactNumber = 'Please enter contact number';
         if (!formData.plateNumber) newErrors.plateNumber = 'Please enter plate number';
         if (!formData.companyName) newErrors.companyName = 'Please enter organization name';
+        if (!formData.sex) newErrors.sex = 'Please select sex';
 
         // Test Details validation
         if (!selectedDate) newErrors.appointmentDate = 'Please select an appointment date';
@@ -271,6 +272,25 @@ export default function MetrologyAppointment() {
                                     />
                                     {errors.contactNumber && (
                                         <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm text-gray-700">
+                                        Sex
+                                    </label>
+                                    <select
+                                        name="sex"
+                                        value={formData.sex}
+                                        onChange={handleChange}
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.sex ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                                    >
+                                        <option value="">Select sex</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    {errors.sex && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.sex}</p>
                                     )}
                                 </div>
 

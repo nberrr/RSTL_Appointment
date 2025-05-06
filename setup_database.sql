@@ -463,11 +463,12 @@ INSERT INTO customers (name, email, contact_number, sex, company_name) VALUES
 -- DUMMY APPOINTMENTS, DETAILS, AND LAB-SPECIFIC DETAILS
 -- Chemistry
 DO $$
-DECLARE i INT := 1; _apt_id INT; _det_id INT;
+DECLARE i INT := 1; _apt_id INT; _det_id INT; _service_id INT;
 BEGIN
   WHILE i <= 15 LOOP
+    _service_id := 1 + MOD(i-1, 5); -- Cycle through service_id 1 to 5
     INSERT INTO appointments (customer_id, service_id, appointment_date, status)
-    VALUES (i, 1, TO_DATE('2025-05-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    VALUES (i, _service_id, TO_DATE('2025-05-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
     INSERT INTO appointment_details (appointment_id, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
     VALUES (_apt_id, 'Sample desc '||i, 'Sample '||i, 'Water', 'Normal', '10', 2, true) RETURNING id INTO _det_id;
     INSERT INTO chemistry_details (appointment_detail_id, analysis_requested, parameters, delivery_type, sample_quantity)
@@ -478,11 +479,12 @@ END$$;
 
 -- Microbiology
 DO $$
-DECLARE i INT := 1; _apt_id INT; _det_id INT;
+DECLARE i INT := 1; _apt_id INT; _det_id INT; _service_id INT;
 BEGIN
   WHILE i <= 15 LOOP
+    _service_id := 54 + MOD(i-1, 5); -- Cycle through service_id 54 to 58
     INSERT INTO appointments (customer_id, service_id, appointment_date, status)
-    VALUES (i, 54, TO_DATE('2025-06-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    VALUES (i, _service_id, TO_DATE('2025-06-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
     INSERT INTO appointment_details (appointment_id, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
     VALUES (_apt_id, 'Bio desc '||i, 'BioSample '||i, 'Food', 'Chilled', '5', 1, true) RETURNING id INTO _det_id;
     INSERT INTO microbiology_details (appointment_detail_id, test_type, organism_target, sample_storage_condition, sample_quantity)
@@ -493,11 +495,12 @@ END$$;
 
 -- Metrology
 DO $$
-DECLARE i INT := 1; _apt_id INT; _det_id INT;
+DECLARE i INT := 1; _apt_id INT; _det_id INT; _service_id INT;
 BEGIN
   WHILE i <= 15 LOOP
+    _service_id := 77 + MOD(i-1, 3); -- Cycle through service_id 77 to 79
     INSERT INTO appointments (customer_id, service_id, appointment_date, status)
-    VALUES (i, 1, TO_DATE('2025-07-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
+    VALUES (i, _service_id, TO_DATE('2025-07-' || LPAD(i::text, 2, '0'), 'YYYY-MM-DD'), 'pending') RETURNING id INTO _apt_id;
     INSERT INTO appointment_details (appointment_id, plate_number, sample_description, name_of_samples, sample_type, sample_condition, sample_quantity, number_of_replicates, terms_accepted)
     VALUES (_apt_id, 'ABC'||i, 'Metro desc '||i, 'MetroSample '||i, 'Liquid', 'Normal', '20', 1, true) RETURNING id INTO _det_id;
     INSERT INTO metrology_details (appointment_detail_id, type_of_test, number_of_liters, instrument_type, truck_plate_number, manager_name, manager_contact, manager_approval_date, liquid_carried_liters)

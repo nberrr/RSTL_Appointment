@@ -440,7 +440,7 @@ export default function ManagerRegistration() {
                 placeholder="Additional Infos."
               />
             </div>
- 
+   
             {/* Terms and Submit */}
             <div className="mt-6 space-y-4">
               <div className="flex items-start">

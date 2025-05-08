@@ -1,150 +1,148 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import DashboardNav from "@/components/layout/DashboardNav";
-import DashboardSidebar from "@/components/layout/DashboardSidebar";
-import AdminLayout from "@/components/layout/AdminLayout";
-import Link from "next/link";
-import { FaCalendar, FaClock, FaCheckCircle, FaFlask, FaBook, FaCubes, FaBacteria } from 'react-icons/fa';
-import DashboardCalendar from "@/components/shared/DashboardCalendar";
-import DashboardRecentAppointments from "@/components/shared/DashboardRecentAppointments";
-import DashboardDayAppointments from "@/components/shared/DashboardDayAppointments";
-import DashboardStats from "@/components/shared/DashboardStats";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import { FaCalendar, FaClock, FaCheckCircle, FaBacteria } from 'react-icons/fa';
+
+const statConfig = [
+  {
+    key: 'total_appointments',
+    label: 'Total Appointments',
+    icon: <FaCalendar className="text-blue-500 w-8 h-8" />, 
+    colorClass: ''
+  },
+  {
+    key: 'pending',
+    label: 'Pending',
+    icon: <FaClock className="text-yellow-500 w-8 h-8" />, 
+    colorClass: ''
+  },
+  {
+    key: 'in_progress',
+    label: 'In Progress',
+    icon: <FaBacteria className="text-green-500 w-8 h-8" />, 
+    colorClass: ''
+  },
+  {
+    key: 'completed',
+    label: 'Completed',
+    icon: <FaCheckCircle className="text-green-500 w-8 h-8" />, 
+    colorClass: ''
+  }
+];
+
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function getStatusColor(status) {
+  switch (status?.toLowerCase()) {
+    case 'pending':
+      return { bgClass: 'bg-yellow-100', textClass: 'text-yellow-800', dotClass: 'bg-yellow-500' };
+    case 'in progress':
+      return { bgClass: 'bg-blue-100', textClass: 'text-blue-800', dotClass: 'bg-blue-500' };
+    case 'completed':
+      return { bgClass: 'bg-green-100', textClass: 'text-green-800', dotClass: 'bg-green-500' };
+    case 'declined':
+      return { bgClass: 'bg-red-100', textClass: 'text-red-800', dotClass: 'bg-red-500' };
+    default:
+      return { bgClass: 'bg-gray-100', textClass: 'text-gray-800', dotClass: 'bg-gray-500' };
+  }
+}
+
+function buildCalendarDays(appointments, year, month) {
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const firstDayWeekday = firstDayOfMonth.getDay();
+  const totalDays = lastDayOfMonth.getDate();
+  const days = [];
+  // Map appointments by day
+  const appointmentMap = {};
+  appointments.forEach(apt => {
+    const aptDate = new Date(apt.appointment_date);
+    if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
+      const dayKey = aptDate.getDate();
+      appointmentMap[dayKey] = {
+        count: apt.appointment_count,
+        statuses: apt.statuses
+      };
+    }
+  });
+  for (let i = 0; i < firstDayWeekday; i++) {
+    days.push({ day: null, isCurrentMonth: false, date: null });
+  }
+  for (let i = 1; i <= totalDays; i++) {
+    days.push({
+      day: i,
+      isCurrentMonth: true,
+      appointments: appointmentMap[i] || null,
+      date: new Date(year, month, i)
+    });
+  }
+  const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
+  const totalCells = neededRows * 7;
+  const remainingCells = totalCells - days.length;
+  for (let i = 0; i < remainingCells; i++) {
+    days.push({ day: null, isCurrentMonth: false, date: null });
+  }
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  return {
+    days,
+    currentMonth: `${monthNames[month]} ${year}`,
+    currentDay: (new Date().getFullYear() === year && new Date().getMonth() === month) ? new Date().getDate() : null,
+  };
+}
 
 export default function MicrobiologyDashboard() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState('');
-  const [selectedDay, setSelectedDay] = useState(new Date());
-  const [currentDay, setCurrentDay] = useState(0);
+  const today = new Date();
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
   const [calendarDays, setCalendarDays] = useState([]);
-  const [dashboardData, setDashboardData] = useState({
-    stats: {
-      total_appointments: 0,
-      pending: 0,
-      completed: 0,
-      in_progress: 0
-    },
-    appointments: [],
-    recentAppointments: [],
-    analysisTypes: []
-  });
+  const [currentMonth, setCurrentMonth] = useState('');
+  const [currentDay, setCurrentDay] = useState(today.getDate());
+  const [stats, setStats] = useState({});
+  const [appointments, setAppointments] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [recentAppointments, setRecentAppointments] = useState([]);
+  const [analysisTypes, setAnalysisTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [loadingSelectedDay, setLoadingSelectedDay] = useState(false);
-  
+
+  // Fetch dashboard data
   useEffect(() => {
-    fetchDashboardData();
-    const today = new Date();
-    setCurrentDate(today);
-    setCurrentDay(today.getDate());
-    setSelectedDay(today.getDate());
-    generateCalendarDays(today);
-    updateMonthDisplay(today);
-  }, []);
-  
-  const fetchDashboardData = async () => {
-    try {
+    async function fetchDashboardData() {
       setLoading(true);
-      const response = await fetch('/api/microbiology/dashboard');
-      const data = await response.json();
-      
-      if (data.success) {
-        setDashboardData(data.data);
-        generateCalendarDays(currentDate, data.data.appointments);
+      setError(null);
+      try {
+        const res = await fetch('/api/microbiology/dashboard');
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.data.stats || {});
+          setRecentAppointments(data.data.recentAppointments || []);
+          setAnalysisTypes(data.data.analysisTypes || []);
+          setAppointments(data.data.appointments || []);
+        } else {
+          setError(data.message || 'Failed to load dashboard data');
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setError(error);
-    } finally {
-      setLoading(false);
     }
-  };
-  
-  const updateMonthDisplay = (date) => {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                      'July', 'August', 'September', 'October', 'November', 'December'];
-    setCurrentMonth(`${monthNames[date.getMonth()]} ${date.getFullYear()}`);
-  };
-  
-  const goToPreviousMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
-    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
-    setCurrentDate(newDate);
-    setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, dashboardData.appointments);
-    updateMonthDisplay(newDate);
-  };
-  
-  const goToNextMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
-    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
-    setCurrentDate(newDate);
-    setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, dashboardData.appointments);
-    updateMonthDisplay(newDate);
-  };
-  
-  const generateCalendarDays = (date, appointments = []) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    const firstDayWeekday = firstDayOfMonth.getDay();
-    const totalDays = lastDayOfMonth.getDate();
-    const days = [];
-    // Create appointment lookup map
-    const appointmentMap = {};
-    appointments.forEach(apt => {
-      const aptDate = new Date(apt.appointment_date);
-      if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
-        const dayKey = aptDate.getDate();
-        appointmentMap[dayKey] = {
-          count: apt.appointment_count,
-          statuses: apt.statuses
-        };
-      }
-    });
-    for (let i = 0; i < firstDayWeekday; i++) {
-      days.push({ day: null, isCurrentMonth: false, date: null });
-    }
-    for (let i = 1; i <= totalDays; i++) {
-      days.push({ 
-        day: i, 
-        isCurrentMonth: true,
-        appointments: appointmentMap[i] || null,
-        date: new Date(year, month, i)
-      });
-    }
-    const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
-    const totalCells = neededRows * 7;
-    const remainingCells = totalCells - days.length;
-    for (let i = 0; i < remainingCells; i++) {
-      days.push({ day: null, isCurrentMonth: false, date: null });
-    }
-    setCalendarDays(days);
-  };
-  
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const isCurrentDay = (day) => day === currentDay;
-  const isSelectedDay = (day) => day === selectedDay;
+    fetchDashboardData();
+  }, []);
 
-  const getStatusColor = (status) => {
-    // Ensure dotClass is included for calendar dots
-    switch (status?.toLowerCase()) {
-      case 'completed': return { bgClass: 'bg-green-100', textClass: 'text-green-800', dotClass: 'bg-green-500' };
-      case 'pending': return { bgClass: 'bg-yellow-100', textClass: 'text-yellow-800', dotClass: 'bg-yellow-500' }; // Adjusted pending for dot
-      case 'in progress': return { bgClass: 'bg-blue-100', textClass: 'text-blue-800', dotClass: 'bg-blue-500' };
-      case 'declined': return { bgClass: 'bg-red-100', textClass: 'text-red-800', dotClass: 'bg-red-500' };
-      default: return { bgClass: 'bg-gray-100', textClass: 'text-gray-800', dotClass: 'bg-gray-500' };
-    }
-  };
+  // Rebuild calendar when appointments, month, or year changes
+  useEffect(() => {
+    const calendar = buildCalendarDays(appointments, calendarYear, calendarMonth);
+    setCalendarDays(calendar.days);
+    setCurrentMonth(calendar.currentMonth);
+    setCurrentDay(calendar.currentDay);
+  }, [appointments, calendarYear, calendarMonth]);
 
+  // Fetch appointments for a selected day
   const fetchAppointmentsForDay = useCallback(async (date) => {
     if (!date) {
       setSelectedDayAppointments([]);
@@ -152,17 +150,17 @@ export default function MicrobiologyDashboard() {
     }
     setLoadingSelectedDay(true);
     try {
-      const response = await fetch(`/api/appointments/by-date?date=${date}&service=microbiology`);
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const res = await fetch(`/api/appointments/by-date?date=${year}-${month}-${day}&service=microbiology`);
+      const data = await res.json();
       if (data.success) {
         setSelectedDayAppointments(data.data || []);
       } else {
-         setSelectedDayAppointments([]);
-         console.error("API Error fetching day appointments:", data.message);
+        setSelectedDayAppointments([]);
       }
-    } catch (error) {
-      console.error('Error fetching day appointments:', error);
+    } catch (err) {
       setSelectedDayAppointments([]);
     } finally {
       setLoadingSelectedDay(false);
@@ -171,45 +169,35 @@ export default function MicrobiologyDashboard() {
 
   useEffect(() => {
     if (selectedDay && selectedDay instanceof Date && !isNaN(selectedDay)) {
-      const year = selectedDay.getFullYear();
-      const month = (selectedDay.getMonth() + 1).toString().padStart(2, '0');
-      const day = selectedDay.getDate().toString().padStart(2, '0');
-      fetchAppointmentsForDay(`${year}-${month}-${day}`);
+      fetchAppointmentsForDay(selectedDay);
     } else {
-      setSelectedDayAppointments([]); // Clear if no valid day/date
+      setSelectedDayAppointments([]);
     }
   }, [selectedDay, fetchAppointmentsForDay]);
 
-  const statConfig = [
-    {
-      key: "total_appointments",
-      label: "Total Appointments",
-      icon: <FaCalendar className="text-blue-500 w-8 h-8" />,
-      colorClass: ""
-    },
-    {
-      key: "pending",
-      label: "Pending",
-      icon: <FaClock className="text-yellow-500 w-8 h-8" />,
-      colorClass: ""
-    },
-    {
-      key: "in_progress",
-      label: "In Progress",
-      icon: <FaBacteria className="text-green-500 w-8 h-8" />,
-      colorClass: ""
-    },
-    {
-      key: "completed",
-      label: "Completed",
-      icon: <FaCheckCircle className="text-green-500 w-8 h-8" />,
-      colorClass: ""
-    }
-  ];
+  // Calendar navigation
+  const goToPreviousMonth = () => {
+    setCalendarMonth(prev => {
+      if (prev === 0) {
+        setCalendarYear(y => y - 1);
+        return 11;
+      }
+      return prev - 1;
+    });
+  };
+  const goToNextMonth = () => {
+    setCalendarMonth(prev => {
+      if (prev === 11) {
+        setCalendarYear(y => y + 1);
+        return 0;
+      }
+      return prev + 1;
+    });
+  };
 
   return (
     <DashboardLayout
-      stats={dashboardData.stats}
+      stats={stats}
       statConfig={statConfig}
       calendarProps={{
         currentMonth,
@@ -222,7 +210,7 @@ export default function MicrobiologyDashboard() {
         setSelectedDay,
         getStatusColor,
       }}
-      recentAppointments={dashboardData.recentAppointments}
+      recentAppointments={recentAppointments}
       loading={loading}
       error={error}
       selectedDayAppointments={selectedDayAppointments}
@@ -231,7 +219,7 @@ export default function MicrobiologyDashboard() {
         selectedDay,
         currentMonth,
       }}
-      analysisTypes={dashboardData.analysisTypes}
+      analysisTypes={analysisTypes}
     />
   );
 } 

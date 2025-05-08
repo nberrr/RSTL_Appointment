@@ -145,46 +145,14 @@ export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-
     if (!id) {
-      return NextResponse.json(
-        { success: false, message: 'Service ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, message: 'Service ID is required' }, { status: 400 });
     }
-
-    // Start a transaction
-    await query('BEGIN');
-
-    try {
-      // Delete from chemistry_details first (due to foreign key constraint)
-      await query(
-        `DELETE FROM chemistry_details WHERE appointment_detail_id = $1`,
-        [id]
-      );
-
-      // Delete from services table
-      await query(
-        `DELETE FROM services WHERE id = $1 AND category = 'chemistry'`,
-        [id]
-      );
-
-      // Commit transaction
-      await query('COMMIT');
-
-      return NextResponse.json({
-        success: true,
-        message: 'Chemistry service deleted successfully'
-      });
-    } catch (error) {
-      await query('ROLLBACK');
-      throw error;
-    }
+    // Soft delete: set active = FALSE
+    await query('UPDATE services SET active = FALSE WHERE id = $1', [id]);
+    return NextResponse.json({ success: true, message: 'Service soft-deleted (set to inactive)' });
   } catch (error) {
-    console.error('Error deleting chemistry service:', error);
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
+    console.error('Error soft-deleting chemistry service:', error);
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

@@ -3,26 +3,7 @@ import { query } from '@/lib/db';
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || 'today';
-
-    // Calculate date range based on period
-    const now = new Date();
-    let startDate = new Date();
-    
-    switch (period) {
-      case 'week':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-      default: // today
-        startDate.setHours(0, 0, 0, 0);
-        break;
-    }
-
-    // Get statistics for each service category
+    // Get statistics for each service category in the same window as chemistry dashboard
     const stats = await query(
       `WITH service_stats AS (
         SELECT 
@@ -32,7 +13,8 @@ export async function GET(request) {
           COUNT(CASE WHEN a.status = 'completed' THEN 1 END) as completed_count
         FROM appointments a
         JOIN services s ON a.service_id = s.id
-        WHERE a.appointment_date >= $1
+        WHERE a.appointment_date >= CURRENT_DATE - INTERVAL '30 days'
+          AND a.appointment_date <= CURRENT_DATE + INTERVAL '60 days'
         GROUP BY s.category
       )
       SELECT 
@@ -40,8 +22,7 @@ export async function GET(request) {
         COALESCE(total_appointments, 0) as appointments,
         COALESCE(pending_count, 0) as pending,
         COALESCE(completed_count, 0) as completed
-      FROM service_stats`,
-      [startDate.toISOString()]
+      FROM service_stats`
     );
 
     // Format response

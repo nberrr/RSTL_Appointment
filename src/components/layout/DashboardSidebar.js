@@ -9,7 +9,8 @@ import {
   CalendarDays,
   FileStack,
   SlidersHorizontal,
-  MessagesSquare   
+  MessagesSquare,
+  Users
 } from "lucide-react";
 
 
@@ -64,6 +65,12 @@ export default function DashboardSidebar() {
             label: "Reports",
             icon: <FileStack size={24} />,
             href: `${basePath}/dashboard/reports`,
+          },
+          {
+            id: "managers",
+            label: "Manage Managers",
+            icon: <Users size={24} />,
+            href: `${basePath}/dashboard/managers`,
           },
         ]
       : isShelfLife

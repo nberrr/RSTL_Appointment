@@ -37,7 +37,7 @@ export async function POST(request) {
     const serviceId = serviceResult.rows[0].id;
     
     // 3. Insert appointment and get appointment_id
-    const appointmentDate = formData.appointmentDate || new Date(formData.selectedDate);
+    const appointmentDate = (formData.selectedDate || formData.appointmentDate || '').slice(0, 10);
     const appointmentResult = await query(
       `INSERT INTO appointments (customer_id, service_id, appointment_date, status)
        VALUES ($1, $2, $3, $4)
@@ -90,5 +90,66 @@ export async function POST(request) {
       { success: false, message: error.message }, 
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const service_id = searchParams.get('service_id');
+  const category = searchParams.get('category');
+  const date = searchParams.get('date');
+  const status = searchParams.get('status');
+
+  let sql = `
+    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name
+    FROM appointments a
+    JOIN services s ON a.service_id = s.id
+    JOIN customers c ON a.customer_id = c.id
+    WHERE 1=1
+  `;
+  const params = [];
+
+  if (service_id) {
+    sql += ` AND s.id = $${params.length + 1}`;
+    params.push(service_id);
+  }
+  if (category) {
+    sql += ` AND s.category = $${params.length + 1}`;
+    params.push(category);
+  }
+  if (date) {
+    sql += ` AND a.appointment_date::date = $${params.length + 1}`;
+    params.push(date);
+  }
+  if (status) {
+    sql += ` AND a.status = $${params.length + 1}`;
+    params.push(status);
+  }
+
+  sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
+
+  try {
+    const result = await query(sql, params);
+    // Normalize appointment_date for all rows
+    const normalizedRows = result.rows.map(row => {
+      let normalizedDate;
+      if (row.appointment_date instanceof Date) {
+        const year = row.appointment_date.getFullYear();
+        const month = (row.appointment_date.getMonth() + 1).toString().padStart(2, '0');
+        const day = row.appointment_date.getDate().toString().padStart(2, '0');
+        normalizedDate = `${year}-${month}-${day}`;
+      } else if (typeof row.appointment_date === 'string') {
+        normalizedDate = row.appointment_date.slice(0, 10);
+      } else {
+        normalizedDate = row.appointment_date;
+      }
+      return {
+        ...row,
+        appointment_date: normalizedDate,
+      };
+    });
+    return NextResponse.json({ success: true, data: normalizedRows });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 } 

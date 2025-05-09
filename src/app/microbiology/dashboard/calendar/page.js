@@ -62,7 +62,7 @@ export default function ChemistryCalendarAndTable() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/microbiology/calendar-appointments`); 
+      const response = await fetch(`/api/appointments?category=microbiology`); 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -71,12 +71,11 @@ export default function ChemistryCalendarAndTable() {
         // Transform API data to match table expectations
         const mapped = (data.data || []).map(apt => ({
           id: apt.id || apt.appointment_id || '',
-          appointment_date: apt.date || apt.appointment_date || '',
+          appointment_date: apt.appointment_date || '',
           appointment_time: apt.appointment_time || '',
-          customer_name: apt.client?.name || apt.customer_name || '',
-          analysis_requested: apt.sampleDetails?.laboratory || apt.analysis_requested || apt.testType || '',
+          customer_name: apt.customer_name || '',
+          analysis_requested: apt.analysis_requested || apt.testType || '',
           status: apt.status || '',
-          // Add any other fields needed for modal/details
           ...apt
         }));
         setAppointments(mapped);

@@ -71,30 +71,30 @@ export default function ServicesPage() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/chemistry/services');
+      const response = await fetch('/api/services?category=chemistry');
       const data = await response.json();
       
       if (data.success) {
-        setServices(data.data.map(service => ({
+        setServices(data.data.chemistry.map(service => ({
           id: service.id,
-          testType: service.test_type || '',
-          testDescription: service.test_description || '',
-          pricing: parseFloat(service.pricing) || 0,
-          appointment: service.appointment || 'Allowed',
+          testType: service.name || '',
+          testDescription: service.description || '',
+          pricing: parseFloat(service.price) || 0,
+          appointment: 'Allowed',
           status: service.active ? 'Active' : 'Inactive',
           sampleType: service.sample_type || 'Uncategorized',
         })));
         // Group by sampleType
         const grouped = {};
-        data.data.forEach(service => {
+        data.data.chemistry.forEach(service => {
           const sampleType = service.sample_type || 'Uncategorized';
           if (!grouped[sampleType]) grouped[sampleType] = [];
           grouped[sampleType].push({
             id: service.id,
-            testType: service.test_type || '',
-            testDescription: service.test_description || '',
-            pricing: parseFloat(service.pricing) || 0,
-            appointment: service.appointment || 'Allowed',
+            testType: service.name || '',
+            testDescription: service.description || '',
+            pricing: parseFloat(service.price) || 0,
+            appointment: 'Allowed',
             status: service.active ? 'Active' : 'Inactive',
             sampleType: sampleType,
           });
@@ -146,19 +146,19 @@ export default function ServicesPage() {
     }
 
     try {
-      const response = await fetch('/api/chemistry/services', {
+      const response = await fetch('/api/services', {
         method: editingId === 'new' ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           id: editingId === 'new' ? undefined : editingId,
-          testType: editedService.testType.trim(),
-          testDescription: editedService.testDescription.trim(),
-          pricing: parseFloat(editedService.pricing) || 0,
-          appointment: editedService.appointment,
+          name: editedService.testType.trim(),
+          description: editedService.testDescription.trim(),
+          price: parseFloat(editedService.pricing) || 0,
           active: editedService.status === 'Active',
-          sampleType: editedService.sampleType || 'Uncategorized',
+          sample_type: editedService.sampleType || 'Uncategorized',
+          category: 'chemistry',
         }),
       });
 
@@ -201,7 +201,7 @@ export default function ServicesPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`/api/chemistry/services?id=${serviceToDelete.id}`, {
+      const response = await fetch(`/api/services?id=${serviceToDelete.id}`, {
         method: 'DELETE',
       });
 

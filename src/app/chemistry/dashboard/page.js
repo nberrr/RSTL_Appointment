@@ -47,12 +47,36 @@ export default function ChemistryDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/chemistry/dashboard');
+      const response = await fetch('/api/appointments?category=chemistry');
       const data = await response.json();
-      
       if (data.success) {
-        setDashboardData(data.data);
-        generateCalendarDays(currentDate, data.data.appointments);
+        const appointments = data.data || [];
+        // Compute stats
+        const stats = {
+          total_appointments: appointments.length,
+          pending: appointments.filter(a => a.status === 'pending').length,
+          completed: appointments.filter(a => a.status === 'completed').length,
+          in_progress: appointments.filter(a => a.status === 'in progress').length
+        };
+        // Recent appointments (last 5 by date)
+        const recentAppointments = [...appointments]
+          .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
+          .slice(0, 5);
+        // Count occurrences of each service_name
+        const analysisTypeCounts = {};
+        appointments.forEach(a => {
+          if (a.service_name) {
+            analysisTypeCounts[a.service_name] = (analysisTypeCounts[a.service_name] || 0) + 1;
+          }
+        });
+        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
+        setDashboardData({
+          stats,
+          appointments,
+          recentAppointments,
+          analysisTypes
+        });
+        generateCalendarDays(currentDate, appointments);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -101,23 +125,37 @@ export default function ChemistryDashboard() {
     // Create appointment lookup map
     const appointmentMap = {};
     appointments.forEach(apt => {
-      const aptDate = new Date(apt.appointment_date);
+      let aptDate;
+      if (typeof apt.appointment_date === 'string') {
+        // Always parse as local date (YYYY-MM-DD)
+        const [year, month, day] = apt.appointment_date.split('-').map(Number);
+        aptDate = new Date(year, month - 1, day);
+      } else if (apt.appointment_date instanceof Date) {
+        aptDate = new Date(apt.appointment_date.getFullYear(), apt.appointment_date.getMonth(), apt.appointment_date.getDate());
+      } else {
+        aptDate = new Date(apt.appointment_date);
+      }
+      // Debug log for each appointment
+      console.log('[DEBUG] Appointment:', apt, 'Parsed Date:', aptDate.toISOString(), 'Local:', aptDate.toLocaleDateString());
       if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
         const dayKey = aptDate.getDate();
-        appointmentMap[dayKey] = {
-          count: apt.appointment_count,
-          statuses: apt.statuses
-        };
+        if (!appointmentMap[dayKey]) {
+          appointmentMap[dayKey] = { count: 0, statuses: [] };
+        }
+        appointmentMap[dayKey].count += 1;
+        appointmentMap[dayKey].statuses.push(apt.status);
       }
     });
     for (let i = 0; i < firstDayWeekday; i++) {
       days.push({ day: null, isCurrentMonth: false, date: null });
     }
     for (let i = 1; i <= totalDays; i++) {
-      days.push({ 
-        day: i, 
+      days.push({
+        day: i,
         isCurrentMonth: true,
-        appointments: appointmentMap[i] || null,
+        appointments: appointmentMap[i]
+          ? { count: appointmentMap[i].count, statuses: appointmentMap[i].statuses.join(', ') }
+          : null,
         date: new Date(year, month, i)
       });
     }
@@ -128,6 +166,10 @@ export default function ChemistryDashboard() {
       days.push({ day: null, isCurrentMonth: false, date: null });
     }
     setCalendarDays(days);
+    // Debug log for calendarDays
+    setTimeout(() => {
+      console.log('[DEBUG] calendarDays:', days.map(d => ({ day: d.day, date: d.date ? d.date.toISOString() : null, appointments: d.appointments })));
+    }, 0);
   };
   
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -152,8 +194,9 @@ export default function ChemistryDashboard() {
     }
     setLoadingSelectedDay(true);
     try {
-      // IMPORTANT: Ensure this API endpoint exists and handles the date & service query params
-      const response = await fetch(`/api/appointments/by-date?date=${date}&service=chemistry`);
+      // Debug log for selected date
+      console.log('FETCH DAY APPOINTMENTS for date:', date);
+      const response = await fetch(`/api/appointments?category=chemistry&date=${date}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       if (data.success) {
@@ -180,6 +223,11 @@ export default function ChemistryDashboard() {
       setSelectedDayAppointments([]); // Clear if no valid day/date
     }
   }, [selectedDay, fetchAppointmentsForDay]);
+
+  // Debug log for selectedDay
+  useEffect(() => {
+    console.log('[DEBUG] selectedDay:', selectedDay instanceof Date ? selectedDay.toISOString() : selectedDay);
+  }, [selectedDay]);
 
   const statConfig = [
     {

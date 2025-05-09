@@ -628,48 +628,20 @@ export default function LaboratoryAppointmentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if submission is allowed from this step
-    if (!checkIfSubmissionAllowed()) {
-      return;
-    }
-    
-    // Prevent multiple submissions
-    if (isSubmitting) {
-      return;
-    }
-    
-    // Mark all appointments as attempted submit
-    setAppointments(prev => 
-      prev.map(appointment => ({
-        ...appointment,
-        hasAttemptedSubmit: true
-      }))
-    );
-    
-    // Re-validate before submit
-    if (!validateForm()) {
-      return;
-    }
-    
+    if (!validateForm()) return;
     setIsSubmitting(true);
-    
+    setSubmissionStatus(null);
     try {
-      // Process each appointment
       const results = [];
-      
       for (const appointment of appointments) {
-        // Group selected services by category
         const selectedServiceIds = appointment.selectedServices || [];
         const servicesByCategory = {};
-        // Flatten all services by id for lookup
         const allServicesFlat = Object.entries(servicesData).reduce((acc, [category, services]) => {
           services.forEach(service => {
             acc[service.id] = { ...service, serviceType: category };
           });
           return acc;
         }, {});
-        // Group selected services by their category
         selectedServiceIds.forEach(id => {
           const service = allServicesFlat[id];
           if (service) {
@@ -677,53 +649,41 @@ export default function LaboratoryAppointmentForm() {
             servicesByCategory[service.serviceType].push(service);
           }
         });
-        // For each category, send to the correct endpoint
         for (const [category, services] of Object.entries(servicesByCategory)) {
-          let endpoint = '';
           const formData = {
-            // Common customer data (from first appointment)
+            // Common customer data
             name: appointment.clientName,
             email: appointment.emailAddress,
-            contactNumber: appointment.phoneNumber,
-            companyName: appointment.organization,
+            contact_number: appointment.phoneNumber,
+            company_name: appointment.organization,
             sex: appointment.sex,
-            // Common sample data
-            nameOfSamples: appointment.sampleName,
-            sampleType: appointment.sampleType || 'Not specified',
-            sampleQuantity: appointment.quantity,
-            sampleDescription: appointment.sampleDescription,
-            selectedDate: appointment.preferredDate,
-            // Terms acceptance (hardcoded for now, should be added to the form)
+            // Sample data
+            name_of_samples: appointment.sampleName,
+            sample_type: appointment.sampleType || 'Not specified',
+            sample_quantity: appointment.quantity,
+            sample_description: appointment.sampleDescription,
+            date: appointment.preferredDate,
             terms: true,
-            // Default values for required fields
-            sampleCondition: 'Normal',
-            replicates: 1
+            category,
+            service_id: services.map(s => s.id),
+            // Shelf life details (if applicable)
+            ...(category === 'shelf_life' ? {
+              objective_of_study: appointment.objectiveOfStudy,
+              product_name: appointment.productName,
+              net_weight: appointment.netWeight,
+              brand_name: appointment.brandName,
+              existing_market: appointment.existingMarket,
+              production_type: appointment.productionType,
+              method_of_preservation: appointment.methodOfPreservation,
+              product_ingredients: appointment.productIngredients,
+              packaging_material: appointment.packagingMaterial,
+              target_shelf_life: appointment.targetShelfLife,
+              mode_of_deterioration: appointment.modeOfDeterioration,
+            } : {})
           };
-          if (category === 'chemistry') {
-            endpoint = '/api/appointments/chemistry';
-            formData.analysisRequested = services.map(s => s.name).join(', ');
-            formData.parameters = 'Standard parameters';
-            formData.deliveryType = 'Standard';
-          } else if (category === 'microbiology') {
-            endpoint = '/api/appointments/microbiology';
-            formData.testType = services.map(s => s.name).join(', ');
-            formData.organismTarget = 'Standard targets';
-            formData.storageCondition = 'Room temperature';
-          } else if (category === 'shelf_life') {
-            endpoint = '/api/appointments/shelf-life';
-            formData.productType = appointment.productName || 'Not specified';
-            formData.storageConditions = appointment.methodOfPreservation || 'Not specified';
-            formData.shelfLifeDuration = appointment.targetShelfLife || 'Not specified';
-            formData.packagingType = appointment.packagingMaterial || 'Not specified';
-            formData.modesOfDeterioration = appointment.modeOfDeterioration.join(', ');
-          } else {
-            continue; // skip unknown categories
-          }
-          const response = await fetch(endpoint, {
+          const response = await fetch('/api/appointments', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
           });
           const result = await response.json();
@@ -733,14 +693,11 @@ export default function LaboratoryAppointmentForm() {
           results.push(result);
         }
       }
-      
-      // All appointments submitted successfully
       setSubmissionStatus({
         success: true,
         message: `Successfully submitted ${results.length} appointment(s)`,
         appointmentIds: results.map(r => r.appointmentId)
       });
-      
     } catch (error) {
       setSubmissionStatus({
         success: false,

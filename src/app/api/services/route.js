@@ -1,42 +1,62 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
-// Get all active services from all labs
+// GET /api/services - List all services (optionally filter by category)
 export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category');
   try {
-    const servicesResult = await query(`
-      SELECT 
-        id,
-        name,
-        description,
-        COALESCE(price, 0) as price,
-        active,
-        category,
-        sample_type
-      FROM services
-      WHERE active = TRUE
-      ORDER BY category, name
-    `);
+    let sql = `SELECT id, name, description, price, category, active, sample_type, created_at, updated_at FROM services`;
+    let params = [];
+    if (category) {
+      sql += ' WHERE category = $1';
+      params.push(category);
+    }
+    sql += ' ORDER BY created_at DESC';
+    const result = await query(sql, params);
 
-    // Group services by category
+    // Group by category for frontend compatibility
     const grouped = {};
-    servicesResult.rows.forEach(service => {
+    result.rows.forEach(service => {
       if (!grouped[service.category]) grouped[service.category] = [];
-      grouped[service.category].push({
-        ...service,
-        price: parseFloat(service.price) || 0
-      });
+      grouped[service.category].push(service);
     });
 
-    return NextResponse.json({
-      success: true,
-      data: grouped
+    // After grouping
+    const categoryKeyMap = {
+      'shelf-life': 'shelf_life',
+      'chemistry': 'chemistry',
+      'microbiology': 'microbiology',
+      'metrology': 'metrology',
+      'research': 'research'
+    };
+    const remapped = {};
+    Object.entries(grouped).forEach(([key, value]) => {
+      const mappedKey = categoryKeyMap[key] || key;
+      remapped[mappedKey] = value;
     });
+    return NextResponse.json({ success: true, data: remapped });
   } catch (error) {
-    console.error('Error fetching all services:', error);
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+  }
+}
+
+// POST /api/services - Create a new service
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { name, description, price, category, active } = body;
+    if (!name || !category) {
+      return NextResponse.json({ success: false, message: 'Name and category are required' }, { status: 400 });
+    }
+    const result = await query(
+      `INSERT INTO services (name, description, price, category, active)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, name, description, price, category, active, created_at, updated_at`,
+      [name, description, price, category, active ?? true]
     );
+    return NextResponse.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 } 

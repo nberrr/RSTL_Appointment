@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { FaCalendar, FaClock, FaCheckCircle, FaFlask } from 'react-icons/fa';
+import Link from 'next/link';
 
 const statConfig = [
   {
@@ -48,63 +49,14 @@ function getStatusColor(status) {
   }
 }
 
-function buildCalendarDays(appointments, year, month) {
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
-  const firstDayWeekday = firstDayOfMonth.getDay();
-  const totalDays = lastDayOfMonth.getDate();
-  const days = [];
-  // Aggregate appointments by day
-  const appointmentMap = {};
-  appointments.forEach(apt => {
-    const aptDate = new Date(apt.appointment_date);
-    if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
-      const dayKey = aptDate.getDate();
-      if (!appointmentMap[dayKey]) {
-        appointmentMap[dayKey] = { count: 0, statuses: [] };
-      }
-      appointmentMap[dayKey].count += 1;
-      appointmentMap[dayKey].statuses.push(apt.status);
-    }
-  });
-  for (let i = 0; i < firstDayWeekday; i++) {
-    days.push({ day: null, isCurrentMonth: false, date: null });
-  }
-  for (let i = 1; i <= totalDays; i++) {
-    days.push({
-      day: i,
-      isCurrentMonth: true,
-      appointments: appointmentMap[i]
-        ? { count: appointmentMap[i].count, statuses: appointmentMap[i].statuses.join(',') }
-        : null,
-      date: new Date(year, month, i)
-    });
-  }
-  const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
-  const totalCells = neededRows * 7;
-  const remainingCells = totalCells - days.length;
-  for (let i = 0; i < remainingCells; i++) {
-    days.push({ day: null, isCurrentMonth: false, date: null });
-  }
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  return {
-    days,
-    currentMonth: `${monthNames[month]} ${year}`,
-    currentDay: (new Date().getFullYear() === year && new Date().getMonth() === month) ? new Date().getDate() : null,
-  };
-}
-
 export default function MetrologyDashboard() {
-  const today = new Date();
-  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
-  const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
-  const [calendarDays, setCalendarDays] = useState([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState('');
-  const [currentDay, setCurrentDay] = useState(today.getDate());
+  const [selectedDay, setSelectedDay] = useState(new Date());
+  const [currentDay, setCurrentDay] = useState(0);
+  const [calendarDays, setCalendarDays] = useState([]);
   const [stats, setStats] = useState({});
   const [appointments, setAppointments] = useState([]);
-  const [selectedDay, setSelectedDay] = useState(null);
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [analysisTypes, setAnalysisTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -123,8 +75,18 @@ export default function MetrologyDashboard() {
         if (data.success) {
           setStats(data.data.stats || {});
           setRecentAppointments(data.data.recentAppointments || []);
-          setAnalysisTypes(data.data.analysisTypes || []);
-          setAppointments(data.data.appointments || []);
+          const appointments = data.data.appointments || [];
+          setAppointments(appointments);
+          // Count occurrences of each service_name or testType
+          const analysisTypeCounts = {};
+          appointments.forEach(a => {
+            const name = a.service_name || a.testType;
+            if (name) {
+              analysisTypeCounts[name] = (analysisTypeCounts[name] || 0) + 1;
+            }
+          });
+          const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
+          setAnalysisTypes(analysisTypes);
         } else {
           setError(data.message || 'Failed to load dashboard data');
         }
@@ -135,15 +97,93 @@ export default function MetrologyDashboard() {
       }
     }
     fetchDashboardData();
+    const today = new Date();
+    setCurrentDate(today);
+    setCurrentDay(today.getDate());
+    setSelectedDay(today.getDate());
+    generateCalendarDays(today, appointments);
+    updateMonthDisplay(today);
   }, []);
 
-  // Rebuild calendar when appointments, month, or year changes
-  useEffect(() => {
-    const calendar = buildCalendarDays(appointments, calendarYear, calendarMonth);
-    setCalendarDays(calendar.days);
-    setCurrentMonth(calendar.currentMonth);
-    setCurrentDay(calendar.currentDay);
-  }, [appointments, calendarYear, calendarMonth]);
+  const updateMonthDisplay = (date) => {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+    setCurrentMonth(`${monthNames[date.getMonth()]} ${date.getFullYear()}`);
+  };
+
+  const goToPreviousMonth = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
+    setCurrentDate(newDate);
+    setSelectedDay(preservedDay);
+    generateCalendarDays(newDate, appointments);
+    updateMonthDisplay(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
+    setCurrentDate(newDate);
+    setSelectedDay(preservedDay);
+    generateCalendarDays(newDate, appointments);
+    updateMonthDisplay(newDate);
+  };
+
+  const generateCalendarDays = (date, appointments = []) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const firstDayWeekday = firstDayOfMonth.getDay();
+    const totalDays = lastDayOfMonth.getDate();
+    const days = [];
+    // Create appointment lookup map
+    const appointmentMap = {};
+    appointments.forEach(apt => {
+      let aptDate;
+      if (typeof apt.appointment_date === 'string') {
+        // Always parse as local date (YYYY-MM-DD)
+        const [year, month, day] = apt.appointment_date.split('-').map(Number);
+        aptDate = new Date(year, month - 1, day);
+      } else if (apt.appointment_date instanceof Date) {
+        aptDate = new Date(apt.appointment_date.getFullYear(), apt.appointment_date.getMonth(), apt.appointment_date.getDate());
+      } else {
+        aptDate = new Date(apt.appointment_date);
+      }
+      if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
+        const dayKey = aptDate.getDate();
+        if (!appointmentMap[dayKey]) {
+          appointmentMap[dayKey] = { count: 0, statuses: [] };
+        }
+        appointmentMap[dayKey].count += 1;
+        appointmentMap[dayKey].statuses.push(apt.status);
+      }
+    });
+    for (let i = 0; i < firstDayWeekday; i++) {
+      days.push({ day: null, isCurrentMonth: false, date: null });
+    }
+    for (let i = 1; i <= totalDays; i++) {
+      days.push({
+        day: i,
+        isCurrentMonth: true,
+        appointments: appointmentMap[i]
+          ? { count: appointmentMap[i].count, statuses: appointmentMap[i].statuses.join(', ') }
+          : null,
+        date: new Date(year, month, i)
+      });
+    }
+    const neededRows = Math.ceil((firstDayWeekday + totalDays) / 7);
+    const totalCells = neededRows * 7;
+    const remainingCells = totalCells - days.length;
+    for (let i = 0; i < remainingCells; i++) {
+      days.push({ day: null, isCurrentMonth: false, date: null });
+    }
+    setCalendarDays(days);
+  };
 
   // Fetch appointments for a selected day
   const fetchAppointmentsForDay = useCallback(async (date) => {
@@ -178,26 +218,6 @@ export default function MetrologyDashboard() {
     }
   }, [selectedDay, fetchAppointmentsForDay]);
 
-  // Calendar navigation
-  const goToPreviousMonth = () => {
-    setCalendarMonth(prev => {
-      if (prev === 0) {
-        setCalendarYear(y => y - 1);
-        return 11;
-      }
-      return prev - 1;
-    });
-  };
-  const goToNextMonth = () => {
-    setCalendarMonth(prev => {
-      if (prev === 11) {
-        setCalendarYear(y => y + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
-  };
-
   return (
     <DashboardLayout
       stats={stats}
@@ -223,6 +243,9 @@ export default function MetrologyDashboard() {
         currentMonth,
       }}
       analysisTypes={analysisTypes}
-    />
+    >
+      {/* Add a sidebar link to Manage Managers */}
+      <Link href="/metrology/dashboard/managers" className="sidebar-link">Manage Managers</Link>
+    </DashboardLayout>
   );
 } 

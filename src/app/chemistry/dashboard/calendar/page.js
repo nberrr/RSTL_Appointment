@@ -62,13 +62,18 @@ export default function ChemistryCalendarAndTable() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/chemistry/calendar-appointments`); 
+      const response = await fetch(`/api/appointments?category=chemistry`); 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       if (data.success) {
-        setAppointments(data.data);
+        // Normalize appointment date field for calendar logic
+        const normalized = data.data.map(a => ({
+          ...a,
+          appointment_date: a.appointment_date || a.date,
+        }));
+        setAppointments(normalized);
       } else {
         throw new Error(data.message || 'Failed to fetch appointments');
       }
@@ -96,7 +101,23 @@ export default function ChemistryCalendarAndTable() {
     // Create appointment lookup map
     const appointmentMap = {};
     appointments.forEach(apt => {
-      const aptDate = new Date(apt.appointment_date);
+      let aptDate;
+      if (typeof apt.appointment_date === 'string') {
+        // Handle both date-only (YYYY-MM-DD) and full ISO datetime strings
+        if (/^\d{4}-\d{2}-\d{2}$/.test(apt.appointment_date)) {
+          // Date only
+          const [year, month, day] = apt.appointment_date.split('-').map(Number);
+          aptDate = new Date(year, month - 1, day);
+        } else {
+          // Full ISO string, parse as UTC and normalize to local midnight
+          const dateObj = new Date(apt.appointment_date);
+          aptDate = new Date(dateObj.getUTCFullYear(), dateObj.getUTCMonth(), dateObj.getUTCDate());
+        }
+      } else if (apt.appointment_date instanceof Date) {
+        aptDate = new Date(apt.appointment_date.getFullYear(), apt.appointment_date.getMonth(), apt.appointment_date.getDate());
+      } else {
+        aptDate = new Date(apt.appointment_date);
+      }
       if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
         const dayKey = aptDate.getDate();
         if (!appointmentMap[dayKey]) {
@@ -131,6 +152,10 @@ export default function ChemistryCalendarAndTable() {
   useEffect(() => {
     generateCalendarDays(currentMonth, appointments);
   }, [currentMonth, appointments]);
+
+  // Debug output
+  console.log('APPOINTMENTS:', appointments);
+  console.log('CALENDAR DAYS:', calendarDays);
 
   // --- Status Update Logic (remains the same) --- 
   const handleStatusUpdate = async (appointmentId, newStatus) => {

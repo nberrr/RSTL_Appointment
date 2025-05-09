@@ -20,7 +20,7 @@ export default function ChemistryReportsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch('/api/microbiology/dashboard/tests');
+        const res = await fetch('/api/appointments?category=microbiology');
         const json = await res.json();
         if (json.success) {
           setAppointments(json.data);
@@ -60,10 +60,10 @@ export default function ChemistryReportsPage() {
   const filteredAppointments = appointments
     .filter(item => {
       const matchesSearch = 
-        item.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sample.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.testType.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filterType === 'all' || item.testType.toLowerCase() === filterType.toLowerCase();
+        (item.customer_name && item.customer_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.sample_name && item.sample_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.testType && item.testType.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesFilter = filterType === 'all' || (item.testType && item.testType.toLowerCase() === filterType.toLowerCase());
       return matchesSearch && matchesFilter;
     })
     .sort(sortByDate);

@@ -41,8 +41,8 @@ CREATE TABLE companies (
     contact_person VARCHAR(100),
     contact_email VARCHAR(100),
     contact_phone VARCHAR(50),
-    business_permit BYTEA,
-    oror_document BYTEA,
+    business_permit TEXT,
+    address TEXT,
     reg_date DATE,
     verified BOOLEAN DEFAULT FALSE,
     verified_date DATE,
@@ -56,6 +56,7 @@ CREATE TABLE trucks (
     id SERIAL PRIMARY KEY,
     license_plate VARCHAR(50) NOT NULL UNIQUE,
     company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
+    orcr_document TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -468,6 +469,7 @@ INSERT INTO customers (name, email, contact_number, sex, company_name) VALUES
 
 -- DUMMY CHEMISTRY APPOINTMENTS
 -- Uses real chemistry service IDs: 1, 3, 5, 6, 7
+-- NOTE: appointment_date must be a plain date string (YYYY-MM-DD), no time or timezone
 INSERT INTO appointments (customer_id, service_id, appointment_date, status)
 VALUES
   (1, 1, '2025-05-01', 'pending'),
@@ -496,6 +498,7 @@ VALUES
 
 -- DUMMY MICROBIOLOGY APPOINTMENTS
 -- Uses real microbiology service IDs: 54, 55, 56, 57, 58
+-- NOTE: appointment_date must be a plain date string (YYYY-MM-DD), no time or timezone
 INSERT INTO appointments (customer_id, service_id, appointment_date, status)
 VALUES
   (1, 54, '2025-06-01', 'pending'),
@@ -524,6 +527,7 @@ VALUES
 
 -- DUMMY METROLOGY APPOINTMENTS
 -- Uses real metrology service IDs: 77, 78, 79
+-- NOTE: appointment_date must be a plain date string (YYYY-MM-DD), no time or timezone
 INSERT INTO appointments (customer_id, service_id, appointment_date, status)
 VALUES
   (1, 77, '2025-07-01', 'pending'),
@@ -546,6 +550,7 @@ VALUES
 
 -- DUMMY SHELF-LIFE APPOINTMENTS
 -- Uses real shelf-life service IDs: 80, 81, 82, 83
+-- NOTE: appointment_date must be a plain date string (YYYY-MM-DD), no time or timezone
 INSERT INTO appointments (customer_id, service_id, appointment_date, status)
 VALUES
   (1, 80, '2025-08-01', 'pending'),

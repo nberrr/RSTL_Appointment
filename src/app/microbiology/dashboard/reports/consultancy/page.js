@@ -19,14 +19,14 @@ export default function ConsultancyReportsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch('/api/microbiology/consultancy-appointments');
+        const res = await fetch('/api/appointments?category=microbiology&type=consultancy');
         const json = await res.json();
         if (json.success) {
           setConsultancyData(json.data);
         } else {
           setConsultancyData([]);
         }
-      } catch (error) {x``
+      } catch (error) {
         setConsultancyData([]);
       }
       setLoading(false);
@@ -82,7 +82,7 @@ export default function ConsultancyReportsPage() {
       const matchesSearch = 
         (item.researcher && item.researcher.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (item.researchType && item.researchType.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.id && item.id.toLowerCase().includes(searchTerm.toLowerCase()));
+        (item.id && String(item.id).toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesFilter = filterType === 'all' || (item.researchType && item.researchType.toLowerCase() === filterType.toLowerCase());
       return matchesSearch && matchesFilter;
     })

@@ -20,7 +20,7 @@ export default function ChemistryReportsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch('/api/chemistry/dashboard/tests');
+        const res = await fetch('/api/appointments?category=chemistry');
         const json = await res.json();
         if (json.success) {
           setAppointments(json.data);

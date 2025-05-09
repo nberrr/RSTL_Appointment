@@ -35,9 +35,27 @@ export async function GET(request) {
       ORDER BY a.appointment_date DESC, a.appointment_time DESC
     `, [serviceIds]);
 
+    // Normalize appointment_date for all rows
+    const normalizedRows = appointmentsResult.rows.map(row => {
+      let normalizedDate;
+      if (row.appointment_date instanceof Date) {
+        const year = row.appointment_date.getFullYear();
+        const month = (row.appointment_date.getMonth() + 1).toString().padStart(2, '0');
+        const day = row.appointment_date.getDate().toString().padStart(2, '0');
+        normalizedDate = `${year}-${month}-${day}`;
+      } else if (typeof row.appointment_date === 'string') {
+        normalizedDate = row.appointment_date.slice(0, 10);
+      } else {
+        normalizedDate = row.appointment_date;
+      }
+      return {
+        ...row,
+        appointment_date: normalizedDate,
+      };
+    });
     return NextResponse.json({
       success: true,
-      data: appointmentsResult.rows
+      data: normalizedRows
     });
 
   } catch (error) {

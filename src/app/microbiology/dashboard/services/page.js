@@ -71,33 +71,27 @@ export default function ServicesPage() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/microbiology/services');
+      const response = await fetch('/api/services?category=microbiology');
       const data = await response.json();
       
       if (data.success) {
-        setServices(data.data.map(service => ({
+        // Map backend fields to frontend fields
+        const mappedServices = (data.data.microbiology || []).map(service => ({
           id: service.id,
-          testType: service.test_type || '',
-          testDescription: service.test_description || '',
-          pricing: parseFloat(service.pricing) || 0,
-          appointment: service.appointment || 'Allowed',
+          testType: service.name || '',
+          testDescription: service.description || '',
+          pricing: parseFloat(service.price) || 0,
+          appointment: 'Allowed',
           status: service.active ? 'Active' : 'Inactive',
           sampleType: service.sample_type || 'Uncategorized',
-        })));
+        }));
+        setServices(mappedServices);
         // Group by sampleType
         const grouped = {};
-        data.data.forEach(service => {
-          const sampleType = service.sample_type || 'Uncategorized';
+        mappedServices.forEach(service => {
+          const sampleType = service.sampleType;
           if (!grouped[sampleType]) grouped[sampleType] = [];
-          grouped[sampleType].push({
-            id: service.id,
-            testType: service.test_type || '',
-            testDescription: service.test_description || '',
-            pricing: parseFloat(service.pricing) || 0,
-            appointment: service.appointment || 'Allowed',
-            status: service.active ? 'Active' : 'Inactive',
-            sampleType: sampleType,
-          });
+          grouped[sampleType].push(service);
         });
         setGroupedServices(grouped);
       } else {
@@ -146,20 +140,22 @@ export default function ServicesPage() {
     }
 
     try {
-      const response = await fetch('/api/microbiology/services', {
-        method: editingId === 'new' ? 'POST' : 'PUT',
+      const method = editingId === 'new' ? 'POST' : 'PUT';
+      const payload = {
+        id: editingId === 'new' ? undefined : editingId,
+        name: editedService.testType.trim(),
+        description: editedService.testDescription.trim(),
+        price: parseFloat(editedService.pricing) || 0,
+        category: 'microbiology',
+        active: editedService.status === 'Active',
+        sample_type: editedService.sampleType || 'Uncategorized',
+      };
+      const response = await fetch('/api/services', {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          id: editingId === 'new' ? undefined : editingId,
-          testType: editedService.testType.trim(),
-          testDescription: editedService.testDescription.trim(),
-          pricing: parseFloat(editedService.pricing) || 0,
-          appointment: editedService.appointment,
-          active: editedService.status === 'Active',
-          sampleType: editedService.sampleType || 'Uncategorized',
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -201,7 +197,7 @@ export default function ServicesPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`/api/microbiology/services?id=${serviceToDelete.id}`, {
+      const response = await fetch(`/api/services?id=${serviceToDelete.id}`, {
         method: 'DELETE',
       });
 

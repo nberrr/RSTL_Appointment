@@ -14,7 +14,8 @@ export default function MetrologyAppointment() {
         numberOfLiters: '',
         typeOfTest: 'Volume Standard Test',
         nameOfSamples: '',
-        terms: false
+        terms: false,
+        intakeFileUrl: null
     });
 
     const [errors, setErrors] = useState({});
@@ -26,6 +27,15 @@ export default function MetrologyAppointment() {
         message: '',
         appointmentId: null
     });
+
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
 
     const validateForm = () => {
         const newErrors = {};
@@ -69,16 +79,66 @@ export default function MetrologyAppointment() {
         }
     };
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        setUploadError('');
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('file', file);
+            const res = await fetch('/api/uploads/appointment', {
+                method: 'POST',
+                body: formDataUpload,
+            });
+            const data = await res.json();
+            if (data.success && data.files && data.files.length > 0) {
+                setFormData(prev => ({ ...prev, intakeFileUrl: data.files[0] }));
+            } else {
+                setUploadError(data.message || 'Failed to upload file');
+            }
+        } catch (err) {
+            setUploadError('Failed to upload file');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            const formDataToSubmit = {
-                ...formData,
-                selectedDate: selectedDate ? selectedDate.toISOString() : null,
-            };
-            
+            let companyId = null;
+            let truckId = null;
             try {
                 setIsSubmitting(true);
+                // 1. Lookup company by name
+                let companyRes = await fetch(`/api/companies?name=${encodeURIComponent(formData.companyName)}`);
+                let companyData = await companyRes.json();
+                if (!(companyData.success && companyData.data && companyData.data.length > 0)) {
+                    setErrorMessage('Company not registered. Please register your company first.');
+                    setShowErrorModal(true);
+                    setIsSubmitting(false);
+                    return;
+                }
+                companyId = companyData.data[0].id;
+                // 2. Lookup truck by plate number and company_id
+                let truckRes = await fetch(`/api/trucks?license_plate=${encodeURIComponent(formData.plateNumber)}&company_id=${companyId}`);
+                let truckData = await truckRes.json();
+                if (!(truckData.success && truckData.data && truckData.data.length > 0)) {
+                    setErrorMessage('Truck not registered under this company. Please register your truck first.');
+                    setShowErrorModal(true);
+                    setIsSubmitting(false);
+                    return;
+                }
+                truckId = truckData.data[0].id;
+                // 3. Submit appointment
+                const formDataToSubmit = {
+                    ...formData,
+                    selectedDate: selectedDate ? selectedDate.toISOString() : null,
+                    company_id: companyId,
+                    truck_id: truckId,
+                    intakeFileUrl: formData.intakeFileUrl || null
+                };
                 const response = await fetch('/api/appointments/metrology', {
                     method: 'POST',
                     headers: {
@@ -86,17 +146,15 @@ export default function MetrologyAppointment() {
                     },
                     body: JSON.stringify(formDataToSubmit),
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
-                    // Show success message
                     setSubmissionStatus({
                         success: true,
                         message: 'Your appointment has been scheduled successfully!',
                         appointmentId: data.appointmentId
                     });
-                    // Reset form
+                    setSuccessMessage('Your appointment has been scheduled successfully!');
+                    setShowSuccessModal(true);
                     setFormData({
                         name: '',
                         email: '',
@@ -108,21 +166,20 @@ export default function MetrologyAppointment() {
                         numberOfLiters: '',
                         typeOfTest: 'Volume Standard Test',
                         nameOfSamples: '',
-                        terms: false
+                        terms: false,
+                        intakeFileUrl: null
                     });
                     setSelectedDate(null);
                 } else {
-                    // Show error message
                     setSubmissionStatus({
                         success: false,
                         message: data.message || 'Failed to schedule appointment. Please try again.'
                     });
                 }
             } catch (error) {
-                console.error('Error submitting form:', error);
                 setSubmissionStatus({
                     success: false,
-                    message: 'Network error. Please check your connection and try again.'
+                    message: error.message || 'Network error. Please check your connection and try again.'
                 });
             } finally {
                 setIsSubmitting(false);
@@ -472,6 +529,24 @@ export default function MetrologyAppointment() {
                                         <p className="mt-1 text-sm text-red-600">{errors.sampleDescription}</p>
                                     )}
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm text-gray-700 font-medium mb-1">Intake File (optional)</label>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.txt,.csv"
+                                        onChange={handleFileChange}
+                                        className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        disabled={uploading}
+                                    />
+                                    {uploading && <p className="text-xs text-blue-600 mt-1">Uploading...</p>}
+                                    {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
+                                    {formData.intakeFileUrl && (
+                                        <div className="mt-1 text-xs text-green-700">
+                                            Uploaded: <a href={formData.intakeFileUrl} target="_blank" rel="noopener noreferrer" className="underline">{formData.intakeFileUrl.split('/').pop()}</a>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -537,6 +612,44 @@ export default function MetrologyAppointment() {
                     )}
                 </div>
             </div>
+
+            {/* Error Modal */}
+            {showErrorModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+                        <svg className="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <h2 className="text-lg font-semibold text-red-700 mb-2">Error</h2>
+                        <p className="text-gray-700 mb-6">{errorMessage}</p>
+                        <button
+                            onClick={() => setShowErrorModal(false)}
+                            className="bg-red-600 text-white px-6 py-2 rounded-md font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+                        <svg className="mx-auto h-12 w-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h2 className="text-lg font-semibold text-green-700 mb-2">Success!</h2>
+                        <p className="text-gray-700 mb-6">{successMessage}</p>
+                        <button
+                            onClick={() => setShowSuccessModal(false)}
+                            className="bg-green-600 text-white px-6 py-2 rounded-md font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 } 

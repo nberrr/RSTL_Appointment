@@ -45,7 +45,7 @@ export async function POST(request) {
     const serviceId = serviceResult.rows[0].id;
     
     // 3. Insert appointment and get appointment_id
-    const appointmentDate = new Date(formData.selectedDate);
+    const appointmentDate = (formData.selectedDate || '').slice(0, 10);
     const appointmentResult = await query(
       `INSERT INTO appointments (customer_id, service_id, appointment_date, status)
        VALUES ($1, $2, $3, $4)

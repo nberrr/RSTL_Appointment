@@ -31,7 +31,7 @@ export default function ConsultancyPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/microbiology/consultancy-appointments');
+      const response = await fetch('/api/appointments?category=microbiology&type=consultancy');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       if (data.success) {

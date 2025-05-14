@@ -75,8 +75,7 @@ export default function ServicesPage() {
       const data = await response.json();
       
       if (data.success) {
-        // Map backend fields to frontend fields
-        const mappedServices = (data.data.microbiology || []).map(service => ({
+        setServices(data.data.microbiology.map(service => ({
           id: service.id,
           testType: service.name || '',
           testDescription: service.description || '',
@@ -84,14 +83,21 @@ export default function ServicesPage() {
           appointment: 'Allowed',
           status: service.active ? 'Active' : 'Inactive',
           sampleType: service.sample_type || 'Uncategorized',
-        }));
-        setServices(mappedServices);
+        })));
         // Group by sampleType
         const grouped = {};
-        mappedServices.forEach(service => {
-          const sampleType = service.sampleType;
+        data.data.microbiology.forEach(service => {
+          const sampleType = service.sample_type || 'Uncategorized';
           if (!grouped[sampleType]) grouped[sampleType] = [];
-          grouped[sampleType].push(service);
+          grouped[sampleType].push({
+            id: service.id,
+            testType: service.name || '',
+            testDescription: service.description || '',
+            pricing: parseFloat(service.price) || 0,
+            appointment: 'Allowed',
+            status: service.active ? 'Active' : 'Inactive',
+            sampleType: sampleType,
+          });
         });
         setGroupedServices(grouped);
       } else {
@@ -140,22 +146,20 @@ export default function ServicesPage() {
     }
 
     try {
-      const method = editingId === 'new' ? 'POST' : 'PUT';
-      const payload = {
-        id: editingId === 'new' ? undefined : editingId,
-        name: editedService.testType.trim(),
-        description: editedService.testDescription.trim(),
-        price: parseFloat(editedService.pricing) || 0,
-        category: 'microbiology',
-        active: editedService.status === 'Active',
-        sample_type: editedService.sampleType || 'Uncategorized',
-      };
       const response = await fetch('/api/services', {
-        method,
+        method: editingId === 'new' ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          id: editingId === 'new' ? undefined : editingId,
+          name: editedService.testType.trim(),
+          description: editedService.testDescription.trim(),
+          price: parseFloat(editedService.pricing) || 0,
+          active: editedService.status === 'Active',
+          sample_type: editedService.sampleType || 'Uncategorized',
+          category: 'microbiology',
+        }),
       });
 
       const data = await response.json();

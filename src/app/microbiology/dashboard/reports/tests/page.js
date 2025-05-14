@@ -60,8 +60,8 @@ export default function ChemistryReportsPage() {
   const filteredAppointments = appointments
     .filter(item => {
       const matchesSearch = 
-        (item.customer_name && item.customer_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.sample_name && item.sample_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.client?.name && item.client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.sample && item.sample.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (item.testType && item.testType.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesFilter = filterType === 'all' || (item.testType && item.testType.toLowerCase() === filterType.toLowerCase());
       return matchesSearch && matchesFilter;

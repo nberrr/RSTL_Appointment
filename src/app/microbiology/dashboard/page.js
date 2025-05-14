@@ -54,10 +54,17 @@ export default function MicrobiologyDashboard() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentDay, setCurrentDay] = useState(0);
   const [calendarDays, setCalendarDays] = useState([]);
-  const [stats, setStats] = useState({});
-  const [appointments, setAppointments] = useState([]);
-  const [recentAppointments, setRecentAppointments] = useState([]);
-  const [analysisTypes, setAnalysisTypes] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      total_appointments: 0,
+      pending: 0,
+      completed: 0,
+      in_progress: 0
+    },
+    appointments: [],
+    recentAppointments: [],
+    analysisTypes: []
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
@@ -65,81 +72,64 @@ export default function MicrobiologyDashboard() {
 
   // Fetch dashboard data
   useEffect(() => {
-    async function fetchDashboardData() {
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch all appointments for microbiology
-        const res = await fetch('/api/appointments?category=microbiology');
-        const data = await res.json();
-        if (data.success) {
-          // Compute stats and recent appointments from the data
-          const appointments = data.data || [];
-          // Example stats computation (customize as needed)
-          const stats = {
-            total_appointments: appointments.length,
-            pending: appointments.filter(a => a.status?.toLowerCase() === 'pending').length,
-            in_progress: appointments.filter(a => a.status?.toLowerCase() === 'in progress').length,
-            completed: appointments.filter(a => a.status?.toLowerCase() === 'completed').length,
-            declined: appointments.filter(a => a.status?.toLowerCase() === 'declined').length,
-          };
-          setStats(stats);
-          setRecentAppointments(appointments.slice(0, 5));
-          setAppointments(appointments);
-          // Count occurrences of each service_name or testType
-          const analysisTypeCounts = {};
-          appointments.forEach(a => {
-            const name = a.service_name || a.testType;
-            if (name) {
-              analysisTypeCounts[name] = (analysisTypeCounts[name] || 0) + 1;
-            }
-          });
-          const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
-          setAnalysisTypes(analysisTypes);
-        } else {
-          setError(data.message || 'Failed to load dashboard data');
-        }
-      } catch (err) {
-        setError(err.message || 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchDashboardData();
     const today = new Date();
     setCurrentDate(today);
     setCurrentDay(today.getDate());
     setSelectedDay(today.getDate());
-    generateCalendarDays(today, appointments);
+    generateCalendarDays(today);
     updateMonthDisplay(today);
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/appointments?category=microbiology');
+      const data = await response.json();
+      if (data.success) {
+        const appointments = data.data || [];
+        // Compute stats
+        const stats = {
+          total_appointments: appointments.length,
+          pending: appointments.filter(a => a.status === 'pending').length,
+          completed: appointments.filter(a => a.status === 'completed').length,
+          in_progress: appointments.filter(a => a.status === 'in progress').length
+        };
+        // Recent appointments (last 5 by date)
+        const recentAppointments = [...appointments]
+          .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
+          .slice(0, 5);
+        // Count occurrences of each analysis_requested (split by comma)
+        const analysisTypeCounts = {};
+        appointments.forEach(a => {
+          if (a.analysis_requested) {
+            a.analysis_requested.split(',').forEach(type => {
+              const trimmed = type.trim();
+              if (trimmed) analysisTypeCounts[trimmed] = (analysisTypeCounts[trimmed] || 0) + 1;
+            });
+          }
+        });
+        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
+        setDashboardData({
+          stats,
+          appointments,
+          recentAppointments,
+          analysisTypes
+        });
+        generateCalendarDays(currentDate, appointments);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const updateMonthDisplay = (date) => {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                       'July', 'August', 'September', 'October', 'November', 'December'];
     setCurrentMonth(`${monthNames[date.getMonth()]} ${date.getFullYear()}`);
-  };
-
-  const goToPreviousMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
-    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
-    setCurrentDate(newDate);
-    setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, appointments);
-    updateMonthDisplay(newDate);
-  };
-
-  const goToNextMonth = () => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
-    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
-    setCurrentDate(newDate);
-    setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, appointments);
-    updateMonthDisplay(newDate);
   };
 
   const generateCalendarDays = (date, appointments = []) => {
@@ -163,6 +153,8 @@ export default function MicrobiologyDashboard() {
       } else {
         aptDate = new Date(apt.appointment_date);
       }
+      // Debug log for each appointment
+      console.log('[DEBUG] Appointment:', apt, 'Parsed Date:', aptDate.toISOString(), 'Local:', aptDate.toLocaleDateString());
       if (aptDate.getMonth() === month && aptDate.getFullYear() === year) {
         const dayKey = aptDate.getDate();
         if (!appointmentMap[dayKey]) {
@@ -192,6 +184,32 @@ export default function MicrobiologyDashboard() {
       days.push({ day: null, isCurrentMonth: false, date: null });
     }
     setCalendarDays(days);
+    // Debug log for calendarDays
+    setTimeout(() => {
+      console.log('[DEBUG] calendarDays:', days.map(d => ({ day: d.day, date: d.date ? d.date.toISOString() : null, appointments: d.appointments })));
+    }, 0);
+  };
+
+  const goToPreviousMonth = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() - 1);
+    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
+    setCurrentDate(newDate);
+    setSelectedDay(preservedDay);
+    generateCalendarDays(newDate, dashboardData.appointments);
+    updateMonthDisplay(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    const lastDayOfNewMonth = new Date(newDate.getFullYear(), newDate.getMonth() + 1, 0).getDate();
+    const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
+    setCurrentDate(newDate);
+    setSelectedDay(preservedDay);
+    generateCalendarDays(newDate, dashboardData.appointments);
+    updateMonthDisplay(newDate);
   };
 
   // Fetch appointments for a selected day
@@ -202,18 +220,21 @@ export default function MicrobiologyDashboard() {
     }
     setLoadingSelectedDay(true);
     try {
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const day = date.getDate().toString().padStart(2, '0');
-      const res = await fetch(`/api/appointments/by-date?date=${year}-${month}-${day}&service=microbiology`);
-      const data = await res.json();
+      // Debug log for selected date
+      console.log('FETCH DAY APPOINTMENTS for date:', date);
+      const response = await fetch(`/api/appointments?category=microbiology&date=${date}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
       if (data.success) {
+        // Use analysis_requested directly for chemistry-style mapping
         setSelectedDayAppointments(data.data || []);
       } else {
         setSelectedDayAppointments([]);
+        console.error("API Error fetching day appointments:", data.message);
       }
-    } catch (err) {
-      setSelectedDayAppointments([]);
+    } catch (error) {
+      console.error('Error fetching day appointments:', error);
+      setSelectedDayAppointments([]); // Clear on error
     } finally {
       setLoadingSelectedDay(false);
     }
@@ -221,15 +242,23 @@ export default function MicrobiologyDashboard() {
 
   useEffect(() => {
     if (selectedDay && selectedDay instanceof Date && !isNaN(selectedDay)) {
-      fetchAppointmentsForDay(selectedDay);
+      const year = selectedDay.getFullYear();
+      const month = (selectedDay.getMonth() + 1).toString().padStart(2, '0');
+      const day = selectedDay.getDate().toString().padStart(2, '0');
+      fetchAppointmentsForDay(`${year}-${month}-${day}`);
     } else {
-      setSelectedDayAppointments([]);
+      setSelectedDayAppointments([]); // Clear if no valid day/date
     }
   }, [selectedDay, fetchAppointmentsForDay]);
 
+  // Debug log for selectedDay
+  useEffect(() => {
+    console.log('[DEBUG] selectedDay:', selectedDay instanceof Date ? selectedDay.toISOString() : selectedDay);
+  }, [selectedDay]);
+
   return (
     <DashboardLayout
-      stats={stats}
+      stats={dashboardData.stats}
       statConfig={statConfig}
       calendarProps={{
         currentMonth,
@@ -242,7 +271,7 @@ export default function MicrobiologyDashboard() {
         setSelectedDay,
         getStatusColor,
       }}
-      recentAppointments={recentAppointments}
+      recentAppointments={dashboardData.recentAppointments}
       loading={loading}
       error={error}
       selectedDayAppointments={selectedDayAppointments}
@@ -251,7 +280,6 @@ export default function MicrobiologyDashboard() {
         selectedDay,
         currentMonth,
       }}
-      analysisTypes={analysisTypes}
     />
   );
 } 

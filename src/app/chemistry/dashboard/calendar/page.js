@@ -72,6 +72,7 @@ export default function ChemistryCalendarAndTable() {
         const normalized = data.data.map(a => ({
           ...a,
           appointment_date: a.appointment_date || a.date,
+          analysis_requested: a.analysis_requested || '',
         }));
         setAppointments(normalized);
       } else {
@@ -326,56 +327,71 @@ export default function ChemistryCalendarAndTable() {
             stats={currentViewStats.stats}
             getStatusColor={getStatusColor}
           />
-          <DashboardFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
         </>
       }
       rightColumn={
         <>
-              <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
-                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                     <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
                 {getTableTitle()}
-                      </h3>
-                      <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
-                              <button 
+              </h3>
+              <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Search ID, Name, Analysis..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="declined">Declined</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
+                  <button 
                     onClick={() => {
                       setViewMode('day');
                       if (!selectedDate) setSelectedDate(new Date());
                     }}
-                                  className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                                  title="Day View (requires selecting a day on calendar)"
+                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                    title="Day View (requires selecting a day on calendar)"
                     disabled={!selectedDate}
-                              >
-                                  Day
-                              </button>
-                           <button 
-                              onClick={() => setViewMode('week')}
-                              className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                          >
-                              Week
-                          </button>
-                          <button 
-                              onClick={() => setViewMode('month')}
-                              className={`px-3 py-1 text-xs rounded-md ${viewMode === 'month' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                          >
-                              Month
-                          </button>
-                          <button 
-                              onClick={() => { setViewMode('all'); setSelectedDate(null); }}
-                              className={`px-3 py-1 text-xs rounded-md ${viewMode === 'all' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                          >
-                              All
-                          </button>
-                      </div>
-                 </div>
+                  >
+                    Day
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('week')}
+                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                  >
+                    Week
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('month')}
+                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'month' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                  >
+                    Month
+                  </button>
+                  <button 
+                    onClick={() => { setViewMode('all'); setSelectedDate(null); }}
+                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'all' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                  >
+                    All
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
           <DashboardAppointmentsTable
             filteredAppointments={filteredAppointments}
             viewMode={viewMode}

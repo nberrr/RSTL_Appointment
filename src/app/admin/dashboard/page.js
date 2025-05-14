@@ -139,9 +139,9 @@ export default function AdminDashboard() {
           <div className="sticky top-0 z-40">
             <DashboardNav />
           </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-12 pb-16">
             {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Laboratory Services Dashboard</h1>
                 <p className="text-base text-gray-500 flex items-center gap-2">
@@ -155,10 +155,10 @@ export default function AdminDashboard() {
                 <span className="hidden md:inline text-sm font-medium text-gray-700">Admin</span>
               </button>
             </div>
-            <div className="border-b border-gray-200 mb-8" aria-hidden="true"></div>
+            <div className="border-b border-gray-200 mb-10" aria-hidden="true"></div>
 
             {/* Time Period Selector */}
-            <Card className="mb-8 p-0">
+            <Card className="mb-10 p-0">
               <EnhancedTabs
                 activeTab={selectedPeriod}
                 onChange={setSelectedPeriod}
@@ -167,30 +167,30 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Service Cards Section */}
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-800">Services Overview</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.map((service) => (
                 <Link key={service.id} href={service.href} className="focus:outline-none group">
-                  <Card className="relative transition-all duration-200 hover:shadow-xl hover:scale-[1.025] hover:border-blue-400 cursor-pointer group focus:ring-2 focus:ring-blue-200">
+                  <Card className="relative transition-all duration-200 hover:shadow-2xl hover:scale-[1.03] hover:border-blue-400 cursor-pointer group focus:ring-2 focus:ring-blue-200 rounded-xl shadow-lg p-8">
                     {/* Floating Pending badge */}
                     {service.stats?.pending > 0 && (
-                      <span className="absolute top-4 right-4 bg-yellow-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow z-10 animate-pulse">
+                      <span className="absolute top-6 right-6 bg-yellow-400 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow z-10 animate-pulse">
                         {service.stats.pending} Pending
                       </span>
                     )}
-                    <div className="flex items-center p-6 pb-2">
-                      <div className={`rounded-full p-4 ${service.color} shadow-md flex items-center justify-center transition-transform duration-200 group-hover:scale-110`}>
-                        <span className="text-white text-2xl">{service.icon}</span>
+                    <div className="flex items-center p-0 pb-2">
+                      <div className={`rounded-full p-6 ${service.color} shadow-md flex items-center justify-center transition-transform duration-200 group-hover:scale-110`}>
+                        <span className="text-white text-3xl">{service.icon}</span>
                       </div>
-                      <div className="ml-4 flex-1">
+                      <div className="ml-6 flex-1">
                         <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{service.name}</h3>
                         <p className="text-sm text-gray-500 mt-1">{service.description}</p>
                       </div>
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"><svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg></span>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 px-6 pb-6 pt-2 text-center">
+                    <div className="grid grid-cols-3 gap-6 px-0 pb-2 pt-4 text-center">
                       <div>
                         <p className="text-2xl font-extrabold text-gray-900">
                           {loading ? <span className="inline-block w-8 h-6 bg-gray-200 rounded animate-pulse" /> : service.stats?.appointments || 0}

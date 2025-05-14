@@ -9,33 +9,60 @@ export async function GET(request) {
   const date = searchParams.get('date');
   const status = searchParams.get('status');
 
-  let sql = `
-    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name
-    FROM appointments a
-    JOIN services s ON a.service_id = s.id
-    JOIN customers c ON a.customer_id = c.id
-    WHERE 1=1
-  `;
-  const params = [];
+  let sql;
+  let params = [];
 
-  if (service_id) {
-    sql += ` AND s.id = $${params.length + 1}`;
-    params.push(service_id);
+  if (category === 'chemistry') {
+    sql = `
+      SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
+             STRING_AGG(cd.analysis_requested, ', ') as analysis_requested
+      FROM appointments a
+      JOIN services s ON a.service_id = s.id
+      JOIN customers c ON a.customer_id = c.id
+      JOIN appointment_details ad ON a.id = ad.appointment_id
+      JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id
+      WHERE 1=1
+    `;
+    if (service_id) {
+      sql += ` AND s.id = $${params.length + 1}`;
+      params.push(service_id);
+    }
+    if (date) {
+      sql += ` AND a.appointment_date::date = $${params.length + 1}`;
+      params.push(date);
+    }
+    if (status) {
+      sql += ` AND a.status = $${params.length + 1}`;
+      params.push(status);
+    }
+    sql += ' GROUP BY a.id, s.name, s.category, c.name, c.email, c.company_name';
+    sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
+  } else {
+    sql = `
+      SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name
+      FROM appointments a
+      JOIN services s ON a.service_id = s.id
+      JOIN customers c ON a.customer_id = c.id
+      WHERE 1=1
+    `;
+    if (service_id) {
+      sql += ` AND s.id = $${params.length + 1}`;
+      params.push(service_id);
+    }
+    if (category) {
+      sql += ` AND s.category = $${params.length + 1}`;
+      params.push(category);
+    }
+    if (date) {
+      sql += ` AND a.appointment_date::date = $${params.length + 1}`;
+      params.push(date);
+    }
+    if (status) {
+      sql += ` AND a.status = $${params.length + 1}`;
+      params.push(status);
+    }
+    sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
   }
-  if (category) {
-    sql += ` AND s.category = $${params.length + 1}`;
-    params.push(category);
-  }
-  if (date) {
-    sql += ` AND a.appointment_date::date = $${params.length + 1}`;
-    params.push(date);
-  }
-  if (status) {
-    sql += ` AND a.status = $${params.length + 1}`;
-    params.push(status);
-  }
-
-  sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
 
   try {
     const result = await query(sql, params);
@@ -139,26 +166,47 @@ export async function POST(request) {
     if (category === 'shelf_life') {
       await query(
         `INSERT INTO shelf_life_details (
-           appointment_detail_id, objective_of_study, product_name, net_weight, brand_name, existing_market, production_type, method_of_preservation, product_ingredients, packaging_material, target_shelf_life, mode_of_deterioration
+           appointment_detail_id, product_type, storage_conditions, shelf_life_duration, packaging_type, modes_of_deterioration
          )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           appointmentDetailId,
-          formData.objective_of_study,
-          formData.product_name,
-          formData.net_weight,
-          formData.brand_name,
-          formData.existing_market,
-          formData.production_type,
-          formData.method_of_preservation,
-          formData.product_ingredients,
-          formData.packaging_material,
-          formData.target_shelf_life,
-          Array.isArray(formData.mode_of_deterioration) ? formData.mode_of_deterioration.join(', ') : formData.mode_of_deterioration
+          formData.product_type || formData.productType || 'General',
+          formData.storage_conditions || '',
+          formData.shelf_life_duration || null,
+          formData.packaging_type || '',
+          Array.isArray(formData.modes_of_deterioration) ? formData.modes_of_deterioration.join(', ') : (formData.modes_of_deterioration || '')
+        ]
+      );
+    } else if (category === 'chemistry') {
+      await query(
+        `INSERT INTO chemistry_details (
+           appointment_detail_id, analysis_requested, parameters, delivery_type, sample_quantity
+         )
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          appointmentDetailId,
+          formData.analysis_requested || formData.analysisRequested || 'Standard analysis',
+          formData.parameters || 'Standard parameters',
+          formData.delivery_type || formData.deliveryType || 'Standard',
+          formData.sample_quantity
+        ]
+      );
+    } else if (category === 'microbiology') {
+      await query(
+        `INSERT INTO microbiology_details (
+           appointment_detail_id, test_type, organism_target, sample_storage_condition, sample_quantity
+         )
+         VALUES ($1, $2, $3, $4, $5)`,
+        [
+          appointmentDetailId,
+          formData.test_type || formData.testType || 'General',
+          formData.organism_target || '',
+          formData.sample_storage_condition || '',
+          formData.sample_quantity
         ]
       );
     }
-    // TODO: Add chemistry/microbiology-specific details if needed
 
     return NextResponse.json({ success: true, appointmentId });
   } catch (error) {

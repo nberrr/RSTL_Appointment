@@ -23,7 +23,6 @@ import DashboardCalendar from "@/components/shared/DashboardCalendar";
 import DashboardQuickInfo from "@/components/shared/DashboardQuickInfo";
 import DashboardAppointmentsTable from "@/components/shared/DashboardAppointmentsTable";
 import CalendarDashboardLayout from '@/components/layout/CalendarDashboardLayout';
-import DashboardFilters from '@/components/shared/DashboardFilters';
 import ScheduleModal from '@/components/shared/ScheduleModal';
 
 export default function CalendarPage() {
@@ -210,6 +209,21 @@ export default function CalendarPage() {
     setSelectedAppointment(null);
   };
 
+  function getStatusColor(status) {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return { bgClass: 'bg-yellow-100', textClass: 'text-yellow-800', dotClass: 'bg-yellow-500' };
+      case 'in progress':
+        return { bgClass: 'bg-blue-100', textClass: 'text-blue-800', dotClass: 'bg-blue-500' };
+      case 'completed':
+        return { bgClass: 'bg-green-100', textClass: 'text-green-800', dotClass: 'bg-green-500' };
+      case 'declined':
+        return { bgClass: 'bg-red-100', textClass: 'text-red-800', dotClass: 'bg-red-500' };
+      default:
+        return { bgClass: 'bg-gray-100', textClass: 'text-gray-800', dotClass: 'bg-gray-500' };
+    }
+  }
+
                     return (
     <CalendarDashboardLayout
       leftColumn={
@@ -230,14 +244,6 @@ export default function CalendarPage() {
             stats={quickInfoStats}
             getStatusColor={status => ({ textClass: "text-blue-500" })}
           />
-          <DashboardFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
         </>
       }
       rightColumn={
@@ -247,14 +253,36 @@ export default function CalendarPage() {
               <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
                 {getTableTitle()}
               </h3>
-              {viewModeButtons}
+              <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Search ID, Name, Status..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="declined">Declined</option>
+                  </select>
+                </div>
+                {viewModeButtons}
+              </div>
             </div>
-        </div>
+          </div>
           <DashboardAppointmentsTable
             filteredAppointments={filteredAppointments}
             viewMode={viewMode}
             openModal={openModal}
-            getStatusColor={() => ({ bgClass: "bg-blue-100", textClass: "text-blue-700" })}
+            getStatusColor={getStatusColor}
             loading={loading}
             error={error}
           />

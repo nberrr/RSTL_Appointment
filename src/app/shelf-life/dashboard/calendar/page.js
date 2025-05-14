@@ -6,6 +6,8 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import AdminLayout from "@/components/layout/AdminLayout";
 import DashboardCalendar from '@/components/shared/DashboardCalendar';
 import DashboardAppointmentsTable from '@/components/shared/DashboardAppointmentsTable';
+import DashboardQuickInfo from '@/components/shared/DashboardQuickInfo';
+import CalendarDashboardLayout from '@/components/layout/CalendarDashboardLayout';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -80,6 +82,9 @@ export default function ShelfLifeCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [loadingSelectedDay, setLoadingSelectedDay] = useState(false);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [viewMode, setViewMode] = useState('day');
 
   // Fetch dashboard data for calendar
   useEffect(() => {
@@ -159,46 +164,101 @@ export default function ShelfLifeCalendarPage() {
     });
   };
 
+  // View mode switcher
+  const viewModeButtons = (
+    <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
+      <button 
+        onClick={() => { setViewMode('day'); setSelectedDay(today); }}
+        className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+      >Day</button>
+      <button 
+        onClick={() => setViewMode('week')}
+        className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+      >Week</button>
+      <button 
+        onClick={() => setViewMode('month')}
+        className={`px-3 py-1 text-xs rounded-md ${viewMode === 'month' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+      >Month</button>
+      <button 
+        onClick={() => setViewMode('all')}
+        className={`px-3 py-1 text-xs rounded-md ${viewMode === 'all' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+      >All</button>
+    </div>
+  );
+
   return (
-    <AdminLayout>
-      <div className="h-screen flex flex-col">
-        <DashboardNav />
-        <div className="flex flex-1 overflow-hidden">
-          <DashboardSidebar />
-          <main className="flex-1 bg-gray-100 p-4 flex flex-col h-full">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">Shelf Life Calendar</h1>
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 h-full min-h-0">
-              {/* Calendar */}
-              <div className="h-full min-h-0 flex flex-col">
-                <DashboardCalendar
-                  currentMonth={currentMonth}
-                  weekdays={weekdays}
-                  calendarDays={calendarDays}
-                  selectedDay={selectedDay}
-                  currentDay={calendarYear === today.getFullYear() && calendarMonth === today.getMonth() ? today.getDate() : null}
-                  goToPreviousMonth={goToPreviousMonth}
-                  goToNextMonth={goToNextMonth}
-                  setSelectedDay={dayObj => setSelectedDay(dayObj?.date || null)}
-                  getStatusColor={getStatusColor}
-                />
-              </div>
-              {/* Appointments Table */}
-              <div className="h-full min-h-0 flex flex-col">
-                <div className="flex-1 min-h-0 overflow-y-auto bg-white rounded-lg shadow-sm border border-gray-200">
-                  <DashboardAppointmentsTable
-                    filteredAppointments={selectedDayAppointments}
-                    viewMode={"day"}
-                    openModal={() => {}}
-                    getStatusColor={getStatusColor}
-                    loading={loadingSelectedDay}
-                    error={error}
+    <CalendarDashboardLayout
+      leftColumn={
+        <>
+          <DashboardCalendar
+            currentMonth={currentMonth}
+            weekdays={weekdays}
+            calendarDays={calendarDays}
+            selectedDay={selectedDay}
+            currentDay={calendarYear === today.getFullYear() && calendarMonth === today.getMonth() ? today.getDate() : null}
+            goToPreviousMonth={goToPreviousMonth}
+            goToNextMonth={goToNextMonth}
+            setSelectedDay={dayObj => setSelectedDay(dayObj?.date || null)}
+            getStatusColor={getStatusColor}
+          />
+          <DashboardQuickInfo
+            title="Date and Stats"
+            stats={{ total: selectedDayAppointments.length, pending: selectedDayAppointments.filter(a => a.status === 'pending').length, completed: selectedDayAppointments.filter(a => a.status === 'completed').length }}
+            getStatusColor={status => ({ textClass: "text-blue-500" })}
+          />
+        </>
+      }
+      rightColumn={
+        <>
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
+                {selectedDay ? `Appointments for ${selectedDay.toLocaleDateString()}` : 'Appointments'}
+              </h3>
+              <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Search ID, Name, Status..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="declined">Declined</option>
+                  </select>
                 </div>
+                {viewModeButtons}
               </div>
             </div>
-          </main>
-        </div>
-      </div>
-    </AdminLayout>
+          </div>
+          <DashboardAppointmentsTable
+            filteredAppointments={selectedDayAppointments.filter(apt => {
+              const lowerSearchTerm = searchTerm?.toLowerCase?.() || '';
+              const matchesSearch = !searchTerm || (
+                apt.id?.toString().includes(lowerSearchTerm) ||
+                apt.customer_name?.toLowerCase().includes(lowerSearchTerm) ||
+                apt.status?.toLowerCase().includes(lowerSearchTerm)
+              );
+              const matchesStatus = filterStatus === 'all' || apt.status?.toLowerCase() === filterStatus;
+              return matchesSearch && matchesStatus;
+            })}
+            viewMode={viewMode}
+            openModal={() => {}}
+            getStatusColor={getStatusColor}
+            loading={loadingSelectedDay}
+            error={error}
+          />
+        </>
+      }
+    />
   );
 } 

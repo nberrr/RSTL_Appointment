@@ -7,6 +7,7 @@ import ServicesToolbar from "@/components/shared/ServicesToolbar";
 import ServicesGroupedTable from "@/components/shared/ServicesGroupedTable";
 import DeleteModal from "@/components/shared/DeleteModal";
 import ConfirmModal from "@/components/shared/ConfirmModal";
+import AddEditServiceModal from '@/components/shared/AddEditServiceModal';
 
 export default function ServicesPage() {
   // State for services, editing, modals, etc.
@@ -264,6 +265,15 @@ export default function ServicesPage() {
                   <div className={`mt-2 text-sm ${limitStatus.success ? 'text-green-700' : 'text-red-700'}`}>{limitStatus.message}</div>
                 )}
               </div>
+              {/* Add/Edit Service Modal */}
+              <AddEditServiceModal
+                isOpen={showAddModal && editingId === 'new'}
+                service={editedService}
+                onChange={handleChange}
+                onSave={handleSaveService}
+                onCancel={handleCancelEdit}
+                mode="add"
+              />
             </div>
           </main>
         </div>

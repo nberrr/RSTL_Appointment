@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { v4 as uuidv4 } from 'uuid';
+import { sendMail } from '../../../../lib/mail';
 
 export async function POST(request) {
   try {
@@ -75,11 +76,26 @@ export async function POST(request) {
         formData.typeOfResearch,
         formData.yearLevel,
         null, // additional_requirements (not present in form)
-        (formData.selectedFiles && formData.selectedFiles.length > 0) ? formData.selectedFiles[0].name : null,
+        (formData.uploadedFiles && formData.uploadedFiles.length > 0) ? formData.uploadedFiles[0] : null,
         formData.consultationDetails
       ]
     );
     
+    // Send confirmation email
+    if (formData.emailAddress) {
+      try {
+        await sendMail({
+          to: formData.emailAddress,
+          subject: 'Research Consultation Request Received',
+          text: 'Thank you for your submission. We have received your research consultation request and will contact you soon.',
+          html: '<p>Thank you for your submission. We have received your research consultation request and will contact you soon.</p>'
+        });
+      } catch (mailErr) {
+        // Log but do not fail the request
+        console.error('Error sending confirmation email:', mailErr);
+      }
+    }
+
     return NextResponse.json({ 
       success: true, 
       message: 'Research consultation appointment created successfully',

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { sendMail } from '@/lib/mail';
 
 export async function PATCH(request, { params }) {
   const { id } = params;
-  const { status } = await request.json();
+  const { status, declineReason } = await request.json();
 
   if (!status) {
     return NextResponse.json(
@@ -47,6 +48,32 @@ export async function PATCH(request, { params }) {
           `UPDATE metrology_details SET number_of_liters = 0 WHERE appointment_detail_id = $1`,
           [appointmentDetailId]
         );
+      }
+    }
+
+    // Fetch email and consultation details for notification
+    const infoResult = await query(
+      `SELECT c.email AS email, rcd.consultation_details FROM appointments a JOIN customers c ON a.customer_id = c.id LEFT JOIN appointment_details ad ON a.id = ad.appointment_id LEFT JOIN research_consultation_details rcd ON ad.id = rcd.appointment_detail_id WHERE a.id = $1`,
+      [id]
+    );
+    if (infoResult.rows.length > 0) {
+      const { email, consultation_details } = infoResult.rows[0];
+      if (email) {
+        if (status.toLowerCase() === 'declined') {
+          await sendMail({
+            to: email,
+            subject: 'Research Consultation Declined',
+            text: `Your research consultation request was declined. Reason: ${declineReason || 'No reason provided.'}\n\nConsultation Details: ${consultation_details || ''}`,
+            html: `<p>Your research consultation request was <b>declined</b>.</p><p><b>Reason:</b> ${declineReason || 'No reason provided.'}</p><p><b>Consultation Details:</b> ${consultation_details || ''}</p>`
+          });
+        } else if (status.toLowerCase() === 'accepted') {
+          await sendMail({
+            to: email,
+            subject: 'Research Consultation Accepted',
+            text: 'Your research consultation request has been accepted. We will contact you with further details.',
+            html: '<p>Your research consultation request has been <b>accepted</b>. We will contact you with further details.</p>'
+          });
+        }
       }
     }
 

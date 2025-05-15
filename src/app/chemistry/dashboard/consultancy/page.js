@@ -55,6 +55,7 @@ export default function ConsultancyPage() {
     if (!appointmentId || !newStatus) return;
     try {
       const bodyPayload = { status: newStatus };
+      if (declineReason) bodyPayload.declineReason = declineReason;
       const response = await fetch(`/api/appointments/${appointmentId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },

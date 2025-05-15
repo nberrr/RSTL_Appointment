@@ -45,15 +45,15 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, description, price, category, active } = body;
+    const { name, description, price, category, active, sample_type } = body;
     if (!name || !category) {
       return NextResponse.json({ success: false, message: 'Name and category are required' }, { status: 400 });
     }
     const result = await query(
-      `INSERT INTO services (name, description, price, category, active)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, description, price, category, active, created_at, updated_at`,
-      [name, description, price, category, active ?? true]
+      `INSERT INTO services (name, description, price, category, active, sample_type)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, name, description, price, category, active, sample_type, created_at, updated_at`,
+      [name, description, price, category, active ?? true, sample_type || null]
     );
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {

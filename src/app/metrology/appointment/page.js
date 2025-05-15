@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
 export default function MetrologyAppointment() {
     const [formData, setFormData] = useState({
@@ -307,6 +308,7 @@ export default function MetrologyAppointment() {
 
     return (
         <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+            {isSubmitting && <LoadingOverlay message="Submitting your appointment..." />}
             <div className="max-w-[98rem] mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="flex items-center justify-center gap-2 text-blue-600 mb-2">

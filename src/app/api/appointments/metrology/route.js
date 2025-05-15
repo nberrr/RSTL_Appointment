@@ -129,11 +129,14 @@ export async function GET(request) {
   const status = searchParams.get('status');
 
   let sql = `
-    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name
+    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
+           ad.sample_description, md.type_of_test, md.number_of_liters, md.truck_plate_number
     FROM appointments a
     JOIN services s ON a.service_id = s.id
     JOIN customers c ON a.customer_id = c.id
-    WHERE 1=1
+    LEFT JOIN appointment_details ad ON a.id = ad.appointment_id
+    LEFT JOIN metrology_details md ON ad.id = md.appointment_detail_id
+    WHERE s.category = 'metrology'
   `;
   const params = [];
 

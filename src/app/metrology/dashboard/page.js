@@ -70,23 +70,11 @@ export default function MetrologyDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('/api/metrology/dashboard');
+        const res = await fetch('/api/appointments/metrology');
         const data = await res.json();
         if (data.success) {
-          setStats(data.data.stats || {});
-          setRecentAppointments(data.data.recentAppointments || []);
-          const appointments = data.data.appointments || [];
-          setAppointments(appointments);
-          // Count occurrences of each service_name or testType
-          const analysisTypeCounts = {};
-          appointments.forEach(a => {
-            const name = a.service_name || a.testType;
-            if (name) {
-              analysisTypeCounts[name] = (analysisTypeCounts[name] || 0) + 1;
-            }
-          });
-          const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
-          setAnalysisTypes(analysisTypes);
+          setAppointments(data.data || []);
+          // Optionally compute stats and recentAppointments here if needed
         } else {
           setError(data.message || 'Failed to load dashboard data');
         }
@@ -104,6 +92,10 @@ export default function MetrologyDashboard() {
     generateCalendarDays(today, appointments);
     updateMonthDisplay(today);
   }, []);
+
+  useEffect(() => {
+    generateCalendarDays(currentDate, appointments);
+  }, [currentDate, appointments]);
 
   const updateMonthDisplay = (date) => {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 

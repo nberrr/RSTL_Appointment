@@ -6,6 +6,7 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import ReportsStatsCards from "@/components/shared/ReportsStatsCards";
 import ReportsToolbar from "@/components/shared/ReportsToolbar";
 import ReportsAppointmentsTable from "@/components/shared/ReportsAppointmentsTable";
+import * as XLSX from "xlsx";
 
 export default function ReportsPage() {
   const [completedCount, setCompletedCount] = useState(0);
@@ -23,13 +24,14 @@ export default function ReportsPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/metrology/dashboard/reports");
+        const res = await fetch("/api/appointments/metrology");
         const data = await res.json();
         if (data.success) {
-          setCompletedCount(data.data.completedCount);
-          setDeclinedCount(data.data.declinedCount);
-          setCancelledCount(data.data.cancelledCount);
-          setReports(data.data.reports);
+          const reports = data.data || [];
+          setCompletedCount(reports.filter(r => r.status === 'completed').length);
+          setDeclinedCount(reports.filter(r => r.status === 'declined').length);
+          setCancelledCount(reports.filter(r => r.status === 'cancelled').length);
+          setReports(reports);
         } else {
           setError(data.message || "Failed to load reports");
         }
@@ -50,7 +52,7 @@ export default function ReportsPage() {
       name: report.customer_name || '',
       organization: report.organization || '',
     },
-    sample: report.name_of_samples || report.sample || '',
+    sample: report.name_of_samples || '',
     sampleDetails: { laboratory: 'Metrology' },
   }));
 
@@ -66,6 +68,25 @@ export default function ReportsPage() {
     return new Date(a.date) - new Date(b.date);
   });
 
+  const handleExport = () => {
+    // Prepare data for export (only visible columns)
+    const exportData = filteredReports.map(r => ({
+      ID: r.id,
+      Date: r.date || r.appointment_date || '',
+      Organization: r.client.organization || '',
+      Customer: r.client.name || '',
+      "Sample Name": r.sample || '',
+      "Type of Test": r.type_of_test || '',
+      Liters: r.number_of_liters || '',
+      "Truck Plate": r.truck_plate_number || '',
+      Status: r.status || '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reports");
+    XLSX.writeFile(wb, "metrology_reports.xlsx");
+  };
+
   return (
     <AdminLayout>
       <div className="h-screen flex flex-col">
@@ -77,7 +98,7 @@ export default function ReportsPage() {
               <ReportsStatsCards completedCount={completedCount} declinedCount={declinedCount} cancelledCount={cancelledCount} />
               <ReportsToolbar
                 title="Reports"
-                onExport={() => {}}
+                onExport={handleExport}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 filterType={filterType}

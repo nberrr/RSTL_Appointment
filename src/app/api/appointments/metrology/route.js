@@ -50,6 +50,28 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
+    // --- ENFORCE ONLY VERIFIED COMPANIES AND THEIR TRUCKS CAN BE USED ---
+    // 0. Check company exists and is verified
+    const companyRes = await query(
+      `SELECT id, verified FROM companies WHERE LOWER(name) = LOWER($1)`,
+      [formData.companyName]
+    );
+    if (companyRes.rows.length === 0) {
+      return NextResponse.json({ success: false, message: 'Company not registered.' }, { status: 400 });
+    }
+    if (!companyRes.rows[0].verified) {
+      return NextResponse.json({ success: false, message: 'Company is not verified.' }, { status: 400 });
+    }
+    const companyId = companyRes.rows[0].id;
+    // 0b. Check truck exists under this company
+    const truckRes = await query(
+      `SELECT id FROM trucks WHERE LOWER(license_plate) = LOWER($1) AND company_id = $2`,
+      [formData.plateNumber, companyId]
+    );
+    if (truckRes.rows.length === 0) {
+      return NextResponse.json({ success: false, message: 'Truck not registered under this company.' }, { status: 400 });
+    }
+    
     // 1. Insert customer data and get customer_id
     const customerResult = await query(
       `INSERT INTO customers (name, email, contact_number, company_name, sex)
@@ -130,7 +152,7 @@ export async function GET(request) {
 
   let sql = `
     SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
-           ad.sample_description, md.type_of_test, md.number_of_liters, md.truck_plate_number
+           ad.name_of_samples, ad.sample_description, md.type_of_test, md.number_of_liters, md.truck_plate_number
     FROM appointments a
     JOIN services s ON a.service_id = s.id
     JOIN customers c ON a.customer_id = c.id

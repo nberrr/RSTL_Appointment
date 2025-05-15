@@ -38,7 +38,10 @@ export async function GET(request) {
     if (serviceCategory.toLowerCase() === 'chemistry') {
       detailsJoin = 'LEFT JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id';
       detailFields = 'cd.analysis_requested'; // Get specific analysis from chemistry_details
-    } 
+    } else if (serviceCategory.toLowerCase() === 'metrology') {
+      detailsJoin = 'LEFT JOIN metrology_details md ON ad.id = md.appointment_detail_id';
+      detailFields = 'md.number_of_liters, md.type_of_test';
+    }
     // Add else if blocks for other services (metrology, microbiology, etc.)
     // if they need different detail fields fetched.
 
@@ -57,7 +60,7 @@ export async function GET(request) {
       ${detailsJoin} 
       WHERE 
         a.service_id = $1 AND
-        a.appointment_date = $2
+        a.appointment_date::date = $2
       ORDER BY a.appointment_time ASC
     `, [serviceId, appointmentDate]);
 

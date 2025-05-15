@@ -44,6 +44,20 @@ export async function POST(request) {
        RETURNING id, license_plate, company_id, orcr_document, created_at, updated_at`,
       [license_plate, company_id, body.orcr_document]
     );
+
+    // After creating a truck, update the company's license_plates field
+    if (company_id) {
+      const platesResult = await query(
+        `SELECT license_plate FROM trucks WHERE company_id = $1 ORDER BY created_at ASC`,
+        [company_id]
+      );
+      const allPlates = platesResult.rows.map(row => row.license_plate).join(',');
+      await query(
+        `UPDATE companies SET license_plates = $1, updated_at = NOW() WHERE id = $2`,
+        [allPlates, company_id]
+      );
+    }
+
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

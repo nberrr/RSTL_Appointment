@@ -63,6 +63,8 @@ export default function MetrologyDashboard() {
   const [error, setError] = useState(null);
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [loadingSelectedDay, setLoadingSelectedDay] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [dailyLimit, setDailyLimit] = useState(80000);
 
   // Fetch dashboard data
   useEffect(() => {
@@ -135,11 +137,12 @@ export default function MetrologyDashboard() {
     const days = [];
     // Create appointment lookup map
     const appointmentMap = {};
+    console.log('[DEBUG] Appointments for calendar:', appointments);
     appointments.forEach(apt => {
       let aptDate;
       if (typeof apt.appointment_date === 'string') {
-        // Always parse as local date (YYYY-MM-DD)
-        const [year, month, day] = apt.appointment_date.split('-').map(Number);
+        // Always use only the date part (first 10 chars)
+        const [year, month, day] = apt.appointment_date.slice(0, 10).split('-').map(Number);
         aptDate = new Date(year, month - 1, day);
       } else if (apt.appointment_date instanceof Date) {
         aptDate = new Date(apt.appointment_date.getFullYear(), apt.appointment_date.getMonth(), apt.appointment_date.getDate());
@@ -155,6 +158,7 @@ export default function MetrologyDashboard() {
         appointmentMap[dayKey].statuses.push(apt.status);
       }
     });
+    console.log('[DEBUG] appointmentMap:', appointmentMap);
     for (let i = 0; i < firstDayWeekday; i++) {
       days.push({ day: null, isCurrentMonth: false, date: null });
     }
@@ -210,6 +214,76 @@ export default function MetrologyDashboard() {
     }
   }, [selectedDay, fetchAppointmentsForDay]);
 
+  // Fetch companies for registered managers
+  useEffect(() => {
+    async function fetchCompanies() {
+      try {
+        const res = await fetch('/api/companies?verified=true');
+        const data = await res.json();
+        if (data.success) {
+          setCompanies(data.data || []);
+        }
+      } catch {}
+    }
+    fetchCompanies();
+  }, []);
+
+  // Fetch daily limit for selected day
+  useEffect(() => {
+    if (!selectedDay) return;
+    function formatLocalDate(date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    async function fetchLimit() {
+      try {
+        const dateStr = formatLocalDate(selectedDay);
+        const res = await fetch(`/api/appointments/metrology/constraints?date=${dateStr}`);
+        const data = await res.json();
+        if (data.success && data.data && data.data.daily_liter_capacity) {
+          setDailyLimit(parseFloat(data.data.daily_liter_capacity));
+        } else {
+          setDailyLimit(80000);
+        }
+      } catch {
+        setDailyLimit(80000);
+      }
+    }
+    fetchLimit();
+  }, [selectedDay]);
+
+  // Compute stats dynamically
+  useEffect(() => {
+    const registeredManagers = companies.length;
+    const scheduledAppointments = appointments.filter(a => a.status === 'pending' || a.status === 'accepted' || a.status === 'in progress').length;
+    const appointmentsToday = selectedDayAppointments.length;
+    const litersUsed = selectedDayAppointments.reduce((sum, a) => sum + (parseFloat(a.number_of_liters) || 0), 0);
+    const litersAvailable = dailyLimit - litersUsed;
+    setStats({
+      managers: registeredManagers,
+      scheduled: scheduledAppointments,
+      today: appointmentsToday,
+      liters: litersAvailable
+    });
+  }, [appointments, selectedDayAppointments, companies, dailyLimit]);
+
+  // Compute recent appointments (5 most recent metrology appointments)
+  useEffect(() => {
+    // Sort by date and time descending
+    const sorted = [...appointments].sort((a, b) => {
+      const dateA = a.appointment_date?.slice(0, 10) || '';
+      const dateB = b.appointment_date?.slice(0, 10) || '';
+      if (dateA !== dateB) return dateB.localeCompare(dateA);
+      // If same date, compare time
+      const timeA = a.appointment_time || '';
+      const timeB = b.appointment_time || '';
+      return (timeB || '').localeCompare(timeA || '');
+    });
+    setRecentAppointments(sorted.slice(0, 5));
+  }, [appointments]);
+
   return (
     <DashboardLayout
       stats={stats}
@@ -236,8 +310,6 @@ export default function MetrologyDashboard() {
       }}
       analysisTypes={analysisTypes}
     >
-      {/* Add a sidebar link to Manage Managers */}
-      <Link href="/metrology/dashboard/managers" className="sidebar-link">Manage Managers</Link>
     </DashboardLayout>
   );
 } 

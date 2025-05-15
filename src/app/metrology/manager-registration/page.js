@@ -160,8 +160,8 @@ export default function ManagerRegistration() {
             })
           });
           const companyData = await companyRes.json();
-          if (!companyData.success) throw new Error(companyData.message || 'Failed to create company');
-          companyId = companyData.data?.id;
+          if (!companyData.success || !companyData.data?.id) throw new Error(companyData.message || 'Failed to create company');
+          companyId = companyData.data.id;
           isNewCompany = true;
         }
         // 4. For each truck, check if it exists for this company, if not, create it

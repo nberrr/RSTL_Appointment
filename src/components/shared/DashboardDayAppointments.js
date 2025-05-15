@@ -15,7 +15,8 @@ export default function DashboardDayAppointments({ selectedDay, currentMonth, se
                   <span className="font-medium text-gray-800 text-sm">{apt.client_name || apt.name || apt.customer_name || 'N/A'}</span>
                   <span className={`text-xs px-2 py-1 rounded-full transition-transform duration-200 group-hover:scale-110 ${statusColor ? statusColor.bgClass + ' ' + statusColor.textClass : 'bg-gray-200 text-gray-700'}`}>{apt.status || 'Pending'}</span>
                 </div>
-                {apt.analysis_requested && <div className="text-xs text-gray-600">Analysis: {apt.analysis_requested}</div>}
+                {apt.type_of_test && <div className="text-xs text-gray-600">Test Type: {apt.type_of_test}</div>}
+                {apt.analysis_requested && !apt.type_of_test && <div className="text-xs text-gray-600">Analysis: {apt.analysis_requested}</div>}
                 {apt.appointment_time && <div className="text-xs text-gray-500">Time: {apt.appointment_time}</div>}
                 {apt.delivery_type && <div className="text-xs text-gray-500">Delivery: {apt.delivery_type}</div>}
               </div>

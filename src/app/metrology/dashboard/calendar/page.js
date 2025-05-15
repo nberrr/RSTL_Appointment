@@ -224,7 +224,54 @@ export default function CalendarPage() {
     }
   }
 
-                    return (
+  // Define metrology columns for the table
+  const metrologyColumns = [
+    { key: 'id', label: 'ID' },
+    { key: 'customer_name', label: 'Customer' },
+    ...(viewMode !== 'day' ? [
+      { key: 'appointment_date', label: 'Date', render: (apt) => format(new Date(apt.appointment_date), 'MMM d, yyyy') },
+    ] : []),
+    { key: 'type_of_test', label: 'Test Type' },
+    { key: 'number_of_liters', label: 'Number of Liters' },
+    { key: 'status', label: 'Status', render: (apt) => {
+      const statusColors = getStatusColor(apt.status);
+      return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>{apt.status}</span>;
+    } },
+    { key: 'actions', label: 'Actions', render: (apt) => (
+      <button
+        onClick={() => openModal(apt)}
+        className="p-1 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-100"
+        title="View Details / Manage"
+      >
+        <FaFlask />
+      </button>
+    ) }
+  ];
+
+  // Status update handler for modal
+  const handleStatusUpdate = async (appointmentId, newStatus) => {
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update status');
+      }
+      // Refetch appointments to show updates
+      const res = await fetch('/api/appointments/metrology/calendar-appointments');
+      const data = await res.json();
+      if (data.success) {
+        setAppointments(data.data);
+      }
+    } catch (err) {
+      alert(`Error updating status: ${err.message}`);
+    }
+  };
+
+  return (
     <CalendarDashboardLayout
       leftColumn={
         <>
@@ -285,6 +332,7 @@ export default function CalendarPage() {
             getStatusColor={getStatusColor}
             loading={loading}
             error={error}
+            columns={metrologyColumns}
           />
         </>
       }
@@ -293,7 +341,7 @@ export default function CalendarPage() {
           isOpen={isModalOpen}
           onClose={closeModal}
           appointment={selectedAppointment}
-          onStatusUpdate={() => {}}
+          onStatusUpdate={handleStatusUpdate}
         />
       }
     />

@@ -34,6 +34,22 @@ export async function PATCH(request, { params }) {
       );
     }
 
+    // When an appointment is declined, set its number_of_liters to 0
+    if (status.toLowerCase() === 'declined') {
+      // Find the appointment_detail_id for this appointment
+      const detailResult = await query(
+        `SELECT ad.id FROM appointment_details ad WHERE ad.appointment_id = $1`,
+        [id]
+      );
+      if (detailResult.rows.length > 0) {
+        const appointmentDetailId = detailResult.rows[0].id;
+        await query(
+          `UPDATE metrology_details SET number_of_liters = 0 WHERE appointment_detail_id = $1`,
+          [appointmentDetailId]
+        );
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Appointment status updated successfully',

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import nodemailer from 'nodemailer';
 
 // GET /api/companies/:id - Get a single company
 export async function GET(request, { params }) {
@@ -42,6 +43,37 @@ export async function PATCH(request, { params }) {
     );
     if (result.rows.length === 0) {
       return NextResponse.json({ success: false, message: 'Company not found' }, { status: 404 });
+    }
+    // Send verification email if verified is being set to true
+    if (body.verified === true) {
+      const company = result.rows[0];
+      if (company.contact_email) {
+        // Fetch all trucks for this company
+        const trucksResult = await query(
+          'SELECT license_plate FROM trucks WHERE company_id = $1',
+          [company.id]
+        );
+        const truckList = trucksResult.rows.map(row => row.license_plate).join(', ');
+        try {
+          const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: false,
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            },
+          });
+          await transporter.sendMail({
+            from: `RSTL <${process.env.SMTP_USER}>`,
+            to: company.contact_email,
+            subject: 'Your Company and Trucks are Now Verified',
+            text: `Hello${company.contact_person ? ' ' + company.contact_person : ''},\n\nYour company ("${company.name}") and the following trucks are now verified and can be used to set metrology appointments:\n\n${truckList}\n\nThank you for registering with RSTL.`,
+          });
+        } catch (emailError) {
+          console.error('Error sending verification email:', emailError);
+        }
+      }
     }
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {

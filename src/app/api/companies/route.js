@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import nodemailer from 'nodemailer';
 
 // GET /api/companies - List all companies
 export async function GET(request) {
@@ -37,6 +38,29 @@ export async function POST(request) {
        RETURNING id, name, contact_person, contact_email, contact_phone, business_permit, reg_date, verified, verified_date, license_plates, created_at, updated_at`,
       [name, contact_person, contact_email, contact_phone, business_permit, reg_date, address]
     );
+    // Send registration email if contact_email is provided
+    if (contact_email) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          secure: false,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+        await transporter.sendMail({
+          from: `RSTL <${process.env.SMTP_USER}>`,
+          to: contact_email,
+          subject: 'RSTL Company Registration Successful',
+          text: `Hello${contact_person ? ' ' + contact_person : ''},\n\nYour company registration for "${name}" was successful.\n\nThank you for registering with RSTL.`,
+        });
+      } catch (emailError) {
+        console.error('Error sending registration email:', emailError);
+        // Do not fail registration if email fails
+      }
+    }
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

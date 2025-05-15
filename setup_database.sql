@@ -437,10 +437,10 @@ INSERT INTO services (name, category, description, price, duration_minutes, acti
 VALUES ('Research Consultation', 'research', 'Consultation on research methodologies and experimental design', 1500.00, 120, true, 'N/A');
 
 -- Insert METROLOGY TESTS
-INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES
-('Flow Meter Calibration', 'metrology', 'Liquid', 2500.00, 120),
-('Volume Verification', 'metrology', 'Liquid', 1800.00, 90),
-('Truck Tank Calibration', 'metrology', 'Liquid', 3000.00, 180);
+INSERT INTO services (name, category, sample_type, price, duration_minutes, description) VALUES
+('Flow Meter Calibration', 'metrology', 'Liquid', 2500.00, 120, 'Calibration of flow meters for liquid measurement accuracy'),
+('Volume Verification', 'metrology', 'Liquid', 1800.00, 90, 'Verification of liquid volume in containers or tanks'),
+('Truck Tank Calibration', 'metrology', 'Liquid', 3000.00, 180, 'Calibration of truck tanks for accurate liquid delivery');
 
 -- Insert SHELF LIFE TESTS
 INSERT INTO services (name, category, sample_type, price, duration_minutes) VALUES

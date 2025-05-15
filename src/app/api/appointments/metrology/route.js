@@ -21,6 +21,35 @@ export async function POST(request) {
     // Generate a unique appointment reference number
     const appointmentRef = `METRO-${uuidv4().substring(0, 8).toUpperCase()}`;
     
+    // Get the appointment date
+    const appointmentDate = (formData.selectedDate || formData.appointmentDate || '').slice(0, 10);
+    // 1. Get the daily liter limit for this date
+    let limitResult = await query(
+      `SELECT daily_liter_capacity FROM appointment_constraints WHERE constraint_date = $1`,
+      [appointmentDate]
+    );
+    let dailyLimit = 80000;
+    if (limitResult.rows.length > 0) {
+      dailyLimit = parseFloat(limitResult.rows[0].daily_liter_capacity);
+    }
+    // 2. Sum the number_of_liters for all metrology appointments on this date
+    let sumResult = await query(
+      `SELECT COALESCE(SUM(md.number_of_liters),0) AS total_liters
+       FROM appointments a
+       JOIN appointment_details ad ON a.id = ad.appointment_id
+       JOIN metrology_details md ON ad.id = md.appointment_detail_id
+       WHERE a.appointment_date = $1`,
+      [appointmentDate]
+    );
+    const currentTotal = parseFloat(sumResult.rows[0].total_liters) || 0;
+    const requestedLiters = parseFloat(formData.numberOfLiters) || 0;
+    if (currentTotal + requestedLiters > dailyLimit) {
+      return NextResponse.json({
+        success: false,
+        message: `Daily limit exceeded. Only ${dailyLimit - currentTotal} liters remaining for ${appointmentDate}.`
+      }, { status: 400 });
+    }
+    
     // 1. Insert customer data and get customer_id
     const customerResult = await query(
       `INSERT INTO customers (name, email, contact_number, company_name, sex)
@@ -37,7 +66,6 @@ export async function POST(request) {
     const serviceId = serviceResult.rows[0].id;
     
     // 3. Insert appointment and get appointment_id
-    const appointmentDate = (formData.selectedDate || formData.appointmentDate || '').slice(0, 10);
     const appointmentResult = await query(
       `INSERT INTO appointments (customer_id, service_id, appointment_date, status)
        VALUES ($1, $2, $3, $4)

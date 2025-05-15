@@ -92,7 +92,7 @@ export default function ServicesGroupedTable({
                           ) : (
                             <div className="min-h-[70px]">
                               <div className="text-sm font-medium text-gray-900">{service.testType}</div>
-                              <div className="text-sm text-gray-500">{service.testDescription}</div>
+                              <div className="text-sm text-gray-500">{service.testDescription || '-'}</div>
                             </div>
                           )}
                         </td>

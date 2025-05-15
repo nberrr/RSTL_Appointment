@@ -8,6 +8,12 @@ export default function ManageManagers() {
   const [trucksByCompany, setTrucksByCompany] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [verifyingId, setVerifyingId] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmCompany, setConfirmCompany] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteCompany, setDeleteCompany] = useState(null);
 
   useEffect(() => {
     async function fetchCompanies() {
@@ -115,8 +121,31 @@ export default function ManageManagers() {
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            {!company.verified && (
-                              <button className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm hover:bg-green-700 transition">Verify</button>
+                            {company.verified ? (
+                              <button
+                                className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm hover:bg-red-700 transition"
+                                onClick={() => { setShowDeleteModal(true); setDeleteCompany(company); }}
+                                disabled={deletingId === company.id}
+                              >
+                                {deletingId === company.id ? 'Removing...' : 'Remove'}
+                              </button>
+                            ) : (
+                              <div className="flex gap-2">
+                                <button
+                                  className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm hover:bg-green-700 transition"
+                                  onClick={() => { setShowConfirmModal(true); setConfirmCompany(company); }}
+                                  disabled={verifyingId === company.id}
+                                >
+                                  {verifyingId === company.id ? 'Verifying...' : 'Verify'}
+                                </button>
+                                <button
+                                  className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-sm hover:bg-red-700 transition"
+                                  onClick={() => { setShowDeleteModal(true); setDeleteCompany(company); }}
+                                  disabled={deletingId === company.id}
+                                >
+                                  {deletingId === company.id ? 'Declining...' : 'Decline'}
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -129,6 +158,92 @@ export default function ManageManagers() {
           </div>
         </main>
       </div>
+      {/* Confirmation Modal */}
+      {showConfirmModal && confirmCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+            <svg className="mx-auto h-12 w-12 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+            <h2 className="text-lg font-semibold text-yellow-700 mb-2">Are you sure?</h2>
+            <p className="text-gray-700 mb-6">This will verify <b>{confirmCompany.name}</b> and all their trucks. They will be notified by email and can now use their trucks for metrology appointments.</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={async () => {
+                  setVerifyingId(confirmCompany.id);
+                  setShowConfirmModal(false);
+                  try {
+                    const res = await fetch(`/api/companies/${confirmCompany.id}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ verified: true, verified_date: new Date().toISOString().slice(0, 10) })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setCompanies(prev => prev.map(c => c.id === confirmCompany.id ? { ...c, verified: true, verified_date: data.data.verified_date } : c));
+                    }
+                  } finally {
+                    setVerifyingId(null);
+                    setConfirmCompany(null);
+                  }
+                }}
+                className="bg-green-600 text-white px-6 py-2 rounded-md font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+                disabled={verifyingId === confirmCompany.id}
+              >
+                {verifyingId === confirmCompany.id ? 'Verifying...' : 'Yes, Verify'}
+              </button>
+              <button
+                onClick={() => { setShowConfirmModal(false); setConfirmCompany(null); }}
+                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete/Decline Modal */}
+      {showDeleteModal && deleteCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+            <svg className="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <h2 className="text-lg font-semibold text-red-700 mb-2">Are you sure?</h2>
+            <p className="text-gray-700 mb-6">This will permanently remove <b>{deleteCompany.name}</b> and all their trucks from the system.</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={async () => {
+                  setDeletingId(deleteCompany.id);
+                  setShowDeleteModal(false);
+                  try {
+                    const res = await fetch(`/api/companies/${deleteCompany.id}`, {
+                      method: 'DELETE'
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      setCompanies(prev => prev.filter(c => c.id !== deleteCompany.id));
+                    }
+                  } finally {
+                    setDeletingId(null);
+                    setDeleteCompany(null);
+                  }
+                }}
+                className="bg-red-600 text-white px-6 py-2 rounded-md font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+                disabled={deletingId === deleteCompany.id}
+              >
+                {deletingId === deleteCompany.id ? 'Removing...' : 'Yes, Remove'}
+              </button>
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteCompany(null); }}
+                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

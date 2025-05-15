@@ -53,6 +53,14 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   const { id } = params;
   try {
+    // Check for referencing appointments
+    const appointmentCheck = await query(
+      `SELECT 1 FROM appointments WHERE service_id = $1 LIMIT 1`,
+      [id]
+    );
+    if (appointmentCheck.rows.length > 0) {
+      return NextResponse.json({ success: false, message: 'Cannot delete service: there are existing appointments referencing this service.' }, { status: 400 });
+    }
     const result = await query(
       `DELETE FROM services WHERE id = $1 RETURNING id`,
       [id]

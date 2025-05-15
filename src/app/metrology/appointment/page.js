@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export default function MetrologyAppointment() {
@@ -36,6 +36,67 @@ export default function MetrologyAppointment() {
 
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState('');
+
+    const [verifiedCompanies, setVerifiedCompanies] = useState([]);
+    const [companyTrucks, setCompanyTrucks] = useState([]);
+
+    const [dailyLimit, setDailyLimit] = useState(80000);
+
+    useEffect(() => {
+        async function fetchVerifiedCompanies() {
+            const res = await fetch('/api/companies?verified=true');
+            const data = await res.json();
+            if (data.success) {
+                setVerifiedCompanies(data.data || []);
+            }
+        }
+        fetchVerifiedCompanies();
+    }, []);
+
+    useEffect(() => {
+        async function fetchTrucks() {
+            if (!formData.companyName) {
+                setCompanyTrucks([]);
+                return;
+            }
+            const company = verifiedCompanies.find(c => c.name === formData.companyName);
+            if (!company) {
+                setCompanyTrucks([]);
+                return;
+            }
+            const res = await fetch(`/api/trucks?company_id=${company.id}`);
+            const data = await res.json();
+            if (data.success) {
+                setCompanyTrucks(data.data || []);
+            }
+        }
+        fetchTrucks();
+    }, [formData.companyName, verifiedCompanies]);
+
+    useEffect(() => {
+        if (!selectedDate) return;
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        async function fetchLimit() {
+            try {
+                const dateStr = formatLocalDate(selectedDate);
+                const res = await fetch(`/api/appointments/metrology/constraints?date=${dateStr}`);
+                const data = await res.json();
+                if (data.success && data.data && data.data.daily_liter_capacity) {
+                    setDailyLimit(parseFloat(data.data.daily_liter_capacity));
+                } else {
+                    setDailyLimit(80000);
+                }
+            } catch {
+                setDailyLimit(80000);
+            }
+        }
+        fetchLimit();
+    }, [selectedDate]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -351,37 +412,39 @@ export default function MetrologyAppointment() {
                                     )}
                                 </div>
 
+                                {/* Company Dropdown */}
                                 <div>
-                                    <label className="block text-sm text-gray-700">
-                                        Plate Number
-                                    </label>
+                                    <label className="block text-sm text-gray-700">Organization Name</label>
+                                    <select
+                                        name="companyName"
+                                        value={formData.companyName}
+                                        onChange={handleChange}
+                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                                    >
+                                        <option value="">Select a verified company</option>
+                                        {verifiedCompanies.map(company => (
+                                            <option key={company.id} value={company.name}>{company.name}</option>
+                                        ))}
+                                    </select>
+                                    {errors.companyName && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
+                                    )}
+                                </div>
+
+                                {/* Truck Dropdown */}
+                                <div>
+                                    <label className="block text-sm text-gray-700">Plate Number</label>
                                     <input
                                         type="text"
                                         name="plateNumber"
                                         value={formData.plateNumber}
                                         onChange={handleChange}
-                                        placeholder="XXX-000"
+                                        placeholder="Enter plate number"
                                         className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.plateNumber ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                                        disabled={!formData.companyName}
                                     />
                                     {errors.plateNumber && (
                                         <p className="mt-1 text-sm text-red-600">{errors.plateNumber}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm text-gray-700">
-                                        Company / Organization
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="companyName"
-                                        value={formData.companyName}
-                                        onChange={handleChange}
-                                        placeholder="Enter organization name"
-                                        className={`mt-1 block w-full px-3 py-2 bg-white border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
-                                    />
-                                    {errors.companyName && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.companyName}</p>
                                     )}
                                 </div>
 
@@ -487,7 +550,7 @@ export default function MetrologyAppointment() {
                                             value={formData.numberOfLiters}
                                             onChange={handleChange}
                                             placeholder="Enter number of liters"
-                                            max="80000"
+                                            max={dailyLimit}
                                             className={`block w-full px-3 py-2 bg-white border ${errors.numberOfLiters ? 'border-red-500' : 'border-gray-300'} rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 pr-8`}
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -497,7 +560,7 @@ export default function MetrologyAppointment() {
                                     {errors.numberOfLiters && (
                                         <p className="mt-1 text-sm text-red-600">{errors.numberOfLiters}</p>
                                     )}
-                                    <p className="mt-1 text-xs text-gray-500">Maximum: 80,000 liters</p>
+                                    <p className="mt-1 text-xs text-gray-500">Maximum: {dailyLimit.toLocaleString()} liters</p>
                                 </div>
 
                                 <div>

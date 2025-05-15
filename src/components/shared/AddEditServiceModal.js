@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function AddEditServiceModal({ isOpen, service, onChange, onSave, onCancel, mode = 'add' }) {
+export default function AddEditServiceModal({ isOpen, service, onChange, onSave, onCancel, mode = 'add', sampleTypeOptions = [] }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -44,7 +44,7 @@ export default function AddEditServiceModal({ isOpen, service, onChange, onSave,
               value={service.sampleType}
               onChange={e => onChange('sampleType', e.target.value)}
             >
-              {["Petroleum", "Water", "Soil", "Gas", "Metals", "Liquid", "Uncategorized"].map(opt => (
+              {sampleTypeOptions.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>

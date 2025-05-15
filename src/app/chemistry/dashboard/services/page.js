@@ -6,6 +6,7 @@ import ServicesToolbar from '@/components/shared/ServicesToolbar';
 import ServicesGroupedTable from '@/components/shared/ServicesGroupedTable';
 import DeleteModal from '@/components/shared/DeleteModal';
 import ConfirmModal from '@/components/shared/ConfirmModal';
+import AddEditServiceModal from '@/components/shared/AddEditServiceModal';
 
 // Add this Toggle Switch component at the top level of the file
 function ToggleSwitch({ enabled, onChange, activeColor = "bg-blue-600", inactiveColor = "bg-gray-200" }) {
@@ -144,26 +145,36 @@ export default function ServicesPage() {
       setModalMessage('Are you sure you want to save service without information?');
       return;
     }
-
     try {
-      const response = await fetch('/api/services', {
-        method: editingId === 'new' ? 'POST' : 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: editingId === 'new' ? undefined : editingId,
-          name: editedService.testType.trim(),
-          description: editedService.testDescription.trim(),
-          price: parseFloat(editedService.pricing) || 0,
-          active: editedService.status === 'Active',
-          sample_type: editedService.sampleType || 'Uncategorized',
-          category: 'chemistry',
-        }),
-      });
-
-      const data = await response.json();
-      
+      let response, data;
+      if (editingId === 'new') {
+        response = await fetch('/api/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: editedService.testType.trim(),
+            description: editedService.testDescription.trim(),
+            price: parseFloat(editedService.pricing) || 0,
+            active: editedService.status === 'Active',
+            sample_type: editedService.sampleType || 'Uncategorized',
+            category: 'chemistry',
+          }),
+        });
+      } else {
+        response = await fetch(`/api/services/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: editedService.testType.trim(),
+            description: editedService.testDescription.trim(),
+            price: parseFloat(editedService.pricing) || 0,
+            active: editedService.status === 'Active',
+            sample_type: editedService.sampleType || 'Uncategorized',
+            category: 'chemistry',
+          }),
+        });
+      }
+      data = await response.json();
       if (data.success) {
         await fetchServices();
         setEditingId(null);
@@ -201,12 +212,10 @@ export default function ServicesPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`/api/services?id=${serviceToDelete.id}`, {
+      const response = await fetch(`/api/services/${serviceToDelete.id}`, {
         method: 'DELETE',
       });
-
       const data = await response.json();
-      
       if (data.success) {
         await fetchServices();
       } else {
@@ -326,6 +335,17 @@ export default function ServicesPage() {
           <span>{error}</span>
           <button onClick={() => setError(null)} className="ml-2 text-red-500 hover:text-red-700">&times;</button>
         </div>
+      )}
+      {showAddModal && (
+        <AddEditServiceModal
+          isOpen={showAddModal}
+          service={editedService}
+          onChange={handleChange}
+          onSave={handleAddModalSave}
+          onCancel={handleAddModalCancel}
+          mode="add"
+          sampleTypeOptions={SAMPLE_TYPE_OPTIONS}
+        />
       )}
     </ServicesDashboardLayout>
   );

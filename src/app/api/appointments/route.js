@@ -14,13 +14,20 @@ export async function GET(request) {
 
   if (category === 'chemistry') {
     sql = `
-      SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
-             STRING_AGG(cd.analysis_requested, ', ') as analysis_requested
+      SELECT a.*, s.category, c.name as customer_name, c.email as customer_email, c.company_name, c.contact_number, c.sex,
+             ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
+             COALESCE(sv.services, '') as services
       FROM appointments a
       JOIN services s ON a.service_id = s.id
       JOIN customers c ON a.customer_id = c.id
       JOIN appointment_details ad ON a.id = ad.appointment_id
       JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id
+      LEFT JOIN (
+        SELECT ads.appointment_detail_id, STRING_AGG(s.name, ', ') as services
+        FROM appointment_detail_services ads
+        JOIN services s ON ads.service_id = s.id
+        GROUP BY ads.appointment_detail_id
+      ) sv ON sv.appointment_detail_id = ad.id
       WHERE 1=1
     `;
     if (service_id) {
@@ -35,7 +42,7 @@ export async function GET(request) {
       sql += ` AND a.status = $${params.length + 1}`;
       params.push(status);
     }
-    sql += ' GROUP BY a.id, s.name, s.category, c.name, c.email, c.company_name';
+    sql += ' GROUP BY a.id, s.category, c.name, c.email, c.company_name, c.contact_number, c.sex, ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description, cd.parameters, cd.delivery_type, sv.services';
     sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
   } else {
     sql = `
@@ -205,6 +212,21 @@ export async function POST(request) {
           formData.sample_storage_condition || '',
           formData.sample_quantity
         ]
+      );
+    }
+
+    // After inserting appointment_details and getting appointmentDetailId
+    if (Array.isArray(formData.service_id)) {
+      for (const sid of formData.service_id) {
+        await query(
+          `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+          [appointmentDetailId, sid]
+        );
+      }
+    } else if (formData.service_id) {
+      await query(
+        `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+        [appointmentDetailId, formData.service_id]
       );
     }
 

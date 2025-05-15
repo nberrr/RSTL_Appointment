@@ -245,6 +245,14 @@ CREATE TABLE lab_assignments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create appointment_detail_services table
+CREATE TABLE appointment_detail_services (
+    id SERIAL PRIMARY KEY,
+    appointment_detail_id INTEGER REFERENCES appointment_details(id) ON DELETE CASCADE,
+    service_id INTEGER REFERENCES services(id) ON DELETE RESTRICT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for frequently queried fields
 CREATE INDEX idx_appointments_customer_id ON appointments(customer_id);
 CREATE INDEX idx_appointments_service_id ON appointments(service_id);

@@ -273,6 +273,7 @@ export default function ServicesPage() {
                 onSave={handleSaveService}
                 onCancel={handleCancelEdit}
                 mode="add"
+                sampleTypeOptions={["Petroleum", "Water", "Soil", "Gas", "Metals", "Liquid", "Uncategorized"]}
               />
             </div>
           </main>

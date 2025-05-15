@@ -6,6 +6,7 @@ import ReportsToolbar from '@/components/shared/ReportsToolbar';
 import ReportsStatsCards from '@/components/shared/ReportsStatsCards';
 import ReportsAppointmentsTable from '@/components/shared/ReportsAppointmentsTable';
 import SampleDetailsModal from '@/components/shared/SampleDetailsModal';
+import * as XLSX from "xlsx";
 
 export default function ChemistryReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,15 +56,16 @@ export default function ChemistryReportsPage() {
     return dateSort === 'newest' ? dateB - dateA : dateA - dateB;
   };
 
-  const filterOptions = Array.from(new Set(appointments.map(a => a.testType))).filter(Boolean);
+  const filterOptions = Array.from(new Set(appointments.map(a => a.services))).filter(Boolean);
 
   const filteredAppointments = appointments
     .filter(item => {
       const matchesSearch = 
-        item.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sample.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.testType.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filterType === 'all' || item.testType.toLowerCase() === filterType.toLowerCase();
+        (item.customer_name && item.customer_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.company_name && item.company_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.name_of_samples && item.name_of_samples.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.services && item.services.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesFilter = filterType === 'all' || (item.services && item.services.toLowerCase() === filterType.toLowerCase());
       return matchesSearch && matchesFilter;
     })
     .sort(sortByDate);
@@ -74,8 +76,35 @@ export default function ChemistryReportsPage() {
   };
 
   const handleExport = () => {
-    // Implement export logic here
-    alert('Export not implemented');
+    // Prepare data for export (all visible columns in the table)
+    if (!filteredAppointments.length) return;
+    const columns = [
+      { key: 'appointment_date', label: 'Date' },
+      { key: 'status', label: 'Status' },
+      { key: 'customer_name', label: 'Client' },
+      { key: 'customer_email', label: 'Email' },
+      { key: 'contact_number', label: 'Phone' },
+      { key: 'company_name', label: 'Org' },
+      { key: 'sex', label: 'Sex' },
+      { key: 'name_of_samples', label: 'Sample' },
+      { key: 'sample_type', label: 'Type' },
+      { key: 'sample_quantity', label: 'Qty' },
+      { key: 'sample_description', label: 'Description' },
+      { key: 'services', label: 'Analysis' },
+      { key: 'parameters', label: 'Params' },
+      { key: 'delivery_type', label: 'Delivery' },
+    ];
+    const exportData = filteredAppointments.map(row => {
+      const obj = {};
+      columns.forEach(col => {
+        obj[col.label] = row[col.key];
+      });
+      return obj;
+    });
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Chemistry Test Reports");
+    XLSX.writeFile(wb, "chemistry_test_reports.xlsx");
   };
 
   if (loading) {
@@ -116,6 +145,22 @@ export default function ChemistryReportsPage() {
           appointments={filteredAppointments}
           getStatusColor={getStatusColor}
           onViewDetails={handleViewDetails}
+          columns={[
+            { key: 'appointment_date', label: 'Date' },
+            { key: 'status', label: 'Status' },
+            { key: 'customer_name', label: 'Client' },
+            { key: 'customer_email', label: 'Email', className: 'hidden md:table-cell' },
+            { key: 'contact_number', label: 'Phone', className: 'hidden lg:table-cell' },
+            { key: 'company_name', label: 'Org', className: 'hidden md:table-cell' },
+            { key: 'sex', label: 'Sex', className: 'hidden lg:table-cell' },
+            { key: 'name_of_samples', label: 'Sample' },
+            { key: 'sample_type', label: 'Type', className: 'hidden md:table-cell' },
+            { key: 'sample_quantity', label: 'Qty', className: 'hidden md:table-cell' },
+            { key: 'sample_description', label: 'Description', className: 'hidden lg:table-cell' },
+            { key: 'services', label: 'Analysis' },
+            { key: 'parameters', label: 'Params', className: 'hidden md:table-cell' },
+            { key: 'delivery_type', label: 'Delivery', className: 'hidden md:table-cell' },
+          ]}
         />
       }
       sidePanel={null}

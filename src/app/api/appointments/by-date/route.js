@@ -37,7 +37,7 @@ export async function GET(request) {
 
     if (serviceCategory.toLowerCase() === 'chemistry') {
       detailsJoin = 'LEFT JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id';
-      detailFields = 'cd.analysis_requested'; // Get specific analysis from chemistry_details
+      detailFields = `cd.analysis_requested, (SELECT STRING_AGG(s.name, ', ') FROM appointment_detail_services ads JOIN services s ON ads.service_id = s.id WHERE ads.appointment_detail_id = ad.id) as services`;
     } else if (serviceCategory.toLowerCase() === 'metrology') {
       detailsJoin = 'LEFT JOIN metrology_details md ON ad.id = md.appointment_detail_id';
       detailFields = 'md.number_of_liters, md.type_of_test';

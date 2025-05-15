@@ -48,11 +48,23 @@ export default function ScheduleModal({ isOpen, onClose, appointment, onStatusUp
           <div className="bg-white rounded-lg border p-3 text-xs flex flex-col gap-1">
             <div className="flex items-center gap-2 mb-1 text-green-700 font-semibold"><FaVial /> Sample & Test</div>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {appointment.services && (
+                <div><span className="text-gray-500">Test Type:</span> <span className="font-medium text-gray-900">{appointment.services}</span></div>
+              )}
               {appointment.analysis_requested && (
                 <div><span className="text-gray-500">Analysis:</span> <span className="font-medium text-gray-900">{appointment.analysis_requested}</span></div>
               )}
               {appointment.sample_description && (
                 <div><span className="text-gray-500">Sample:</span> <span className="font-medium text-gray-900">{appointment.sample_description}</span></div>
+              )}
+              {appointment.sample_type && (
+                <div><span className="text-gray-500">Sample Type:</span> <span className="font-medium text-gray-900">{appointment.sample_type}</span></div>
+              )}
+              {appointment.sample_quantity && (
+                <div><span className="text-gray-500">Sample Qty:</span> <span className="font-medium text-gray-900">{appointment.sample_quantity}{appointment.sample_quantity_units ? ` ${appointment.sample_quantity_units}` : ''}</span></div>
+              )}
+              {appointment.parameters && (
+                <div><span className="text-gray-500">Parameters:</span> <span className="font-medium text-gray-900">{appointment.parameters}</span></div>
               )}
               {appointment.delivery_type && (
                 <div><span className="text-gray-500">Delivery:</span> <span className="font-medium text-gray-900">{appointment.delivery_type}</span></div>

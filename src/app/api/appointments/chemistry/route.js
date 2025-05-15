@@ -90,6 +90,21 @@ export async function POST(request) {
       ]
     );
     
+    // 6. Insert appointment_detail_services
+    if (Array.isArray(formData.service_id)) {
+      for (const sid of formData.service_id) {
+        await query(
+          `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+          [appointmentDetailId, sid]
+        );
+      }
+    } else if (formData.service_id) {
+      await query(
+        `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+        [appointmentDetailId, formData.service_id]
+      );
+    }
+    
     // Record action log for the appointment
     await query(
       `INSERT INTO action_logs (appointment_id, action_type, action_desc)
@@ -109,5 +124,43 @@ export async function POST(request) {
       { success: false, message: error.message || 'Failed to create appointment' }, 
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request) {
+  try {
+    const sql = `
+      SELECT a.id AS appointment_id, a.appointment_date, a.status,
+             c.name AS customer_name, c.company_name,
+             ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
+             cd.analysis_requested, cd.parameters, cd.delivery_type,
+             (SELECT STRING_AGG(s.name, ', ') FROM appointment_detail_services ads JOIN services s ON ads.service_id = s.id WHERE ads.appointment_detail_id = ad.id) as services
+      FROM appointments a
+      JOIN customers c ON a.customer_id = c.id
+      JOIN services s ON a.service_id = s.id
+      LEFT JOIN appointment_details ad ON a.id = ad.appointment_id
+      LEFT JOIN chemistry_details cd ON ad.id = cd.appointment_detail_id
+      WHERE s.category = 'chemistry'
+      ORDER BY a.appointment_date DESC
+    `;
+    const result = await query(sql);
+    const data = result.rows.map(row => ({
+      id: row.appointment_id,
+      date: row.appointment_date,
+      status: row.status,
+      customer: row.customer_name,
+      company: row.company_name,
+      sampleName: row.name_of_samples,
+      sampleType: row.sample_type,
+      sampleQuantity: row.sample_quantity,
+      sampleDescription: row.sample_description,
+      analysisRequested: row.analysis_requested,
+      parameters: row.parameters,
+      deliveryType: row.delivery_type,
+      services: row.services
+    }));
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 } 

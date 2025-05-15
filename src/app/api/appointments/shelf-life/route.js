@@ -103,6 +103,21 @@ export async function POST(request) {
       [appointmentId, 'creation', 'Shelf life study appointment created through online form']
     );
     
+    // After inserting appointment_details and getting appointmentDetailId
+    if (Array.isArray(formData.service_id)) {
+      for (const sid of formData.service_id) {
+        await query(
+          `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+          [appointmentDetailId, sid]
+        );
+      }
+    } else if (formData.service_id) {
+      await query(
+        `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
+        [appointmentDetailId, formData.service_id]
+      );
+    }
+    
     return NextResponse.json({ 
       success: true, 
       message: 'Shelf life study appointment created successfully',
@@ -126,7 +141,8 @@ export async function GET(request) {
   const status = searchParams.get('status');
 
   let sql = `
-    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name
+    SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
+    (SELECT STRING_AGG(s.name, ', ') FROM appointment_detail_services ads JOIN services s ON ads.service_id = s.id WHERE ads.appointment_detail_id = ad.id) as services
     FROM appointments a
     JOIN services s ON a.service_id = s.id
     JOIN customers c ON a.customer_id = c.id

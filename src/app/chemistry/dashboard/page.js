@@ -62,17 +62,17 @@ export default function ChemistryDashboard() {
         const recentAppointments = [...appointments]
           .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
           .slice(0, 5);
-        // Count occurrences of each analysis_requested
+        // Count occurrences of each services
         const analysisTypeCounts = {};
         appointments.forEach(a => {
-          if (a.analysis_requested) {
-            a.analysis_requested.split(',').forEach(type => {
+          if (a.services) {
+            a.services.split(',').forEach(type => {
               const trimmed = type.trim();
               if (trimmed) analysisTypeCounts[trimmed] = (analysisTypeCounts[trimmed] || 0) + 1;
             });
           }
         });
-        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
+        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ services: name, count }));
         setDashboardData({
           stats,
           appointments,

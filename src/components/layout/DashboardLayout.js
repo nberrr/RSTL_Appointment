@@ -59,12 +59,12 @@ export default function DashboardLayout({
                       {loading && <p className="text-sm text-gray-500 text-center">Loading...</p>}
                       {error && <p className="text-sm text-red-500 text-center">Error loading analysis types.</p>}
                       {!loading && !error && analysisTypes && analysisTypes.length > 0 ? (
-                        analysisTypes.slice(0, 5).map((analysis, index) => (
+                        analysisTypes.slice(0, 10).map((analysis, index) => (
                           <div
                             key={index}
                             className="flex items-center justify-between transition-all duration-300 hover:border-l-4 hover:border-blue-400 hover:pl-2 hover:bg-blue-50 hover:scale-105 hover:shadow-md rounded cursor-pointer group"
                           >
-                            <span className="text-sm text-gray-600">{analysis.analysis_requested}</span>
+                            <span className="text-sm text-gray-600">{analysis.services}</span>
                             <span className="text-sm font-medium text-gray-900 transition-transform duration-200 group-hover:scale-110">{analysis.count} tests</span>
                           </div>
                         ))

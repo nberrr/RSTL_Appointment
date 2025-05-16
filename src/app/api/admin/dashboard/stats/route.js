@@ -26,13 +26,22 @@ export async function GET(request) {
     );
 
     // Format response
-    const formattedStats = {};
+    const formattedStats = {
+      metrology: { appointments: 0, pending: 0, completed: 0 },
+      chemistry: { appointments: 0, pending: 0, completed: 0 },
+      microbiology: { appointments: 0, pending: 0, completed: 0 },
+      shelfLife: { appointments: 0, pending: 0, completed: 0 }
+    };
     stats.rows.forEach(row => {
-      formattedStats[row.category] = {
-        appointments: parseInt(row.appointments),
-        pending: parseInt(row.pending),
-        completed: parseInt(row.completed)
-      };
+      let key = row.category;
+      if (key === 'shelf-life' || key === 'shelf_life') key = 'shelfLife';
+      if (key === 'chemistry' || key === 'microbiology' || key === 'metrology' || key === 'shelfLife') {
+        formattedStats[key] = {
+          appointments: parseInt(row.appointments),
+          pending: parseInt(row.pending),
+          completed: parseInt(row.completed)
+        };
+      }
     });
 
     return NextResponse.json({

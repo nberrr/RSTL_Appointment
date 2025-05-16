@@ -28,7 +28,7 @@ CREATE TABLE customers (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     contact_number VARCHAR(50),
-    sex VARCHAR(10),
+    sex VARCHAR(50),
     company_name VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -180,10 +180,18 @@ CREATE TABLE microbiology_details (
 CREATE TABLE shelf_life_details (
     id SERIAL PRIMARY KEY,
     appointment_detail_id INTEGER REFERENCES appointment_details(id) ON DELETE CASCADE,
+    -- Extended fields
+    objective_of_study TEXT,
     product_type VARCHAR(100),
+    net_weight VARCHAR(100),
+    brand_name VARCHAR(255),
+    existing_market TEXT,
+    production_type VARCHAR(100),
+    product_ingredients TEXT,
     storage_conditions TEXT,
-    shelf_life_duration INTEGER,
+    shelf_life_duration VARCHAR(100),
     packaging_type VARCHAR(100),
+    target_shelf_life VARCHAR(100),
     modes_of_deterioration TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

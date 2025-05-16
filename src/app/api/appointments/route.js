@@ -13,7 +13,19 @@ export async function GET(request) {
   let sql;
   let params = [];
 
-  if (category === 'chemistry') {
+  // Normalize category for shelf life for internal logic only
+  let normalizedCategory = category;
+  if (category === 'shelf-life' || category === 'shelf_life') {
+    normalizedCategory = 'shelf_life';
+  }
+
+  // Use the actual DB value for SQL filtering
+  let sqlCategory = category;
+  if (category === 'shelf_life') {
+    sqlCategory = 'shelf-life';
+  }
+
+  if (normalizedCategory === 'chemistry') {
     sql = `
       SELECT a.*, s.category, c.name as customer_name, c.email as customer_email, c.company_name, c.contact_number, c.sex,
              ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
@@ -43,9 +55,13 @@ export async function GET(request) {
       sql += ` AND a.status = $${params.length + 1}`;
       params.push(status);
     }
+    if (sqlCategory) {
+      sql += ` AND s.category = $${params.length + 1}`;
+      params.push(sqlCategory);
+    }
     sql += ' GROUP BY a.id, s.category, c.name, c.email, c.company_name, c.contact_number, c.sex, ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description, cd.parameters, cd.delivery_type, sv.services';
     sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
-  } else if (category === 'microbiology') {
+  } else if (normalizedCategory === 'microbiology') {
     sql = `
       SELECT a.*, s.category, c.name as customer_name, c.email as customer_email, c.company_name, c.contact_number, c.sex,
              ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
@@ -75,7 +91,40 @@ export async function GET(request) {
       sql += ` AND a.status = $${params.length + 1}`;
       params.push(status);
     }
+    if (sqlCategory) {
+      sql += ` AND s.category = $${params.length + 1}`;
+      params.push(sqlCategory);
+    }
     sql += ' GROUP BY a.id, s.category, c.name, c.email, c.company_name, c.contact_number, c.sex, ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description, sv.services';
+    sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
+  } else if (normalizedCategory === 'shelf_life') {
+    sql = `
+      SELECT a.*, s.category, c.name as customer_name, c.email as customer_email, c.company_name,
+             ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
+             sld.product_type, sld.brand_name, sld.net_weight, sld.product_ingredients, sld.packaging_type, sld.shelf_life_duration
+      FROM appointments a
+      JOIN services s ON a.service_id = s.id
+      JOIN customers c ON a.customer_id = c.id
+      JOIN appointment_details ad ON a.id = ad.appointment_id
+      LEFT JOIN shelf_life_details sld ON ad.id = sld.appointment_detail_id
+      WHERE 1=1
+    `;
+    if (service_id) {
+      sql += ` AND s.id = $${params.length + 1}`;
+      params.push(service_id);
+    }
+    if (sqlCategory) {
+      sql += ` AND s.category = $${params.length + 1}`;
+      params.push(sqlCategory);
+    }
+    if (date) {
+      sql += ` AND a.appointment_date::date = $${params.length + 1}`;
+      params.push(date);
+    }
+    if (status) {
+      sql += ` AND a.status = $${params.length + 1}`;
+      params.push(status);
+    }
     sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
   } else {
     sql = `
@@ -89,9 +138,9 @@ export async function GET(request) {
       sql += ` AND s.id = $${params.length + 1}`;
       params.push(service_id);
     }
-    if (category) {
+    if (sqlCategory) {
       sql += ` AND s.category = $${params.length + 1}`;
-      params.push(category);
+      params.push(sqlCategory);
     }
     if (date) {
       sql += ` AND a.appointment_date::date = $${params.length + 1}`;
@@ -146,6 +195,18 @@ export async function POST(request) {
     // Only implement chemistry, microbiology, shelf_life for now
     if (category === 'metrology' || category === 'research') {
       return NextResponse.json({ success: false, message: 'POST handler for this category not yet implemented' }, { status: 501 });
+    }
+
+    // Normalize category for shelf life for internal logic only
+    let normalizedCategory = category;
+    if (category === 'shelf-life' || category === 'shelf_life') {
+      normalizedCategory = 'shelf_life';
+    }
+
+    // Use the actual DB value for SQL filtering
+    let sqlCategory = category;
+    if (category === 'shelf_life') {
+      sqlCategory = 'shelf-life';
     }
 
     // Validate required fields
@@ -203,22 +264,29 @@ export async function POST(request) {
     const appointmentDetailId = appointmentDetailsResult.rows[0].id;
 
     // 5. Insert category-specific details
-    if (category === 'shelf_life') {
+    if (normalizedCategory === 'shelf_life') {
       await query(
         `INSERT INTO shelf_life_details (
-           appointment_detail_id, product_type, storage_conditions, shelf_life_duration, packaging_type, modes_of_deterioration
+           appointment_detail_id, objective_of_study, product_type, net_weight, brand_name, existing_market, production_type, product_ingredients, storage_conditions, shelf_life_duration, packaging_type, target_shelf_life, modes_of_deterioration
          )
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
         [
           appointmentDetailId,
-          formData.product_type || formData.productType || 'General',
+          formData.objective_of_study || '',
+          formData.product_type || formData.productName || '',
+          formData.net_weight || '',
+          formData.brand_name || '',
+          formData.existing_market || '',
+          formData.production_type || '',
+          formData.product_ingredients || '',
           formData.storage_conditions || '',
-          formData.shelf_life_duration || null,
+          formData.shelf_life_duration || formData.target_shelf_life || null,
           formData.packaging_type || '',
+          formData.target_shelf_life || '',
           Array.isArray(formData.modes_of_deterioration) ? formData.modes_of_deterioration.join(', ') : (formData.modes_of_deterioration || '')
         ]
       );
-    } else if (category === 'chemistry') {
+    } else if (normalizedCategory === 'chemistry') {
       await query(
         `INSERT INTO chemistry_details (
            appointment_detail_id, analysis_requested, parameters, delivery_type, sample_quantity
@@ -232,7 +300,7 @@ export async function POST(request) {
           formData.sample_quantity
         ]
       );
-    } else if (category === 'microbiology') {
+    } else if (normalizedCategory === 'microbiology') {
       await query(
         `INSERT INTO microbiology_details (
            appointment_detail_id, test_type, organism_target, sample_storage_condition, sample_quantity

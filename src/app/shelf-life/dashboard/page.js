@@ -54,55 +54,86 @@ export default function ShelfLifeDashboard() {
   const [selectedDay, setSelectedDay] = useState(new Date());
   const [currentDay, setCurrentDay] = useState(0);
   const [calendarDays, setCalendarDays] = useState([]);
-  const [stats, setStats] = useState({});
-  const [appointments, setAppointments] = useState([]);
-  const [recentAppointments, setRecentAppointments] = useState([]);
-  const [analysisTypes, setAnalysisTypes] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      total_appointments: 0,
+      pending: 0,
+      completed: 0,
+      in_progress: 0
+    },
+    appointments: [],
+    recentAppointments: [],
+    analysisTypes: []
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDayAppointments, setSelectedDayAppointments] = useState([]);
   const [loadingSelectedDay, setLoadingSelectedDay] = useState(false);
 
-  // Fetch dashboard data
   useEffect(() => {
-    async function fetchDashboardData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/shelf-life/dashboard');
-        const data = await res.json();
-        if (data.success) {
-          setStats(data.data.stats || {});
-          setRecentAppointments(data.data.recentAppointments || []);
-          const appointments = data.data.appointments || [];
-          setAppointments(appointments);
-          // Count occurrences of each service_name or testType
-          const analysisTypeCounts = {};
-          appointments.forEach(a => {
-            const name = a.service_name || a.testType;
-            if (name) {
-              analysisTypeCounts[name] = (analysisTypeCounts[name] || 0) + 1;
-            }
-          });
-          const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
-          setAnalysisTypes(analysisTypes);
-        } else {
-          setError(data.message || 'Failed to load dashboard data');
-        }
-      } catch (err) {
-        setError(err.message || 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchDashboardData();
     const today = new Date();
     setCurrentDate(today);
     setCurrentDay(today.getDate());
     setSelectedDay(today.getDate());
-    generateCalendarDays(today, appointments);
+    generateCalendarDays(today);
     updateMonthDisplay(today);
+    // eslint-disable-next-line
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Fetch appointments with shelf life details
+      const response = await fetch('/api/appointments?category=shelf-life');
+      const data = await response.json();
+      if (data.success) {
+        const appointments = (data.data || []).map(a => ({
+          ...a,
+          // If shelf_life_details fields are present, keep them; otherwise, leave undefined
+          product_type: a.product_type,
+          storage_conditions: a.storage_conditions,
+          shelf_life_duration: a.shelf_life_duration,
+          packaging_type: a.packaging_type,
+          modes_of_deterioration: a.modes_of_deterioration,
+        }));
+        // Compute stats
+        const stats = {
+          total_appointments: appointments.length,
+          pending: appointments.filter(a => a.status === 'pending').length,
+          completed: appointments.filter(a => a.status === 'completed').length,
+          in_progress: appointments.filter(a => a.status === 'in progress').length
+        };
+        // Recent appointments (last 5 by date)
+        const recentAppointments = [...appointments]
+          .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
+          .slice(0, 5);
+        // Count occurrences of each services
+        const analysisTypeCounts = {};
+        appointments.forEach(a => {
+          if (a.services) {
+            a.services.split(',').forEach(type => {
+              const trimmed = type.trim();
+              if (trimmed) analysisTypeCounts[trimmed] = (analysisTypeCounts[trimmed] || 0) + 1;
+            });
+          }
+        });
+        const analysisTypes = Object.entries(analysisTypeCounts).map(([services, count]) => ({ services, count }));
+        setDashboardData({
+          stats,
+          appointments,
+          recentAppointments,
+          analysisTypes
+        });
+        generateCalendarDays(currentDate, appointments);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const updateMonthDisplay = (date) => {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -117,7 +148,7 @@ export default function ShelfLifeDashboard() {
     const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
     setCurrentDate(newDate);
     setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, appointments);
+    generateCalendarDays(newDate, dashboardData.appointments);
     updateMonthDisplay(newDate);
   };
 
@@ -128,7 +159,7 @@ export default function ShelfLifeDashboard() {
     const preservedDay = Math.min(selectedDay, lastDayOfNewMonth);
     setCurrentDate(newDate);
     setSelectedDay(preservedDay);
-    generateCalendarDays(newDate, appointments);
+    generateCalendarDays(newDate, dashboardData.appointments);
     updateMonthDisplay(newDate);
   };
 
@@ -184,7 +215,6 @@ export default function ShelfLifeDashboard() {
     setCalendarDays(days);
   };
 
-  // Fetch appointments for a selected day
   const fetchAppointmentsForDay = useCallback(async (date) => {
     if (!date) {
       setSelectedDayAppointments([]);
@@ -195,14 +225,15 @@ export default function ShelfLifeDashboard() {
       const year = date.getFullYear();
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const day = date.getDate().toString().padStart(2, '0');
-      const res = await fetch(`/api/appointments/by-date?date=${year}-${month}-${day}&service=shelf-life`);
-      const data = await res.json();
+      const response = await fetch(`/api/appointments?category=shelf-life&date=${year}-${month}-${day}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
       if (data.success) {
         setSelectedDayAppointments(data.data || []);
       } else {
         setSelectedDayAppointments([]);
       }
-    } catch (err) {
+    } catch (error) {
       setSelectedDayAppointments([]);
     } finally {
       setLoadingSelectedDay(false);
@@ -219,7 +250,7 @@ export default function ShelfLifeDashboard() {
 
   return (
     <DashboardLayout
-      stats={stats}
+      stats={dashboardData.stats}
       statConfig={statConfig}
       calendarProps={{
         currentMonth,
@@ -232,7 +263,7 @@ export default function ShelfLifeDashboard() {
         setSelectedDay,
         getStatusColor,
       }}
-      recentAppointments={recentAppointments}
+      recentAppointments={dashboardData.recentAppointments}
       loading={loading}
       error={error}
       selectedDayAppointments={selectedDayAppointments}
@@ -241,7 +272,7 @@ export default function ShelfLifeDashboard() {
         selectedDay,
         currentMonth,
       }}
-      analysisTypes={analysisTypes}
+      analysisTypes={dashboardData.analysisTypes}
     />
   );
 } 

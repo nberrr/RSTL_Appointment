@@ -644,13 +644,19 @@ export default function LaboratoryAppointmentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    console.log('[DEBUG] handleSubmit called');
+    const isValid = validateForm();
+    console.log('[DEBUG] validateForm result:', isValid);
+    if (!isValid) return;
     setIsSubmitting(true);
     setSubmissionStatus(null);
     try {
       const results = [];
       for (const appointment of appointments) {
         const selectedServiceIds = appointment.selectedServices || [];
+        const shelfLifeServiceIds = Object.entries(appointment.shelfLifeServices || {})
+          .filter(([id, selected]) => selected)
+          .map(([id]) => parseInt(id, 10));
         const servicesByCategory = {};
         const allServicesFlat = Object.entries(servicesData).reduce((acc, [category, services]) => {
           services.forEach(service => {
@@ -658,6 +664,7 @@ export default function LaboratoryAppointmentForm() {
           });
           return acc;
         }, {});
+        // Standard services
         selectedServiceIds.forEach(id => {
           const service = allServicesFlat[id];
           if (service) {
@@ -665,6 +672,10 @@ export default function LaboratoryAppointmentForm() {
             servicesByCategory[service.serviceType].push(service);
           }
         });
+        // Shelf life services
+        if (shelfLifeServiceIds.length > 0) {
+          servicesByCategory['shelf_life'] = shelfLifeServiceIds.map(id => allServicesFlat[id]).filter(Boolean);
+        }
         for (const [category, services] of Object.entries(servicesByCategory)) {
           const formData = {
             // Common customer data
@@ -685,18 +696,20 @@ export default function LaboratoryAppointmentForm() {
             // Shelf life details (if applicable)
             ...(category === 'shelf_life' ? {
               objective_of_study: appointment.objectiveOfStudy,
-              product_name: appointment.productName,
+              product_type: appointment.productName,
               net_weight: appointment.netWeight,
               brand_name: appointment.brandName,
               existing_market: appointment.existingMarket,
               production_type: appointment.productionType,
-              method_of_preservation: appointment.methodOfPreservation,
               product_ingredients: appointment.productIngredients,
-              packaging_material: appointment.packagingMaterial,
+              storage_conditions: appointment.methodOfPreservation,
+              shelf_life_duration: appointment.targetShelfLife,
+              packaging_type: appointment.packagingMaterial,
               target_shelf_life: appointment.targetShelfLife,
-              mode_of_deterioration: appointment.modeOfDeterioration,
+              modes_of_deterioration: appointment.modeOfDeterioration,
             } : {})
           };
+          console.log('[DEBUG] POSTing formData:', formData);
           const response = await fetch('/api/appointments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -704,6 +717,7 @@ export default function LaboratoryAppointmentForm() {
           });
           const result = await response.json();
           if (!response.ok) {
+            console.error('[DEBUG] POST error:', result);
             throw new Error(result.message || 'Failed to submit appointment');
           }
           results.push(result);
@@ -715,6 +729,7 @@ export default function LaboratoryAppointmentForm() {
         appointmentIds: results.map(r => r.appointmentId)
       });
     } catch (error) {
+      console.error('[DEBUG] Submission error:', error);
       setSubmissionStatus({
         success: false,
         message: error.message || 'An error occurred during submission. Please try again.'

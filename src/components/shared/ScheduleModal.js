@@ -71,6 +71,48 @@ export default function ScheduleModal({ isOpen, onClose, appointment, onStatusUp
               )}
             </div>
           </div>
+          {/* Shelf Life Details */}
+          {(appointment.product_type || appointment.brand_name || appointment.net_weight || appointment.packaging_type || appointment.shelf_life_duration || appointment.objective_of_study || appointment.existing_market || appointment.production_type || appointment.product_ingredients || appointment.storage_conditions || appointment.target_shelf_life || appointment.modes_of_deterioration) && (
+            <div className="bg-white rounded-lg border p-3 text-xs flex flex-col gap-1">
+              <div className="flex items-center gap-2 mb-1 text-purple-700 font-semibold"><FaFlask /> Shelf Life Details</div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {appointment.objective_of_study && (
+                  <div><span className="text-gray-500">Objective of Study:</span> <span className="font-medium text-gray-900">{appointment.objective_of_study}</span></div>
+                )}
+                {appointment.product_type && (
+                  <div><span className="text-gray-500">Product Type:</span> <span className="font-medium text-gray-900">{appointment.product_type}</span></div>
+                )}
+                {appointment.brand_name && (
+                  <div><span className="text-gray-500">Brand Name:</span> <span className="font-medium text-gray-900">{appointment.brand_name}</span></div>
+                )}
+                {appointment.net_weight && (
+                  <div><span className="text-gray-500">Net Weight:</span> <span className="font-medium text-gray-900">{appointment.net_weight}</span></div>
+                )}
+                <div><span className="text-gray-500">Product Ingredients:</span> <span className="font-medium text-gray-900">{appointment.product_ingredients || ''}</span></div>
+                {appointment.packaging_type && (
+                  <div><span className="text-gray-500">Packaging Type:</span> <span className="font-medium text-gray-900">{appointment.packaging_type}</span></div>
+                )}
+                {appointment.shelf_life_duration && (
+                  <div><span className="text-gray-500">Shelf Life Duration:</span> <span className="font-medium text-gray-900">{appointment.shelf_life_duration}</span></div>
+                )}
+                {appointment.existing_market && (
+                  <div><span className="text-gray-500">Existing Market:</span> <span className="font-medium text-gray-900">{appointment.existing_market}</span></div>
+                )}
+                {appointment.production_type && (
+                  <div><span className="text-gray-500">Production Type:</span> <span className="font-medium text-gray-900">{appointment.production_type}</span></div>
+                )}
+                {appointment.storage_conditions && (
+                  <div><span className="text-gray-500">Storage Conditions:</span> <span className="font-medium text-gray-900">{appointment.storage_conditions}</span></div>
+                )}
+                {appointment.target_shelf_life && (
+                  <div><span className="text-gray-500">Target Shelf Life:</span> <span className="font-medium text-gray-900">{appointment.target_shelf_life}</span></div>
+                )}
+                {appointment.modes_of_deterioration && (
+                  <div><span className="text-gray-500">Modes of Deterioration:</span> <span className="font-medium text-gray-900">{appointment.modes_of_deterioration}</span></div>
+                )}
+              </div>
+            </div>
+          )}
           {/* Metrology Details */}
           {(appointment.type_of_test || appointment.number_of_liters || appointment.truck_plate_number) && (
             <div className="bg-white rounded-lg border p-3 text-xs flex flex-col gap-1">

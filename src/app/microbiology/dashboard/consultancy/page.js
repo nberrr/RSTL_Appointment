@@ -31,11 +31,21 @@ export default function ConsultancyPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/appointments?category=microbiology&type=consultancy');
+      const response = await fetch('/api/appointments/research-consultation?type=consultancy');
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       if (data.success) {
-        setAppointments(Array.isArray(data.data) ? data.data : []);
+        const mapped = (Array.isArray(data.data) ? data.data : []).map(apt => ({
+          id: apt.id,
+          date: apt.date,
+          customer: apt.customer,
+          organization: apt.organization,
+          researchTopic: apt.researchTopic,
+          researchStage: apt.researchStage,
+          status: apt.status,
+          ...apt
+        }));
+        setAppointments(mapped);
       } else {
         throw new Error(data.message || 'Failed to fetch consultations');
       }

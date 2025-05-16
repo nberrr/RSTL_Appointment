@@ -74,6 +74,7 @@ export default function ChemistryCalendarAndTable() {
           appointment_date: apt.appointment_date || '',
           appointment_time: apt.appointment_time || '',
           customer_name: apt.customer_name || '',
+          customer_contact: apt.contact_number || '',
           analysis_requested: apt.analysis_requested || apt.testType || '',
           status: apt.status || '',
           ...apt
@@ -383,6 +384,25 @@ export default function ChemistryCalendarAndTable() {
             getStatusColor={getStatusColor}
             loading={loading}
             error={error}
+            columns={[
+              { key: 'appointment_date', label: 'Date', render: (apt) => apt.appointment_date },
+              { key: 'customer_name', label: 'Customer' },
+              { key: 'services', label: 'Analysis' },
+              { key: 'name_of_samples', label: 'Sample' },
+              { key: 'status', label: 'Status', render: (apt) => {
+                const statusColors = getStatusColor(apt.status);
+                return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>{apt.status}</span>;
+              } },
+              { key: 'actions', label: 'Actions', render: (apt) => (
+                <button
+                  onClick={() => openModal(apt)}
+                  className="p-1 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-100"
+                  title="View Details / Manage"
+                >
+                  <FaEllipsisH />
+                </button>
+              ) }
+            ]}
           />
         </>
       }

@@ -106,7 +106,7 @@ export default function ShelfLifePage() {
         {/* Right side - Image */}
         <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
           <img
-              src="/shelf-life-hero.jpg"
+              src="/shelf-life.jpg"
               alt="Shelf Life Testing Laboratory"
             className="w-full h-full object-cover"
           />

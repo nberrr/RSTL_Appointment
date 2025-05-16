@@ -73,6 +73,7 @@ export default function ChemistryCalendarAndTable() {
           ...a,
           appointment_date: a.appointment_date || a.date,
           services: a.services || '',
+          customer_contact: a.contact_number || '',
         }));
         setAppointments(normalized);
       } else {

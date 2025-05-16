@@ -44,6 +44,38 @@ export async function GET(request) {
     }
     sql += ' GROUP BY a.id, s.category, c.name, c.email, c.company_name, c.contact_number, c.sex, ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description, cd.parameters, cd.delivery_type, sv.services';
     sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
+  } else if (category === 'microbiology') {
+    sql = `
+      SELECT a.*, s.category, c.name as customer_name, c.email as customer_email, c.company_name, c.contact_number, c.sex,
+             ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description,
+             COALESCE(sv.services, '') as services
+      FROM appointments a
+      JOIN services s ON a.service_id = s.id
+      JOIN customers c ON a.customer_id = c.id
+      JOIN appointment_details ad ON a.id = ad.appointment_id
+      JOIN microbiology_details md ON ad.id = md.appointment_detail_id
+      LEFT JOIN (
+        SELECT ads.appointment_detail_id, STRING_AGG(s.name, ', ') as services
+        FROM appointment_detail_services ads
+        JOIN services s ON ads.service_id = s.id
+        GROUP BY ads.appointment_detail_id
+      ) sv ON sv.appointment_detail_id = ad.id
+      WHERE 1=1
+    `;
+    if (service_id) {
+      sql += ` AND s.id = $${params.length + 1}`;
+      params.push(service_id);
+    }
+    if (date) {
+      sql += ` AND a.appointment_date::date = $${params.length + 1}`;
+      params.push(date);
+    }
+    if (status) {
+      sql += ` AND a.status = $${params.length + 1}`;
+      params.push(status);
+    }
+    sql += ' GROUP BY a.id, s.category, c.name, c.email, c.company_name, c.contact_number, c.sex, ad.name_of_samples, ad.sample_type, ad.sample_quantity, ad.sample_description, sv.services';
+    sql += ' ORDER BY a.appointment_date DESC, a.created_at DESC';
   } else {
     sql = `
       SELECT a.*, s.name as service_name, s.category, c.name as customer_name, c.email as customer_email, c.company_name

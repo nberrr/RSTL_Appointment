@@ -99,17 +99,17 @@ export default function MicrobiologyDashboard() {
         const recentAppointments = [...appointments]
           .sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date))
           .slice(0, 5);
-        // Count occurrences of each analysis_requested (split by comma)
+        // Count occurrences of each service (test type) for popular analysis
         const analysisTypeCounts = {};
         appointments.forEach(a => {
-          if (a.analysis_requested) {
-            a.analysis_requested.split(',').forEach(type => {
+          if (a.services) {
+            a.services.split(',').forEach(type => {
               const trimmed = type.trim();
               if (trimmed) analysisTypeCounts[trimmed] = (analysisTypeCounts[trimmed] || 0) + 1;
             });
           }
         });
-        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ analysis_requested: name, count }));
+        const analysisTypes = Object.entries(analysisTypeCounts).map(([name, count]) => ({ services: name, count }));
         setDashboardData({
           stats,
           appointments,
@@ -220,13 +220,10 @@ export default function MicrobiologyDashboard() {
     }
     setLoadingSelectedDay(true);
     try {
-      // Debug log for selected date
-      console.log('FETCH DAY APPOINTMENTS for date:', date);
       const response = await fetch(`/api/appointments?category=microbiology&date=${date}`);
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       if (data.success) {
-        // Use analysis_requested directly for chemistry-style mapping
         setSelectedDayAppointments(data.data || []);
       } else {
         setSelectedDayAppointments([]);
@@ -234,7 +231,7 @@ export default function MicrobiologyDashboard() {
       }
     } catch (error) {
       console.error('Error fetching day appointments:', error);
-      setSelectedDayAppointments([]); // Clear on error
+      setSelectedDayAppointments([]);
     } finally {
       setLoadingSelectedDay(false);
     }
@@ -280,6 +277,7 @@ export default function MicrobiologyDashboard() {
         selectedDay,
         currentMonth,
       }}
+      analysisTypes={dashboardData.analysisTypes}
     />
   );
 } 

@@ -93,7 +93,6 @@ export default function ScheduleModal({ isOpen, onClose, appointment, onStatusUp
             <div className="flex items-center gap-2 mb-1 text-gray-700 font-semibold"><FaCalendarAlt /> Appointment</div>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               <div><span className="text-gray-500">Date:</span> <span className="font-medium text-gray-900">{format(parseISO(appointment.appointment_date), 'PPP')}</span></div>
-              <div><span className="text-gray-500">Time:</span> <span className="font-medium text-gray-900">{appointment.appointment_time ? format(parseISO(`1970-01-01T${appointment.appointment_time}Z`), 'p') : 'N/A'}</span></div>
               <div className="flex items-center gap-2 mt-1"><span className={`inline-block w-2 h-2 rounded-full ${statusColors.dotClass}`}></span><span className={`font-semibold px-2 py-0.5 rounded-full text-xxs ${statusColors.bgClass} ${statusColors.textClass}`}>{appointment.status}</span></div>
             </div>
           </div>
@@ -135,15 +134,6 @@ export default function ScheduleModal({ isOpen, onClose, appointment, onStatusUp
               )}
             </div>
           </div>
-        </div>
-        {/* Footer Actions */}
-        <div className="flex justify-end gap-2 px-4 py-3 border-t bg-white rounded-b-xl">
-          <button
-            onClick={onClose}
-            className="px-4 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 font-medium shadow"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

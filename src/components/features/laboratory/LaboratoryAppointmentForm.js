@@ -455,7 +455,7 @@ export default function LaboratoryAppointmentForm() {
   // Validation functions
   const validateContactInfo = () => {
     const newErrors = {};
-    const currentAppointment = appointments[currentAppointmentIndex];
+    const currentAppointment = appointments[0]; // Always validate the first (global) contact info
 
     if (!currentAppointment.clientName?.trim()) {
       newErrors.clientName = 'Client name is required';
@@ -469,13 +469,13 @@ export default function LaboratoryAppointmentForm() {
       newErrors.phoneNumber = 'Phone number is required';
     }
     if (!currentAppointment.sex?.trim()) {
-      newErrors.sex = 'Please select your sex';
+      newErrors.sex = 'Please select your sex (gender)';
     }
     
     // Return validation result object
-    return { 
-      isValid: Object.keys(newErrors).length === 0, 
-      errors: newErrors 
+    return {
+      isValid: Object.keys(newErrors).length === 0,
+      errors: newErrors
     };
   };
 

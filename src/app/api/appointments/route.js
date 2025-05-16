@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { sendMail } from '@/lib/mail';
 
 // GET /api/appointments?service_id=3&category=chemistry&date=2025-05-01&status=pending
 export async function GET(request) {
@@ -262,6 +263,51 @@ export async function POST(request) {
       );
     }
 
+    // Fetch all service names for this appointment detail
+    const servicesRes = await query(
+      `SELECT s.name FROM appointment_detail_services ads JOIN services s ON ads.service_id = s.id WHERE ads.appointment_detail_id = $1`,
+      [appointmentDetailId]
+    );
+    const serviceNames = servicesRes.rows.map(row => row.name);
+
+    // Send confirmation email with review-style structure
+    try {
+      const html = `
+        <p>Dear ${formData.name},</p>
+        <h3>Appointment & Contact Information</h3>
+        <ul>
+          <li><strong>Client Name:</strong> ${formData.name}</li>
+          <li><strong>Email:</strong> ${formData.email}</li>
+          <li><strong>Phone:</strong> ${formData.contact_number}</li>
+          ${formData.company_name ? `<li><strong>Organization:</strong> ${formData.company_name}</li>` : ''}
+          <li><strong>Sex:</strong> ${formData.sex}</li>
+        </ul>
+        <h4>Sample Details</h4>
+        <ul>
+          <li><strong>Sample Name:</strong> ${formData.name_of_samples}</li>
+          <li><strong>Sample Type:</strong> ${formData.sample_type}</li>
+          <li><strong>Quantity:</strong> ${formData.sample_quantity}</li>
+          <li><strong>Preferred Date:</strong> ${appointmentDate}</li>
+          <li><strong>Sample Description:</strong> ${formData.sample_description}</li>
+        </ul>
+        <h4>Selected Services</h4>
+        <ul>
+          ${serviceNames.map(name => `<li>${name}</li>`).join('')}
+        </ul>
+        <p>Thank you for choosing our laboratory services. We look forward to serving you!</p>
+        <p>Best regards,<br/>RSTL Team</p>
+      `;
+      const text = `Dear ${formData.name},\n\nAppointment & Contact Information\n- Client Name: ${formData.name}\n- Email: ${formData.email}\n- Phone: ${formData.contact_number}\n${formData.company_name ? `- Organization: ${formData.company_name}\n` : ''}- Sex: ${formData.sex}\n\nSample Details\n- Sample Name: ${formData.name_of_samples}\n- Sample Type: ${formData.sample_type}\n- Quantity: ${formData.sample_quantity}\n- Preferred Date: ${appointmentDate}\n- Sample Description: ${formData.sample_description}\n\nSelected Services\n${serviceNames.map(name => `- ${name}`).join('\n')}\n\nThank you for choosing our laboratory services. We look forward to serving you!\n\nBest regards,\nRSTL Team`;
+      await sendMail({
+        to: formData.email,
+        subject: 'Your Appointment is Booked',
+        html,
+        text,
+      });
+    } catch (e) {
+      // Log but do not fail the booking if email fails
+      console.error('Failed to send confirmation email:', e);
+    }
     return NextResponse.json({ success: true, appointmentId });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message || 'Failed to create appointment' }, { status: 500 });

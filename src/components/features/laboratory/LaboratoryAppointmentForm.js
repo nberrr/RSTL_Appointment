@@ -12,6 +12,7 @@ import ServiceSelection from './ServiceSelection';
 import ShelfLifeDetails from './ShelfLifeDetails';
 import ReviewSection from './ReviewSection';
 import { SubmissionStatus, DeleteConfirmModal } from './Notifications';
+import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
 // Progress Stepper Component
 const ProgressStepper = ({ currentStep, isShelfLifeSelected }) => {
@@ -63,20 +64,35 @@ const ProgressStepper = ({ currentStep, isShelfLifeSelected }) => {
   );
 };
 
-// Loading Overlay Component
-const LoadingOverlay = ({ isVisible }) => {
-  if (!isVisible) return null;
-  
+// ReviewPageModal: User-friendly modal for review page success/error
+function ReviewPageModal({ open, success, message, appointmentIds, onClose }) {
+  if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-lg font-semibold text-gray-800">Submitting your appointment...</p>
-        <p className="text-sm text-gray-600 mt-2">Please wait, this may take a moment.</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 flex flex-col items-center text-center">
+        {success ? (
+          <CheckCircleIcon className="h-20 w-20 text-green-500 mb-4" aria-hidden="true" />
+        ) : (
+          <XMarkIcon className="h-20 w-20 text-red-500 mb-4" aria-hidden="true" />
+        )}
+        <h2 className="text-2xl font-bold mb-2">{success ? 'Appointment Booked!' : 'Something Went Wrong'}</h2>
+        <p className="text-gray-700 mb-4">
+          {success
+            ? 'Your appointment has been successfully booked! You will receive a confirmation email shortly.'
+            : message}
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className={`px-8 py-3 text-base font-semibold text-white rounded-lg w-full mt-2 focus:outline-none focus:ring-2 focus:ring-offset-2 ${success ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'}`}
+          autoFocus
+        >
+          OK
+        </button>
       </div>
     </div>
   );
-};
+}
 
 export default function LaboratoryAppointmentForm() {
   // States
@@ -159,6 +175,7 @@ export default function LaboratoryAppointmentForm() {
   // Handle contact info change
   const handleContactInfoChange = (name, value) => {
     setAppointments(prev => {
+      // Always update the field for all appointments
       return prev.map(appointment => ({
         ...appointment,
         [name]: value
@@ -368,17 +385,17 @@ export default function LaboratoryAppointmentForm() {
   // Add new appointment tab
   const addNewAppointment = () => {
     if (!selectedDate) {
-      // console.warn('Please select a date before adding another appointment'); // Removed log
       return;
     }
-
+    const first = appointments[0] || {};
     const newAppointment = {
       id: appointments.length + 1,
       // Keep contact information from the first appointment
-      clientName: appointments[0].clientName,
-      emailAddress: appointments[0].emailAddress,
-      phoneNumber: appointments[0].phoneNumber,
-      organization: appointments[0].organization,
+      clientName: first.clientName,
+      emailAddress: first.emailAddress,
+      phoneNumber: first.phoneNumber,
+      organization: first.organization,
+      sex: first.sex,
       // Set the preferred date to the selected date
       preferredDate: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
       // Reset other fields
@@ -405,7 +422,6 @@ export default function LaboratoryAppointmentForm() {
       productImageFile: null,
       hasAttemptedSubmit: false
     };
-    
     setAppointments([...appointments, newAppointment]);
     setCurrentAppointmentIndex(appointments.length);
     setErrors({});
@@ -732,38 +748,40 @@ export default function LaboratoryAppointmentForm() {
   // console.log("Rendering LaboratoryAppointmentForm"); // Removed log
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Laboratory Testing Services</h1>
-          <p className="mt-2 text-lg text-gray-600">Schedule your laboratory testing appointment</p>
-        </div>
+    <>
+      {isSubmitting && <LoadingOverlay message="Submitting your appointment..." />}
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Laboratory Testing Services</h1>
+            <p className="mt-2 text-lg text-gray-600">Schedule your laboratory testing appointment</p>
+          </div>
 
-        {/* Progress Stepper */}
-        <ProgressStepper 
-          currentStep={currentStep} 
-          isShelfLifeSelected={appointments.some(app => 
-            Object.values(app.shelfLifeServices).some(value => value)
-          )} 
-        />
+          {/* Progress Stepper */}
+          <ProgressStepper 
+            currentStep={currentStep} 
+            isShelfLifeSelected={appointments.some(app => 
+              Object.values(app.shelfLifeServices).some(value => value)
+            )} 
+          />
 
-        {/* Modals */}
-      {showDeleteModal && (
-        <DeleteConfirmModal
-          show={showDeleteModal}
-          onCancel={() => setShowDeleteModal(false)}
-          onConfirm={confirmDeleteAppointment}
-        />
-      )}
-      {isSubmitting && <LoadingOverlay isVisible={isSubmitting} />}
-      {submissionStatus && (
-          <SubmissionStatus
-            status={submissionStatus}
+          {/* Modals */}
+          {showDeleteModal && (
+            <DeleteConfirmModal
+              show={showDeleteModal}
+              onCancel={() => setShowDeleteModal(false)}
+              onConfirm={confirmDeleteAppointment}
+            />
+          )}
+          <ReviewPageModal
+            open={!!submissionStatus}
+            success={submissionStatus?.success}
+            message={submissionStatus?.message}
+            appointmentIds={submissionStatus?.appointmentIds}
             onClose={() => {
               setSubmissionStatus(null);
-              // Only reset the form if submission was successful
-              if (submissionStatus.success) {
+              if (submissionStatus?.success) {
                 setCurrentStep('contact');
                 setErrors({});
                 setSelectedDate(null);
@@ -801,114 +819,147 @@ export default function LaboratoryAppointmentForm() {
               }
             }}
           />
-      )}
-      
-        {/* Main Form Container */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          {/* Form Content */}
-          <div className="p-8">
-        {/* Contact Information Section */}
-        {currentStep === 'contact' && (
-            <ContactInformation
-                contactInfo={appointments[0]}
-              onContactInfoChange={handleContactInfoChange}
-              errors={errors}
-              onNext={handleNextStep}
-              disabled={isSubmitting}
-            />
-        )}
-
-        {/* Sample Details and Service Selection Section */}
-        {currentStep === 'sample' && (
-              <div className="space-y-8">
-            {/* Appointment Tabs */}
-                <div className="flex flex-wrap items-center gap-2 pb-4 border-b border-gray-200">
-              {appointments.map((appointment, index) => {
-                const tabLabel = (appointment.sampleName && appointment.sampleName.trim())
-                                 ? appointment.sampleName.trim()
-                                 : `Appointment ${index + 1}`;
-                
-                return (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setCurrentAppointmentIndex(index)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      index === currentAppointmentIndex
-                            ? 'bg-blue-600 text-white shadow-md transform scale-105'
-                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                        } disabled:opacity-50 disabled:cursor-not-allowed max-w-[200px] truncate`}
-                    disabled={isSubmitting}
-                    title={tabLabel}
-                  >
-                        <span className="flex items-center gap-2">
-                          <span className="truncate">{tabLabel}</span>
-                      {appointments.length > 1 && (
-                            <button
-                          onClick={(e) => {
-                                e.stopPropagation();
-                            handleDeleteAppointment(index);
-                          }}
-                              className="p-1 hover:bg-red-100 rounded-full"
-                              disabled={isSubmitting}
-                        >
-                              <XMarkIcon className="h-4 w-4 text-red-500" />
-                            </button>
-                      )}
-                        </span>
-                  </button>
-                );
-              })}
-                  
-              <button
-                type="button"
-                onClick={addNewAppointment}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          
+          {/* Main Form Container */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            {/* Form Content */}
+            <div className="p-8">
+          {/* Contact Information Section */}
+          {currentStep === 'contact' && (
+              <ContactInformation
+                  contactInfo={appointments[0]}
+                onContactInfoChange={handleContactInfoChange}
+                errors={errors}
+                onNext={handleNextStep}
                 disabled={isSubmitting}
-              >
-                    <PlusIcon className="h-4 w-4" />
-                    Add Appointment
-              </button>
-            </div>
+              />
+          )}
 
-                {/* Form Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Calendar */}
-              <div className="lg:col-span-1">
-                <AppointmentCalendar 
-                  selectedDate={selectedDate} 
-                  onDateSelect={handleDateSelect}
-                  bookedDates={bookedDates}
+          {/* Sample Details and Service Selection Section */}
+          {currentStep === 'sample' && (
+                <div className="space-y-8">
+              {/* Appointment Tabs */}
+                  <div className="flex flex-wrap items-center gap-2 pb-4 border-b border-gray-200">
+                {appointments.map((appointment, index) => {
+                  const tabLabel = (appointment.sampleName && appointment.sampleName.trim())
+                                   ? appointment.sampleName.trim()
+                                   : `Appointment ${index + 1}`;
+                  
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setCurrentAppointmentIndex(index)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        index === currentAppointmentIndex
+                              ? 'bg-blue-600 text-white shadow-md transform scale-105'
+                              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                          } disabled:opacity-50 disabled:cursor-not-allowed max-w-[200px] truncate`}
+                          disabled={isSubmitting}
+                          title={tabLabel}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="truncate">{tabLabel}</span>
+                        {appointments.length > 1 && (
+                              <button
+                            onClick={(e) => {
+                                  e.stopPropagation();
+                              handleDeleteAppointment(index);
+                            }}
+                                className="p-1 hover:bg-red-100 rounded-full"
+                                disabled={isSubmitting}
+                          >
+                                <XMarkIcon className="h-4 w-4 text-red-500" />
+                              </button>
+                        )}
+                          </span>
+                    </button>
+                  );
+                })}
+                    
+                <button
+                  type="button"
+                  onClick={addNewAppointment}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   disabled={isSubmitting}
-                />
+                >
+                      <PlusIcon className="h-4 w-4" />
+                      Add Appointment
+                </button>
               </div>
 
-                  {/* Details */}
-                  <div className="lg:col-span-2 space-y-8">
-                <SampleDetails
-                  appointment={appointments[currentAppointmentIndex]}
-                  onChange={handleAppointmentChange}
-                  errors={errors}
-                  disabled={isSubmitting}
-                />
-
-                <ServiceSelection
-                  appointment={appointments[currentAppointmentIndex]}
-                  onServiceTabChange={handleServiceTabChange}
-                  onServiceSelection={handleServiceSelection}
-                  onShelfLifeServiceChange={handleShelfLifeServiceChange}
-                  onSearchChange={handleSearchChange}
-                  onContinueToShelfLife={handleContinueToShelfLife}
-                  servicesData={servicesData}
-                  servicesLoading={servicesLoading}
-                  servicesError={servicesError}
-                  errors={errors}
-                  disabled={isSubmitting}
-                />
+                  {/* Form Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      {/* Calendar */}
+                  <div className="lg:col-span-1">
+                    <AppointmentCalendar 
+                      selectedDate={selectedDate} 
+                      onDateSelect={handleDateSelect}
+                      bookedDates={bookedDates}
+                      disabled={isSubmitting}
+                    />
                   </div>
-                </div>
 
-                {/* Navigation Buttons */}
+                      {/* Details */}
+                      <div className="lg:col-span-2 space-y-8">
+                    <SampleDetails
+                      appointment={appointments[currentAppointmentIndex]}
+                      onChange={handleAppointmentChange}
+                      errors={errors}
+                      disabled={isSubmitting}
+                    />
+
+                    <ServiceSelection
+                      appointment={appointments[currentAppointmentIndex]}
+                      onServiceTabChange={handleServiceTabChange}
+                      onServiceSelection={handleServiceSelection}
+                      onShelfLifeServiceChange={handleShelfLifeServiceChange}
+                      onSearchChange={handleSearchChange}
+                      onContinueToShelfLife={handleContinueToShelfLife}
+                      servicesData={servicesData}
+                      servicesLoading={servicesLoading}
+                      servicesError={servicesError}
+                      errors={errors}
+                      disabled={isSubmitting}
+                    />
+                      </div>
+                    </div>
+
+                    {/* Navigation Buttons */}
+                    <div className="flex justify-between pt-8 border-t border-gray-200">
+                      <button
+                        type="button"
+                        onClick={handlePreviousStep}
+                        className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isSubmitting}
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleNextStep}
+                        className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isSubmitting}
+                      >
+                        Continue
+                      </button>
+                </div>
+              </div>
+            )}
+
+                {/* Shelf Life Details Section */}
+            {currentStep === 'shelflife' && (
+              <>
+              <ShelfLifeDetails
+                appointment={appointments[currentAppointmentIndex]}
+                onChange={handleAppointmentChange}
+                onModeChange={handleModeChange}
+                onAddMode={handleAddMode}
+                onRemoveMode={handleRemoveMode}
+                onFileChange={handleFileChange}
+                errors={errors}
+                disabled={isSubmitting}
+              />
                 <div className="flex justify-between pt-8 border-t border-gray-200">
                   <button
                     type="button"
@@ -916,7 +967,7 @@ export default function LaboratoryAppointmentForm() {
                     className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isSubmitting}
                   >
-                    Back
+                    Back to Sample Details
                   </button>
                   <button
                     type="button"
@@ -924,60 +975,27 @@ export default function LaboratoryAppointmentForm() {
                     className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isSubmitting}
                   >
-                    Continue
+                    Continue to Review
                   </button>
-            </div>
-          </div>
-        )}
+                </div>
+              </>
+            )}
 
-            {/* Shelf Life Details Section */}
-        {currentStep === 'shelflife' && (
-          <>
-          <ShelfLifeDetails
-            appointment={appointments[currentAppointmentIndex]}
-            onChange={handleAppointmentChange}
-            onModeChange={handleModeChange}
-            onAddMode={handleAddMode}
-            onRemoveMode={handleRemoveMode}
-            onFileChange={handleFileChange}
-            errors={errors}
-            disabled={isSubmitting}
-          />
-            <div className="flex justify-between pt-8 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={handlePreviousStep}
-                className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
-              >
-                Back to Sample Details
-              </button>
-              <button
-                type="button"
-                onClick={handleNextStep}
-                className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting}
-              >
-                Continue to Review
-              </button>
+            {/* Review Section */}
+            {currentStep === 'review' && (
+                <ReviewSection
+                  servicesData={servicesData}
+                  errors={errors}
+                  onPrevious={handlePreviousStep}
+                  isSubmitting={isSubmitting}
+                  onSubmit={handleSubmit}
+                  allAppointments={appointments}
+                />
+            )}
+              </div>
             </div>
-          </>
-        )}
-
-        {/* Review Section */}
-        {currentStep === 'review' && (
-            <ReviewSection
-              servicesData={servicesData}
-              errors={errors}
-              onPrevious={handlePreviousStep}
-              isSubmitting={isSubmitting}
-              onSubmit={handleSubmit}
-              allAppointments={appointments}
-            />
-        )}
           </div>
         </div>
-      </div>
-    </div>
+    </>
   );
 } 

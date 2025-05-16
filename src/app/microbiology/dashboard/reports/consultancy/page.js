@@ -5,6 +5,7 @@ import ConsultancyReportsToolbar from '@/components/shared/ConsultancyReportsToo
 import ConsultancyReportsStatsCards from '@/components/shared/ConsultancyReportsStatsCards';
 import ConsultancyReportsTable from '@/components/shared/ConsultancyReportsTable';
 import ConsultancyReportsModal from '@/components/shared/ConsultancyReportsModal';
+import * as XLSX from "xlsx";
 
 export default function ConsultancyReportsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +20,7 @@ export default function ConsultancyReportsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch('/api/appointments?category=microbiology&type=consultancy');
+        const res = await fetch('/api/appointments/research-consultation?category=microbiology');
         const json = await res.json();
         if (json.success) {
           setConsultancyData(json.data);
@@ -65,8 +66,22 @@ export default function ConsultancyReportsPage() {
   };
 
   const handleExport = () => {
-    // Implement export logic here
-    alert('Export not implemented');
+    if (!filteredData.length) return;
+    const exportData = filteredData.map(row => ({
+      "Research Topic": row.researchTopic,
+      "Consultation Type": row.consultationType,
+      "Research Stage": row.researchStage,
+      "Date": row.date,
+      "Customer": row.customer,
+      "Organization": row.organization,
+      "Contact Number": row.contactNumber,
+      "Email": row.emailAddress,
+      "Status": row.status,
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Consultancy Reports");
+    XLSX.writeFile(wb, "consultancy_reports.xlsx");
   };
 
   const sortByDate = (a, b) => {

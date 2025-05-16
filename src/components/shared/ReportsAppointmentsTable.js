@@ -2,8 +2,8 @@ import React from "react";
 
 export default function ReportsAppointmentsTable({ appointments, getStatusColor, columns = [] }) {
   return (
-    <div className="overflow-x-auto flex-1 min-h-0 rounded-b-2xl" style={{ overflowY: 'auto' }}>
-      <table className="w-full">
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr className="bg-gray-50">
             {columns.map(col => (

@@ -43,10 +43,10 @@ export function AlertMessage({ show, message, onClose }) {
 export function SubmissionStatus({ status, onClose }) {
   if (!status) return null;
 
-  const { success, message, appointmentIds } = status;
+  const { success, message, subtitle, appointmentIds } = status;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50" role="dialog" aria-modal="true">
       <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
         <div className="flex flex-col items-center text-center">
           {success ? (
@@ -54,11 +54,12 @@ export function SubmissionStatus({ status, onClose }) {
           ) : (
             <XCircleIcon className="h-16 w-16 text-red-500 mb-6" aria-hidden="true" />
           )}
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {success ? 'Submission Successful!' : 'Submission Failed'}
+          <h3 className="text-xl font-semibold text-gray-900 mb-1">
+            {success ? 'Success' : 'Error'}
           </h3>
+          {subtitle && <div className="text-base text-gray-700 mb-2">{subtitle}</div>}
           <p className="text-gray-600 mb-6">{message}</p>
-          
+
           {success && appointmentIds && appointmentIds.length > 0 && (
             <div className="mb-6 w-full">
               <p className="text-sm font-medium text-gray-700 mb-2">Appointment ID{appointmentIds.length > 1 ? 's' : ''}:</p>
@@ -71,15 +72,16 @@ export function SubmissionStatus({ status, onClose }) {
               </div>
             </div>
           )}
-          
+
           <button
             type="button"
             onClick={onClose}
-            className={`px-6 py-3 text-sm font-medium text-white rounded-lg w-full ${
-              success ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+            className={`px-6 py-3 text-sm font-medium text-white rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              success ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
             }`}
+            autoFocus
           >
-            {success ? 'Continue' : 'Try Again'}
+            OK
           </button>
         </div>
       </div>

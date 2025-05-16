@@ -98,14 +98,23 @@ export default function ReviewSection({
       <div className="bg-white shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Appointments Summary
+            Appointment & Contact Information
           </h3>
           <div className="mt-2 max-w-xl text-sm text-gray-500">
-            <p>Review your appointment details before submission.</p>
+            <p>Review your appointment and contact details before submission.</p>
           </div>
-          
+          {allAppointments && allAppointments.length > 0 && (
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 mt-4 mb-6">
+              {renderSection("Client Name", allAppointments[0].clientName)}
+              {renderSection("Email", allAppointments[0].emailAddress)}
+              {renderSection("Phone", allAppointments[0].phoneNumber)}
+              {renderSection("Organization", allAppointments[0].organization)}
+              {renderSection("Sex", allAppointments[0].sex)}
+            </dl>
+          )}
+          <h4 className="text-md font-semibold text-gray-900 mb-2 mt-8">Samples</h4>
           {allAppointments && allAppointments.length > 0 ? (
-            <div className="mt-5 space-y-6">
+            <div className="mt-2 space-y-6">
               {allAppointments.map((appointment, index) => (
                 <div 
                   key={index}
@@ -113,14 +122,10 @@ export default function ReviewSection({
                     index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
                   } border border-gray-200`}
                 >
-                  <h4 className="text-md font-medium text-gray-900 mb-4">
-                    Appointment #{index + 1}
-                  </h4>
+                  <h5 className="text-md font-medium text-gray-900 mb-4">
+                    Sample #{index + 1}
+                  </h5>
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-                    {renderSection("Client Name", appointment.clientName)}
-                    {renderSection("Email", appointment.emailAddress)}
-                    {renderSection("Phone", appointment.phoneNumber)}
-                    {renderSection("Organization", appointment.organization)}
                     {renderSection("Sample Name", appointment.sampleName)}
                     {renderSection("Sample Type", appointment.sampleType)}
                     {renderSection("Quantity", appointment.quantity)}
@@ -150,7 +155,7 @@ export default function ReviewSection({
             </div>
           ) : (
             <div className="mt-5">
-              <p className="text-sm text-red-600">No appointments have been added yet.</p>
+              <p className="text-sm text-red-600">No samples have been added yet.</p>
             </div>
           )}
         </div>

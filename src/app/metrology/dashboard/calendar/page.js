@@ -24,6 +24,7 @@ import DashboardQuickInfo from "@/components/shared/DashboardQuickInfo";
 import DashboardAppointmentsTable from "@/components/shared/DashboardAppointmentsTable";
 import CalendarDashboardLayout from '@/components/layout/CalendarDashboardLayout';
 import ScheduleModal from '@/components/shared/ScheduleModal';
+import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
 export default function CalendarPage() {
   const today = new Date(); 
@@ -42,6 +43,7 @@ export default function CalendarPage() {
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const [selectedDay, setSelectedDay] = useState(today);
   const [currentDay, setCurrentDay] = useState(today.getDate());
+  const [loadingAction, setLoadingAction] = useState(false);
 
   // Fetch appointments from backend
   useEffect(() => {
@@ -250,100 +252,104 @@ export default function CalendarPage() {
 
   // Status update handler for modal
   const handleStatusUpdate = async (appointmentId, newStatus) => {
+    setLoadingAction(true);
     try {
       const response = await fetch(`/api/appointments/${appointmentId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ status: newStatus }),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update status');
       }
-      // Refetch appointments to show updates
-      const res = await fetch('/api/appointments/metrology/calendar-appointments');
-      const data = await res.json();
-      if (data.success) {
-        setAppointments(data.data);
-      }
+      fetchAppointments();
     } catch (err) {
+      console.error("Failed to update appointment status:", err);
       alert(`Error updating status: ${err.message}`);
+    } finally {
+      setLoadingAction(false);
     }
   };
 
   return (
-    <CalendarDashboardLayout
-      leftColumn={
-        <>
-          <DashboardCalendar
-            currentMonth={currentMonth}
-            weekdays={weekdays}
-            calendarDays={calendarDays}
-            selectedDay={selectedDay}
-            currentDay={currentDay}
-            goToPreviousMonth={() => setCurrentDate(subMonths(currentDate, 1))}
-            goToNextMonth={() => setCurrentDate(addMonths(currentDate, 1))}
-            setSelectedDay={setSelectedDay}
-            getStatusColor={() => ({ bgClass: "bg-blue-100", dotClass: "bg-blue-500" })}
-          />
-          <DashboardQuickInfo
-            title="Date and Stats"
-            stats={quickInfoStats}
-            getStatusColor={status => ({ textClass: "text-blue-500" })}
-          />
-        </>
-      }
-      rightColumn={
-        <>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
-                {getTableTitle()}
-              </h3>
-              <div className="flex flex-1 items-center gap-2 w-full justify-between">
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Search ID, Name, Status..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="all">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="in progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="declined">Declined</option>
-                  </select>
+    <>
+      {loadingAction && <LoadingOverlay message="Processing action..." />}
+      <CalendarDashboardLayout
+        leftColumn={
+          <>
+            <DashboardCalendar
+              currentMonth={currentMonth}
+              weekdays={weekdays}
+              calendarDays={calendarDays}
+              selectedDay={selectedDay}
+              currentDay={currentDay}
+              goToPreviousMonth={() => setCurrentDate(subMonths(currentDate, 1))}
+              goToNextMonth={() => setCurrentDate(addMonths(currentDate, 1))}
+              setSelectedDay={setSelectedDay}
+              getStatusColor={() => ({ bgClass: "bg-blue-100", dotClass: "bg-blue-500" })}
+            />
+            <DashboardQuickInfo
+              title="Date and Stats"
+              stats={quickInfoStats}
+              getStatusColor={status => ({ textClass: "text-blue-500" })}
+            />
+          </>
+        }
+        rightColumn={
+          <>
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
+                  {getTableTitle()}
+                </h3>
+                <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Search ID, Name, Status..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="pending">Pending</option>
+                      <option value="in progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="declined">Declined</option>
+                    </select>
+                  </div>
+                  {viewModeButtons}
                 </div>
-                {viewModeButtons}
               </div>
             </div>
-          </div>
-          <DashboardAppointmentsTable
-            filteredAppointments={filteredAppointments}
-            viewMode={viewMode}
-            openModal={openModal}
-            getStatusColor={getStatusColor}
-            loading={loading}
-            error={error}
-            columns={metrologyColumns}
+            <DashboardAppointmentsTable
+              filteredAppointments={filteredAppointments}
+              viewMode={viewMode}
+              openModal={openModal}
+              getStatusColor={getStatusColor}
+              loading={loading}
+              error={error}
+              columns={metrologyColumns}
+            />
+          </>
+        }
+        modal={
+          <ScheduleModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            appointment={selectedAppointment}
+            onStatusUpdate={handleStatusUpdate}
           />
-        </>
-      }
-      modal={
-        <ScheduleModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          appointment={selectedAppointment}
-          onStatusUpdate={handleStatusUpdate}
-        />
-      }
-    />
+        }
+      />
+    </>
   );
 } 

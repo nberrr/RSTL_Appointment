@@ -27,6 +27,7 @@ import DashboardQuickInfo from "@/components/shared/DashboardQuickInfo";
 import DashboardFilters from "@/components/shared/DashboardFilters";
 import DashboardAppointmentsTable from "@/components/shared/DashboardAppointmentsTable";
 import ScheduleModal from "@/components/shared/ScheduleModal";
+import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
 export default function ChemistryCalendarAndTable() {
   const [appointments, setAppointments] = useState([]);
@@ -39,6 +40,7 @@ export default function ChemistryCalendarAndTable() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null); 
   const [viewMode, setViewMode] = useState('month'); // 'day', 'week', 'month', 'all'
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const [calendarDays, setCalendarDays] = useState([]);
@@ -161,7 +163,8 @@ export default function ChemistryCalendarAndTable() {
 
   // --- Status Update Logic (remains the same) --- 
   const handleStatusUpdate = async (appointmentId, newStatus) => {
-     try {
+    setLoadingAction(true);
+    try {
       const response = await fetch(`/api/appointments/${appointmentId}/status`, {
         method: 'PATCH',
         headers: {
@@ -169,18 +172,16 @@ export default function ChemistryCalendarAndTable() {
         },
         body: JSON.stringify({ status: newStatus }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update status');
       }
-      
-      // Refetch appointments to show updates
       fetchAppointments(); 
-      
     } catch (err) {
       console.error("Failed to update appointment status:", err);
       alert(`Error updating status: ${err.message}`);
+    } finally {
+      setLoadingAction(false);
     }
   };
 
@@ -303,133 +304,135 @@ export default function ChemistryCalendarAndTable() {
       }
   };
 
+  // Define chemistry columns for the table
+  const chemistryColumns = [
+    { key: 'appointment_date', label: 'Date', render: (apt) => apt.appointment_date ? format(parseISO(apt.appointment_date), 'MMM d, yyyy') : '' },
+    { key: 'customer_name', label: 'Customer' },
+    { key: 'services', label: 'Analysis' },
+    { key: 'name_of_samples', label: 'Sample' },
+    { key: 'status', label: 'Status', render: (apt) => {
+      const statusColors = getStatusColor(apt.status);
+      return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>{apt.status}</span>;
+    } },
+    { key: 'actions', label: 'Actions', render: (apt) => (
+      <button
+        onClick={() => openModal(apt)}
+        className="p-1 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-100"
+        title="View Details / Manage"
+      >
+        <FaEllipsisH />
+      </button>
+    ) }
+  ];
+
   // --- Main JSX Layout --- 
   return (
-    <CalendarDashboardLayout
-      leftColumn={
-        <>
-          <DashboardCalendar
-            currentMonth={format(currentMonth, 'MMMM yyyy')}
-            weekdays={weekdays}
-            calendarDays={calendarDays}
-            selectedDay={selectedDay}
-            currentDay={currentDay}
-            goToPreviousMonth={prevMonth}
-            goToNextMonth={nextMonth}
-            setSelectedDay={(date) => {
-              setSelectedDay(date);
-              setSelectedDate(date);
-              setViewMode('day');
-            }}
-            getStatusColor={getStatusColor}
-          />
-          <DashboardQuickInfo
-            title={currentViewStats.title}
-            stats={currentViewStats.stats}
-            getStatusColor={getStatusColor}
-          />
-        </>
-      }
-      rightColumn={
-        <>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
-                {getTableTitle()}
-              </h3>
-              <div className="flex flex-1 items-center gap-2 w-full justify-between">
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Search ID, Name, Analysis..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="all">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="accepted">Accepted</option>
-                    <option value="in progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="declined">Declined</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
-                  <button 
-                    onClick={() => {
-                      setViewMode('day');
-                      if (!selectedDate) setSelectedDate(new Date());
-                    }}
-                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                    title="Day View (requires selecting a day on calendar)"
-                    disabled={!selectedDate}
-                  >
-                    Day
-                  </button>
-                  <button 
-                    onClick={() => setViewMode('week')}
-                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                  >
-                    Week
-                  </button>
-                  <button 
-                    onClick={() => setViewMode('month')}
-                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'month' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                  >
-                    Month
-                  </button>
-                  <button 
-                    onClick={() => { setViewMode('all'); setSelectedDate(null); }}
-                    className={`px-3 py-1 text-xs rounded-md ${viewMode === 'all' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
-                  >
-                    All
-                  </button>
+    <>
+      {loadingAction && <LoadingOverlay message="Processing action..." />}
+      <CalendarDashboardLayout
+        leftColumn={
+          <>
+            <DashboardCalendar
+              currentMonth={format(currentMonth, 'MMMM yyyy')}
+              weekdays={weekdays}
+              calendarDays={calendarDays}
+              selectedDay={selectedDay}
+              currentDay={currentDay}
+              goToPreviousMonth={prevMonth}
+              goToNextMonth={nextMonth}
+              setSelectedDay={(date) => {
+                setSelectedDay(date);
+                setSelectedDate(date);
+                setViewMode('day');
+              }}
+              getStatusColor={getStatusColor}
+            />
+            <DashboardQuickInfo
+              title={currentViewStats.title}
+              stats={currentViewStats.stats}
+              getStatusColor={getStatusColor}
+            />
+          </>
+        }
+        rightColumn={
+          <>
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
+                  {getTableTitle()}
+                </h3>
+                <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Search ID, Name, Analysis..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="pending">Pending</option>
+                      <option value="accepted">Accepted</option>
+                      <option value="in progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="declined">Declined</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5">
+                    <button 
+                      onClick={() => {
+                        setViewMode('day');
+                        if (!selectedDate) setSelectedDate(new Date());
+                      }}
+                      className={`px-3 py-1 text-xs rounded-md ${viewMode === 'day' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                      title="Day View (requires selecting a day on calendar)"
+                      disabled={!selectedDate}
+                    >
+                      Day
+                    </button>
+                    <button 
+                      onClick={() => setViewMode('week')}
+                      className={`px-3 py-1 text-xs rounded-md ${viewMode === 'week' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                    >
+                      Week
+                    </button>
+                    <button 
+                      onClick={() => setViewMode('month')}
+                      className={`px-3 py-1 text-xs rounded-md ${viewMode === 'month' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                    >
+                      Month
+                    </button>
+                    <button 
+                      onClick={() => { setViewMode('all'); setSelectedDate(null); }}
+                      className={`px-3 py-1 text-xs rounded-md ${viewMode === 'all' ? 'bg-gray-200 font-medium' : 'hover:bg-gray-100'}`}
+                    >
+                      All
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <DashboardAppointmentsTable
-            filteredAppointments={filteredAppointments}
-            viewMode={viewMode}
-            openModal={openModal}
-            getStatusColor={getStatusColor}
-            loading={loading}
-            error={error}
-            columns={[
-              { key: 'appointment_date', label: 'Date', render: (apt) => apt.appointment_date },
-              { key: 'customer_name', label: 'Customer' },
-              { key: 'services', label: 'Analysis' },
-              { key: 'name_of_samples', label: 'Sample' },
-              { key: 'status', label: 'Status', render: (apt) => {
-                const statusColors = getStatusColor(apt.status);
-                return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.bgClass} ${statusColors.textClass}`}>{apt.status}</span>;
-              } },
-              { key: 'actions', label: 'Actions', render: (apt) => (
-                <button
-                  onClick={() => openModal(apt)}
-                  className="p-1 text-gray-500 hover:text-gray-700 rounded hover:bg-gray-100"
-                  title="View Details / Manage"
-                >
-                  <FaEllipsisH />
-                </button>
-              ) }
-            ]}
-          />
-        </>
-      }
-      modal={
-        <ScheduleModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          appointment={selectedAppointment}
-          onStatusUpdate={handleStatusUpdate}
-        />
-      }
-    />
+            <DashboardAppointmentsTable
+              filteredAppointments={filteredAppointments}
+              viewMode={viewMode}
+              openModal={openModal}
+              getStatusColor={getStatusColor}
+              columns={chemistryColumns}
+            />
+            <ScheduleModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              appointment={selectedAppointment}
+              onStatusUpdate={handleStatusUpdate}
+            />
+          </>
+        }
+      />
+    </>
   );
 } 

@@ -26,6 +26,7 @@ import {
 } from 'date-fns';
 import ScheduleModal from '@/components/shared/ScheduleModal';
 import { FaEllipsisH } from 'react-icons/fa';
+import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -61,6 +62,7 @@ export default function ShelfLifeCalendarPage() {
   const [viewMode, setViewMode] = useState('month');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   // Fetch all shelf-life appointments
   const fetchAppointments = useCallback(async () => {
@@ -272,10 +274,13 @@ export default function ShelfLifeCalendarPage() {
 
   // Status update handler
   const handleStatusUpdate = async (appointmentId, newStatus) => {
+    setLoadingAction(true);
     try {
       const response = await fetch(`/api/appointments/${appointmentId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ status: newStatus }),
       });
       if (!response.ok) {
@@ -284,7 +289,10 @@ export default function ShelfLifeCalendarPage() {
       }
       fetchAppointments();
     } catch (err) {
+      console.error("Failed to update appointment status:", err);
       alert(`Error updating status: ${err.message}`);
+    } finally {
+      setLoadingAction(false);
     }
   };
 
@@ -323,76 +331,79 @@ export default function ShelfLifeCalendarPage() {
   ];
 
   return (
-    <CalendarDashboardLayout
-      leftColumn={
-        <>
-          <DashboardCalendar
-            currentMonth={format(currentMonth, 'MMMM yyyy')}
-            weekdays={weekdays}
-            calendarDays={calendarDays}
-            selectedDay={selectedDate}
-            currentDay={calendarYear === today.getFullYear() && calendarMonth === today.getMonth() ? today.getDate() : null}
-            goToPreviousMonth={prevMonth}
-            goToNextMonth={nextMonth}
-            setSelectedDay={dayObj => setSelectedDate(dayObj?.date || null)}
-            getStatusColor={getStatusColor}
-          />
-          <DashboardQuickInfo
-            title={currentViewStats.title}
-            stats={currentViewStats.stats}
-            getStatusColor={status => ({ textClass: "text-blue-500" })}
-          />
-        </>
-      }
-      rightColumn={
-        <>
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
-                {getTableTitle()}
-              </h3>
-              <div className="flex flex-1 items-center gap-2 w-full justify-between">
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder="Search ID, Name, Status..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="all">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="in progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="declined">Declined</option>
-                  </select>
+    <>
+      {loadingAction && <LoadingOverlay message="Processing action..." />}
+      <CalendarDashboardLayout
+        leftColumn={
+          <>
+            <DashboardCalendar
+              currentMonth={format(currentMonth, 'MMMM yyyy')}
+              weekdays={weekdays}
+              calendarDays={calendarDays}
+              selectedDay={selectedDate}
+              currentDay={calendarYear === today.getFullYear() && calendarMonth === today.getMonth() ? today.getDate() : null}
+              goToPreviousMonth={prevMonth}
+              goToNextMonth={nextMonth}
+              setSelectedDay={dayObj => setSelectedDate(dayObj?.date || null)}
+              getStatusColor={getStatusColor}
+            />
+            <DashboardQuickInfo
+              title={currentViewStats.title}
+              stats={currentViewStats.stats}
+              getStatusColor={status => ({ textClass: "text-blue-500" })}
+            />
+          </>
+        }
+        rightColumn={
+          <>
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 whitespace-nowrap">
+                  {getTableTitle()}
+                </h3>
+                <div className="flex flex-1 items-center gap-2 w-full justify-between">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Search ID, Name, Status..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 w-48 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="pending">Pending</option>
+                      <option value="in progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="declined">Declined</option>
+                    </select>
+                  </div>
+                  {viewModeButtons}
                 </div>
-                {viewModeButtons}
               </div>
             </div>
-          </div>
-          <DashboardAppointmentsTable
-            filteredAppointments={filteredAppointments}
-            viewMode={viewMode}
-            openModal={openModal}
-            getStatusColor={getStatusColor}
-            loading={loading}
-            error={error}
-            columns={shelfLifeColumns}
-          />
-          <ScheduleModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            appointment={selectedAppointment}
-            onStatusUpdate={handleStatusUpdate}
-          />
-        </>
-      }
-    />
+            <DashboardAppointmentsTable
+              filteredAppointments={filteredAppointments}
+              viewMode={viewMode}
+              openModal={openModal}
+              getStatusColor={getStatusColor}
+              loading={loading}
+              error={error}
+              columns={shelfLifeColumns}
+            />
+            <ScheduleModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              appointment={selectedAppointment}
+              onStatusUpdate={handleStatusUpdate}
+            />
+          </>
+        }
+      />
+    </>
   );
 } 

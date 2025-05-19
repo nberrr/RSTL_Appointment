@@ -7,6 +7,7 @@ import { FaFlask, FaRuler, FaBacteria, FaBook, FaClock, FaInfoCircle, FaTachomet
 import { motion } from 'framer-motion';
 import { Card, Button, StatusBadge, Tabs } from '@/components/ui';
 import DashboardNav from '@/components/layout/DashboardNav';
+import { signOut } from 'next-auth/react';
 
 // AdminSidebar component
 function AdminSidebar({ current }) {
@@ -65,6 +66,7 @@ export default function AdminDashboard() {
     shelfLife: { appointments: 0, pending: 0, completed: 0 }
   });
   const [loading, setLoading] = useState(true);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const periodTabs = [
     { id: 'today', label: 'Today' },
@@ -141,7 +143,7 @@ export default function AdminDashboard() {
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-12 pb-16">
             {/* Header */}
-            <div className="mb-10 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-between relative">
               <div>
                 <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Laboratory Services Dashboard</h1>
                 <p className="text-base text-gray-500 flex items-center gap-2">
@@ -149,11 +151,27 @@ export default function AdminDashboard() {
                   Select a laboratory service to view its dashboard
                 </p>
               </div>
-              {/* User avatar/profile menu placeholder */}
-              <button className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="User menu">
-                <span className="inline-block w-8 h-8 bg-blue-200 text-blue-700 font-bold rounded-full flex items-center justify-center">A</span>
-                <span className="hidden md:inline text-sm font-medium text-gray-700">Admin</span>
-              </button>
+              {/* User avatar/profile menu */}
+              <div className="relative">
+                <button
+                  className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  aria-label="User menu"
+                  onClick={() => setProfileMenuOpen((v) => !v)}
+                >
+                  <span className="inline-block w-8 h-8 bg-blue-200 text-blue-700 font-bold rounded-full flex items-center justify-center">A</span>
+                  <span className="hidden md:inline text-sm font-medium text-gray-700">Admin</span>
+                </button>
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <button
+                      onClick={() => signOut({ callbackUrl: '/login' })}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="border-b border-gray-200 mb-10" aria-hidden="true"></div>
 

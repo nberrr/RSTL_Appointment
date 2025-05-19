@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { sendMail } from '@/lib/mail';
 import { z } from 'zod';
+import { requireAuth } from "@/lib/api-auth";
 
 // Zod schemas
 const appointmentQuerySchema = z.object({
@@ -36,6 +37,10 @@ const appointmentCreateSchema = z.object({
 
 // GET /api/appointments?service_id=3&category=chemistry&date=2025-05-01&status=pending
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+  if (error) {
+    return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+  }
   const { searchParams } = new URL(request.url);
   const paramsObj = Object.fromEntries(searchParams.entries());
   const parseResult = appointmentQuerySchema.safeParse(paramsObj);

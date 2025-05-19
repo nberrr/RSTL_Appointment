@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   try {
     // Get statistics for each service category in the same window as chemistry dashboard
     const stats = await query(

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
+import { requireAuth } from "@/lib/api-auth";
 
 // Zod schemas
 const metrologyQuerySchema = z.object({
@@ -172,6 +173,10 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   const { searchParams } = new URL(request.url);
   const paramsObj = Object.fromEntries(searchParams.entries());
   const parseResult = metrologyQuerySchema.safeParse(paramsObj);

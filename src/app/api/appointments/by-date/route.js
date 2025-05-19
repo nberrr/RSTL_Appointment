@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { format, parseISO } from 'date-fns'; // Import if needed for response formatting
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   const { searchParams } = new URL(request.url);
   const appointmentDate = searchParams.get('date'); // Expecting YYYY-MM-DD format
   const serviceCategory = searchParams.get('service'); // Expecting category name like 'chemistry'

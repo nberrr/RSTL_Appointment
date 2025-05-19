@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireAuth } from "@/lib/api-auth";
 
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   try {
     // Query to fetch all inquiries with all related data (based on appointment_report_view)
     const result = await query(`

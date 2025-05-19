@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireAuth } from "@/lib/api-auth";
 
 // POST /api/appointments/metrology/constraints
 export async function POST(request) {
@@ -36,6 +37,10 @@ export async function POST(request) {
 
 // GET /api/appointments/metrology/constraints?date=YYYY-MM-DD
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   const { searchParams } = new URL(request.url);
   const date = searchParams.get('date');
   if (!date) {

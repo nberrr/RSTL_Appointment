@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import nodemailer from 'nodemailer';
+import { requireAuth } from "@/lib/api-auth";
 
 // GET /api/companies/:id - Get a single company
 export async function GET(request, { params }) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   const { id } = params;
   try {
     const result = await query(

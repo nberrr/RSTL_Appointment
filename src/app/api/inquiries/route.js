@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireAuth } from "@/lib/api-auth";
 
 // GET /api/inquiries - List all inquiries
 export async function GET(request) {
+  const { session, error } = await requireAuth(request, "admin");
+     if (error) {
+       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
+     }
   try {
     const result = await query(`
       SELECT id, customer_id, service_id, message, status, created_at, updated_at

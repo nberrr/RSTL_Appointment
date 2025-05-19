@@ -1,10 +1,38 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
 import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
+
+// Zod schemas
+const metrologyQuerySchema = z.object({
+  service_id: z.string().optional(),
+  category: z.string().optional(),
+  date: z.string().optional(),
+  status: z.string().optional(),
+});
+
+const metrologyCreateSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  contactNumber: z.string().min(1),
+  sex: z.string().min(1),
+  nameOfSamples: z.string().min(1),
+  sampleDescription: z.string().min(1),
+  selectedDate: z.string().min(1),
+  plateNumber: z.string().min(1),
+  typeOfTest: z.string().min(1),
+  numberOfLiters: z.union([z.string(), z.number()]),
+  terms: z.boolean(),
+  companyName: z.string().min(1),
+});
 
 export async function POST(request) {
   try {
     const formData = await request.json();
+    const parseResult = metrologyCreateSchema.safeParse(formData);
+    if (!parseResult.success) {
+      return NextResponse.json({ success: false, message: 'Invalid input', errors: parseResult.error.errors }, { status: 400 });
+    }
     
     // Validate required fields
     const requiredFields = ['name', 'email', 'contactNumber', 'sex', 'nameOfSamples', 'sampleDescription', 'selectedDate', 'plateNumber', 'typeOfTest', 'numberOfLiters', 'terms'];
@@ -145,6 +173,11 @@ export async function POST(request) {
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+  const paramsObj = Object.fromEntries(searchParams.entries());
+  const parseResult = metrologyQuerySchema.safeParse(paramsObj);
+  if (!parseResult.success) {
+    return NextResponse.json({ success: false, message: 'Invalid query parameters', errors: parseResult.error.errors }, { status: 400 });
+  }
   const service_id = searchParams.get('service_id');
   const category = searchParams.get('category');
   const date = searchParams.get('date');

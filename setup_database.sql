@@ -1,11 +1,36 @@
 -- RSTL Appointment Portal Database Setup Script
 -- This script creates the database and all required tables
 
--- Create database
+-- Drop and recreate the database for a clean setup (dev only)
+DROP DATABASE IF EXISTS rstl_appointment_portal;
 CREATE DATABASE rstl_appointment_portal;
-
--- Connect to the database 
 \c rstl_appointment_portal
+
+-- Drop all tables if they exist (in dependency order)
+DROP TABLE IF EXISTS appointment_detail_services CASCADE;
+DROP TABLE IF EXISTS lab_assignments CASCADE;
+DROP TABLE IF EXISTS remarks CASCADE;
+DROP TABLE IF EXISTS action_logs CASCADE;
+DROP TABLE IF EXISTS test_results CASCADE;
+DROP TABLE IF EXISTS research_consultation_details CASCADE;
+DROP TABLE IF EXISTS shelf_life_details CASCADE;
+DROP TABLE IF EXISTS microbiology_details CASCADE;
+DROP TABLE IF EXISTS chemistry_details CASCADE;
+DROP TABLE IF EXISTS metrology_details CASCADE;
+DROP TABLE IF EXISTS appointment_details CASCADE;
+DROP TABLE IF EXISTS inquiry_information CASCADE;
+DROP TABLE IF EXISTS appointments CASCADE;
+DROP TABLE IF EXISTS admin_assignments CASCADE;
+DROP TABLE IF EXISTS appointment_constraints CASCADE;
+DROP TABLE IF EXISTS services CASCADE;
+DROP TABLE IF EXISTS trucks CASCADE;
+DROP TABLE IF EXISTS companies CASCADE;
+DROP TABLE IF EXISTS customers CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS nextauth_verification_tokens CASCADE;
+DROP TABLE IF EXISTS nextauth_sessions CASCADE;
+DROP TABLE IF EXISTS nextauth_accounts CASCADE;
+DROP TABLE IF EXISTS nextauth_users CASCADE;
 
 -- Enable the UUID extension for generating unique IDs
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -54,12 +79,17 @@ CREATE TABLE companies (
 -- Create Trucks table (for metrology)
 CREATE TABLE trucks (
     id SERIAL PRIMARY KEY,
-    license_plate VARCHAR(50) NOT NULL UNIQUE,
+    license_plate VARCHAR(50) NOT NULL,
     company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
     orcr_document TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Remove old unique constraint if it exists
+ALTER TABLE trucks DROP CONSTRAINT IF EXISTS trucks_license_plate_key;
+-- Add new composite unique constraint
+ALTER TABLE trucks ADD CONSTRAINT trucks_license_plate_company_id_key UNIQUE (license_plate, company_id);
 
 -- Create Services table
 CREATE TABLE services (
@@ -301,7 +331,7 @@ SELECT
     (SELECT action_desc FROM action_logs WHERE appointment_id = a.id AND action_type = 'cro' ORDER BY created_at DESC LIMIT 1) AS action_from_cro,
     i.response_deadline AS wait_response_until,
     a.status,
-    (SELECT string_agg(action_desc, ', ') FROM action_logs WHERE appointment_id = a.id ORDER BY created_at DESC) AS action_logs,
+    (SELECT string_agg(action_desc, ', ' ORDER BY created_at DESC) FROM action_logs WHERE appointment_id = a.id) AS action_logs,
     -- Metrology specific fields
     CASE WHEN s.category = 'metrology' THEN 
         (SELECT t.license_plate FROM trucks t WHERE t.id = a.truck_id) 
@@ -311,7 +341,7 @@ SELECT
     ELSE NULL END AS liquid_carried_liters,
     CASE WHEN s.category = 'metrology' THEN 
         (SELECT comp.name FROM companies comp WHERE comp.id = a.company_id)
-    ELSE NULL END AS company_name
+    ELSE NULL END AS metrology_company_name
 FROM 
     appointments a
 JOIN 
@@ -464,3 +494,48 @@ INSERT INTO services (name, category, sample_type, price, duration_minutes) VALU
 ('Shelf Life Test (Cosmetics & Personal Care)', 'shelf-life', 'Cosmetics', 3000.00, 60),
 ('Shelf Life Test (Pharmaceuticals)', 'shelf-life', 'Pharmaceuticals', 5000.00, 60),
 ('Shelf Life Test (Packaging Materials)', 'shelf-life', 'Packaging', 1500.00, 60);
+
+-- NextAuth.js required tables for authentication
+CREATE TABLE nextauth_users (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    email_verified TIMESTAMP,
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE nextauth_accounts (
+    user_id VARCHAR(255) NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    provider VARCHAR(255) NOT NULL,
+    provider_account_id VARCHAR(255) NOT NULL,
+    refresh_token TEXT,
+    access_token TEXT,
+    expires_at INTEGER,
+    token_type VARCHAR(255),
+    scope VARCHAR(255),
+    id_token TEXT,
+    session_state VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (provider, provider_account_id),
+    FOREIGN KEY (user_id) REFERENCES nextauth_users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE nextauth_sessions (
+    session_token VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    expires TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES nextauth_users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE nextauth_verification_tokens (
+    identifier VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires TIMESTAMP NOT NULL,
+    PRIMARY KEY (identifier, token)
+);

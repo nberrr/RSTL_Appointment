@@ -242,7 +242,12 @@ function getStatusColor(status) {
 function toISODate(dateStr) {
   if (!dateStr) return undefined;
   const d = new Date(dateStr);
-  if (!isNaN(d)) return d.toISOString().split('T')[0];
+  if (!isNaN(d)) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
   return undefined;
 }
 

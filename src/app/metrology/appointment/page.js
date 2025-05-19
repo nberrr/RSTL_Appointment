@@ -194,9 +194,15 @@ export default function MetrologyAppointment() {
                 }
                 truckId = truckData.data[0].id;
                 // 3. Submit appointment
+                function formatLocalDate(date) {
+                    const year = date.getFullYear();
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
                 const formDataToSubmit = {
                     ...formData,
-                    selectedDate: selectedDate ? selectedDate.toISOString() : null,
+                    selectedDate: selectedDate ? formatLocalDate(selectedDate) : null,
                     company_id: companyId,
                     truck_id: truckId,
                     intakeFileUrl: formData.intakeFileUrl || null

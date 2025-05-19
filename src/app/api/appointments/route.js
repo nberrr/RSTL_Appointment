@@ -1,14 +1,48 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { sendMail } from '@/lib/mail';
+import { z } from 'zod';
+
+// Zod schemas
+const appointmentQuerySchema = z.object({
+  service_id: z.string().optional(),
+  category: z.string().optional(),
+  date: z.string().optional(),
+  status: z.string().optional(),
+});
+
+const appointmentCreateSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  contact_number: z.string().min(1),
+  sex: z.string().min(1),
+  name_of_samples: z.string().min(1),
+  sample_type: z.string().min(1),
+  sample_quantity: z.union([z.string(), z.number()]),
+  sample_description: z.string().min(1),
+  date: z.string().min(1),
+  service_id: z.union([z.string(), z.array(z.string()), z.number(), z.array(z.number())]),
+  category: z.string().min(1),
+  terms: z.boolean().optional(),
+  sample_condition: z.string().optional(),
+  number_of_replicates: z.union([z.string(), z.number()]).optional(),
+  analysis_requested: z.string().optional(),
+  parameters: z.string().optional(),
+  delivery_type: z.string().optional(),
+  test_type: z.string().optional(),
+  organism_target: z.string().optional(),
+  sample_storage_condition: z.string().optional(),
+});
 
 // GET /api/appointments?service_id=3&category=chemistry&date=2025-05-01&status=pending
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const service_id = searchParams.get('service_id');
-  const category = searchParams.get('category');
-  const date = searchParams.get('date');
-  const status = searchParams.get('status');
+  const paramsObj = Object.fromEntries(searchParams.entries());
+  const parseResult = appointmentQuerySchema.safeParse(paramsObj);
+  if (!parseResult.success) {
+    return NextResponse.json({ success: false, message: 'Invalid query parameters', errors: parseResult.error.errors }, { status: 400 });
+  }
+  const { service_id, category, date, status } = parseResult.data;
 
   let sql;
   let params = [];
@@ -183,7 +217,12 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const formData = await request.json();
-    const category = formData.category;
+    const parseResult = appointmentCreateSchema.safeParse(formData);
+    if (!parseResult.success) {
+      return NextResponse.json({ success: false, message: 'Invalid input', errors: parseResult.error.errors }, { status: 400 });
+    }
+    const data = parseResult.data;
+    const category = data.category;
     if (!category) {
       return NextResponse.json({ success: false, message: 'Missing category in request body' }, { status: 400 });
     }
@@ -215,7 +254,7 @@ export async function POST(request) {
       'name_of_samples', 'sample_type', 'sample_quantity', 'sample_description', 'date', 'service_id'
     ];
     for (const field of requiredFields) {
-      if (!formData[field]) {
+      if (!data[field]) {
         return NextResponse.json({ success: false, message: `Missing required field: ${field}` }, { status: 400 });
       }
     }
@@ -225,15 +264,15 @@ export async function POST(request) {
       `INSERT INTO customers (name, email, contact_number, company_name, sex)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [formData.name, formData.email, formData.contact_number, formData.company_name || null, formData.sex]
+      [data.name, data.email, data.contact_number, data.company_name || null, data.sex]
     );
     const customerId = customerResult.rows[0].id;
 
     // 2. Use the first service_id (array) for now (TODO: support multiple services per appointment)
-    const serviceId = Array.isArray(formData.service_id) ? formData.service_id[0] : formData.service_id;
+    const serviceId = Array.isArray(data.service_id) ? data.service_id[0] : data.service_id;
 
     // 3. Insert appointment
-    const appointmentDate = (formData.date || '').slice(0, 10);
+    const appointmentDate = (data.date || '').slice(0, 10);
     const appointmentResult = await query(
       `INSERT INTO appointments (customer_id, service_id, appointment_date, status)
        VALUES ($1, $2, $3, $4)
@@ -252,13 +291,13 @@ export async function POST(request) {
        RETURNING id`,
       [
         appointmentId,
-        formData.name_of_samples,
-        formData.sample_type,
-        parseInt(formData.sample_quantity, 10) || 1,
-        formData.sample_description,
-        formData.sample_condition || 'Normal',
-        formData.number_of_replicates || 1,
-        formData.terms || true
+        data.name_of_samples,
+        data.sample_type,
+        parseInt(data.sample_quantity, 10) || 1,
+        data.sample_description,
+        data.sample_condition || 'Normal',
+        data.number_of_replicates || 1,
+        data.terms || true
       ]
     );
     const appointmentDetailId = appointmentDetailsResult.rows[0].id;
@@ -272,18 +311,18 @@ export async function POST(request) {
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
         [
           appointmentDetailId,
-          formData.objective_of_study || '',
-          formData.product_type || formData.productName || '',
-          formData.net_weight || '',
-          formData.brand_name || '',
-          formData.existing_market || '',
-          formData.production_type || '',
-          formData.product_ingredients || '',
-          formData.storage_conditions || '',
-          formData.shelf_life_duration || formData.target_shelf_life || null,
-          formData.packaging_type || '',
-          formData.target_shelf_life || '',
-          Array.isArray(formData.modes_of_deterioration) ? formData.modes_of_deterioration.join(', ') : (formData.modes_of_deterioration || '')
+          data.objective_of_study || '',
+          data.product_type || data.productName || '',
+          data.net_weight || '',
+          data.brand_name || '',
+          data.existing_market || '',
+          data.production_type || '',
+          data.product_ingredients || '',
+          data.storage_conditions || '',
+          data.shelf_life_duration || data.target_shelf_life || null,
+          data.packaging_type || '',
+          data.target_shelf_life || '',
+          Array.isArray(data.modes_of_deterioration) ? data.modes_of_deterioration.join(', ') : (data.modes_of_deterioration || '')
         ]
       );
     } else if (normalizedCategory === 'chemistry') {
@@ -294,10 +333,10 @@ export async function POST(request) {
          VALUES ($1, $2, $3, $4, $5)`,
         [
           appointmentDetailId,
-          formData.analysis_requested || formData.analysisRequested || 'Standard analysis',
-          formData.parameters || 'Standard parameters',
-          formData.delivery_type || formData.deliveryType || 'Standard',
-          formData.sample_quantity
+          data.analysis_requested || data.analysisRequested || 'Standard analysis',
+          data.parameters || 'Standard parameters',
+          data.delivery_type || data.deliveryType || 'Standard',
+          data.sample_quantity
         ]
       );
     } else if (normalizedCategory === 'microbiology') {
@@ -308,26 +347,26 @@ export async function POST(request) {
          VALUES ($1, $2, $3, $4, $5)`,
         [
           appointmentDetailId,
-          formData.test_type || formData.testType || 'General',
-          formData.organism_target || '',
-          formData.sample_storage_condition || '',
-          formData.sample_quantity
+          data.test_type || data.testType || 'General',
+          data.organism_target || '',
+          data.sample_storage_condition || '',
+          data.sample_quantity
         ]
       );
     }
 
     // After inserting appointment_details and getting appointmentDetailId
-    if (Array.isArray(formData.service_id)) {
-      for (const sid of formData.service_id) {
+    if (Array.isArray(data.service_id)) {
+      for (const sid of data.service_id) {
         await query(
           `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
           [appointmentDetailId, sid]
         );
       }
-    } else if (formData.service_id) {
+    } else if (data.service_id) {
       await query(
         `INSERT INTO appointment_detail_services (appointment_detail_id, service_id) VALUES ($1, $2)`,
-        [appointmentDetailId, formData.service_id]
+        [appointmentDetailId, data.service_id]
       );
     }
 
@@ -341,22 +380,22 @@ export async function POST(request) {
     // Send confirmation email with review-style structure
     try {
       const html = `
-        <p>Dear ${formData.name},</p>
+        <p>Dear ${data.name},</p>
         <h3>Appointment & Contact Information</h3>
         <ul>
-          <li><strong>Client Name:</strong> ${formData.name}</li>
-          <li><strong>Email:</strong> ${formData.email}</li>
-          <li><strong>Phone:</strong> ${formData.contact_number}</li>
-          ${formData.company_name ? `<li><strong>Organization:</strong> ${formData.company_name}</li>` : ''}
-          <li><strong>Sex:</strong> ${formData.sex}</li>
+          <li><strong>Client Name:</strong> ${data.name}</li>
+          <li><strong>Email:</strong> ${data.email}</li>
+          <li><strong>Phone:</strong> ${data.contact_number}</li>
+          ${data.company_name ? `<li><strong>Organization:</strong> ${data.company_name}</li>` : ''}
+          <li><strong>Sex:</strong> ${data.sex}</li>
         </ul>
         <h4>Sample Details</h4>
         <ul>
-          <li><strong>Sample Name:</strong> ${formData.name_of_samples}</li>
-          <li><strong>Sample Type:</strong> ${formData.sample_type}</li>
-          <li><strong>Quantity:</strong> ${formData.sample_quantity}</li>
+          <li><strong>Sample Name:</strong> ${data.name_of_samples}</li>
+          <li><strong>Sample Type:</strong> ${data.sample_type}</li>
+          <li><strong>Quantity:</strong> ${data.sample_quantity}</li>
           <li><strong>Preferred Date:</strong> ${appointmentDate}</li>
-          <li><strong>Sample Description:</strong> ${formData.sample_description}</li>
+          <li><strong>Sample Description:</strong> ${data.sample_description}</li>
         </ul>
         <h4>Selected Services</h4>
         <ul>
@@ -365,9 +404,9 @@ export async function POST(request) {
         <p>Thank you for choosing our laboratory services. We look forward to serving you!</p>
         <p>Best regards,<br/>RSTL Team</p>
       `;
-      const text = `Dear ${formData.name},\n\nAppointment & Contact Information\n- Client Name: ${formData.name}\n- Email: ${formData.email}\n- Phone: ${formData.contact_number}\n${formData.company_name ? `- Organization: ${formData.company_name}\n` : ''}- Sex: ${formData.sex}\n\nSample Details\n- Sample Name: ${formData.name_of_samples}\n- Sample Type: ${formData.sample_type}\n- Quantity: ${formData.sample_quantity}\n- Preferred Date: ${appointmentDate}\n- Sample Description: ${formData.sample_description}\n\nSelected Services\n${serviceNames.map(name => `- ${name}`).join('\n')}\n\nThank you for choosing our laboratory services. We look forward to serving you!\n\nBest regards,\nRSTL Team`;
+      const text = `Dear ${data.name},\n\nAppointment & Contact Information\n- Client Name: ${data.name}\n- Email: ${data.email}\n- Phone: ${data.contact_number}\n${data.company_name ? `- Organization: ${data.company_name}\n` : ''}- Sex: ${data.sex}\n\nSample Details\n- Sample Name: ${data.name_of_samples}\n- Sample Type: ${data.sample_type}\n- Quantity: ${data.sample_quantity}\n- Preferred Date: ${appointmentDate}\n- Sample Description: ${data.sample_description}\n\nSelected Services\n${serviceNames.map(name => `- ${name}`).join('\n')}\n\nThank you for choosing our laboratory services. We look forward to serving you!\n\nBest regards,\nRSTL Team`;
       await sendMail({
-        to: formData.email,
+        to: data.email,
         subject: 'Your Appointment is Booked',
         html,
         text,

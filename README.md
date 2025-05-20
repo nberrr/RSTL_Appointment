@@ -1,11 +1,11 @@
 # RSTL Appointment Portal
 
 ## Overview
-The RSTL (Regional Science and Technology Laboratory) Appointment Portal is a web-based application designed to streamline the process of scheduling and managing laboratory services appointments. This system serves various laboratory departments including Metrology, Chemistry, Microbiology, and Research & Consultation services.
+The RSTL (Regional Science and Technology Laboratory) Appointment Portal is a web-based application designed to streamline the process of scheduling and managing laboratory services appointments. This system serves various laboratory departments including Metrology, Chemistry, Microbiology, Shelf Life, and Research & Consultation services.
 
 ## Features
 - 🔒 Secure user authentication and role-based access control
-- 📅 Appointment scheduling and management
+- 📅 Appointment scheduling and management for multiple laboratory types
 - 🏢 Company verification and management system
 - 🚛 Truck and metrology service management
 - 📊 Laboratory service cataloging and pricing
@@ -20,6 +20,17 @@ The RSTL (Regional Science and Technology Laboratory) Appointment Portal is a we
 - **Database**: PostgreSQL
 - **Styling**: TailwindCSS with PostCSS
 - **Development Tools**: ESLint, Autoprefixer
+
+## Appointment Form Architecture
+- **Laboratory Appointment Form**: A multi-step, multi-appointment form is used for Chemistry, Microbiology, and Shelf Life appointments. It supports contact information, sample details, service selection, and (if applicable) shelf life details, allowing users to book multiple appointments in one session.
+- **Metrology Appointment Form**: Metrology appointments use a separate, custom form that includes company and truck verification, and specific metrology test details.
+- **Research Consultation Form**: Research consultation appointments have their own dedicated form tailored to research needs.
+- **Shared Components**: Some UI elements (calendar, overlays, modals) are reused, but the main appointment form logic is not shared between modules.
+
+## Backend API Structure
+- **Laboratory Appointments**: Handled via `/api/appointments` endpoint, supporting creation, listing, updating, and deletion. Data is stored in normalized tables: `appointments`, `appointment_details`, `customers`, etc. Dates are always stored as local date strings (YYYY-MM-DD).
+- **Metrology Appointments**: Managed via `/api/appointments/metrology`, with custom logic for company and truck validation.
+- **Other Appointment Types**: Each has its own API endpoint and logic as needed.
 
 ## Prerequisites
 - Node.js (Latest LTS version recommended)

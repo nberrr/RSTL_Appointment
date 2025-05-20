@@ -14,6 +14,12 @@ import ReviewSection from './ReviewSection';
 import { SubmissionStatus, DeleteConfirmModal } from './Notifications';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
 
+const formatDateLocal = (date) => {
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
+
+
 // Progress Stepper Component
 const ProgressStepper = ({ currentStep, isShelfLifeSelected }) => {
   const steps = [
@@ -230,10 +236,7 @@ export default function LaboratoryAppointmentForm() {
   // Handle date selection
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-
-    // Format as YYYY-MM-DD in local time
-    const pad = n => n.toString().padStart(2, '0');
-    const localDateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    const localDateString = formatDateLocal(date);
 
     // Update preferred date for all appointments
     setAppointments(prev => 
@@ -388,6 +391,8 @@ export default function LaboratoryAppointmentForm() {
       return;
     }
     const first = appointments[0] || {};
+    const localDateString = formatDateLocal(selectedDate);
+    
     const newAppointment = {
       id: appointments.length + 1,
       // Keep contact information from the first appointment
@@ -397,7 +402,7 @@ export default function LaboratoryAppointmentForm() {
       organization: first.organization,
       sex: first.sex,
       // Set the preferred date to the selected date
-      preferredDate: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
+      preferredDate: localDateString,
       // Reset other fields
       sampleName: '',
       sampleType: '',

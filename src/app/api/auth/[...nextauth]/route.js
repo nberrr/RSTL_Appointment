@@ -43,6 +43,9 @@ export const authOptions = {
       return session;
     },
   },
+  pages: {
+    signOut: '/login',
+  },
 };
 
 const handler = NextAuth(authOptions);

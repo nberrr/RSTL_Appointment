@@ -601,7 +601,7 @@ export default function ManagerRegistration() {
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  <p className="mt-2 text-sm text-gray-500">No trucks added yet. Click "Add Truck" to begin.</p>
+                  <p className="mt-2 text-sm text-gray-500">No trucks added yet. Click &quot;Add Truck&quot; to begin.</p>
                 </div>
               )}
             </div>

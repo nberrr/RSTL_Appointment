@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from "next/link";
+import Image from 'next/image';
 
 export default function MicrobiologyPage() {
   const [openQuestion, setOpenQuestion] = useState(null);
@@ -397,7 +398,7 @@ export default function MicrobiologyPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently asked questions</h2>
             <p className="text-gray-600">
               Common questions about our metrology services.
-              Can't find what you're looking for? <a href="#" className="text-blue-600 hover:underline"></a>
+              Can&apos;t find what you&apos;re looking for? <a href="#" className="text-blue-600 hover:underline"></a>
             </p>
           </div>
 

@@ -11,7 +11,7 @@ export default function LabDashboard({ department }) {
           <h2 className="text-xl font-semibold mb-4">Appointments Overview</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span>Today's Appointments</span>
+              <span>Today&apos;s Appointments</span>
               <span className="font-semibold">0</span>
             </div>
             <div className="flex justify-between">

@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: rstl_appointment_portal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1052
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./setup_database.sql:/docker-entrypoint-initdb.d/setup_database.sql
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_USER: postgres
+      DB_HOST: db
+      DB_NAME: rstl_appointment_portal
+      DB_PASSWORD: 1052
+      DB_PORT: 5432
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      JWT_SECRET: rstl_jwt_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d_2024
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: kclydebaclao@gmail.com
+      SMTP_PASS: zyou hhnu tonk vrde
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: b08017a36f4beddc68e796b656eb48a0a4e1ba063c6080e22554bb840ea16a05
+      
+    depends_on:
+      - db
+
+volumes:
+  db_data:

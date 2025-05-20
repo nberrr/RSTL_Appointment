@@ -142,7 +142,7 @@ export default function Home() {
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                I'm a Manager
+                I&apos;m a Manager
               </Link>
             </div>
           </div>
@@ -892,7 +892,7 @@ export default function Home() {
                 href="/metrology/manager-registration"
                     className="bg-blue-700 text-white px-4 py-2 rounded-md font-medium flex items-center justify-center hover:bg-blue-800 transition-colors"
               >
-                    I'm a Manager
+                    I&apos;m a Manager
               </Link>
                 </div>
               </div>
@@ -1133,7 +1133,7 @@ export default function Home() {
                             How Our Consultation Helps You
                           </h3>
                           <p className="text-gray-700">
-                            Our research consultation services provide expert guidance tailored to your specific needs, whether you're a student working on a thesis, a researcher developing new methodologies, or an industry professional seeking innovation.
+                            Our research consultation services provide expert guidance tailored to your specific needs, whether you&apos;re a student working on a thesis, a researcher developing new methodologies, or an industry professional seeking innovation.
                           </p>
                         </div>
 
@@ -1374,7 +1374,7 @@ export default function Home() {
               How to Avail Our Services
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Follow these simple steps to access our laboratory testing and calibration services. We're here to make the process as smooth as possible for you.
+              Follow these simple steps to access our laboratory testing and calibration services. We&apos;re here to make the process as smooth as possible for you.
             </p>
           </div>
 

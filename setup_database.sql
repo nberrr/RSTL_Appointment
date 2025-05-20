@@ -1,37 +1,6 @@
 -- RSTL Appointment Portal Database Setup Script
 -- This script creates the database and all required tables
 
--- Drop and recreate the database for a clean setup (dev only)
-DROP DATABASE IF EXISTS rstl_appointment_portal;
-CREATE DATABASE rstl_appointment_portal;
-\c rstl_appointment_portal
-
--- Drop all tables if they exist (in dependency order)
-DROP TABLE IF EXISTS appointment_detail_services CASCADE;
-DROP TABLE IF EXISTS lab_assignments CASCADE;
-DROP TABLE IF EXISTS remarks CASCADE;
-DROP TABLE IF EXISTS action_logs CASCADE;
-DROP TABLE IF EXISTS test_results CASCADE;
-DROP TABLE IF EXISTS research_consultation_details CASCADE;
-DROP TABLE IF EXISTS shelf_life_details CASCADE;
-DROP TABLE IF EXISTS microbiology_details CASCADE;
-DROP TABLE IF EXISTS chemistry_details CASCADE;
-DROP TABLE IF EXISTS metrology_details CASCADE;
-DROP TABLE IF EXISTS appointment_details CASCADE;
-DROP TABLE IF EXISTS inquiry_information CASCADE;
-DROP TABLE IF EXISTS appointments CASCADE;
-DROP TABLE IF EXISTS admin_assignments CASCADE;
-DROP TABLE IF EXISTS appointment_constraints CASCADE;
-DROP TABLE IF EXISTS services CASCADE;
-DROP TABLE IF EXISTS trucks CASCADE;
-DROP TABLE IF EXISTS companies CASCADE;
-DROP TABLE IF EXISTS customers CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS nextauth_verification_tokens CASCADE;
-DROP TABLE IF EXISTS nextauth_sessions CASCADE;
-DROP TABLE IF EXISTS nextauth_accounts CASCADE;
-DROP TABLE IF EXISTS nextauth_users CASCADE;
-
 -- Enable the UUID extension for generating unique IDs
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from "next/link";
+import Image from 'next/image';
 
 export default function ShelfLifePage() {
   const [openQuestion, setOpenQuestion] = useState(null);
@@ -106,8 +107,8 @@ export default function ShelfLifePage() {
         {/* Right side - Image */}
         <div className="relative w-full md:w-1/2 h-[400px] bg-gray-100 rounded-lg overflow-hidden">
           <img
-              src="/shelf-life.jpg"
-              alt="Shelf Life Testing Laboratory"
+            src="/shelf-life.jpg"
+            alt="Shelf Life Testing Laboratory"
             className="w-full h-full object-cover"
           />
           <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tr from-blue-900/20 to-transparent"></div>
@@ -326,7 +327,7 @@ export default function ShelfLifePage() {
               <div className="w-full lg:w-1/2">
                 <div className="relative h-[500px] rounded-lg overflow-hidden">
                   <img
-                    src="/shelf-life-lab.jpg"
+                    src="/shelf-life.jpg"
                     alt="Shelf Life Laboratory Equipment"
                     className="w-full h-full object-cover"
                   />
@@ -343,7 +344,7 @@ export default function ShelfLifePage() {
                       <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently asked questions</h2>
                       <p className="text-gray-600">
               Common questions about our shelf life testing services.
-                        Can't find what you're looking for? <a href="#" className="text-blue-600 hover:underline"></a>
+              Can&apos;t find what you&apos;re looking for? <a href="#" className="text-blue-600 hover:underline"></a>
                       </p>
                     </div>
                     <div className="max-w-[80rem] mx-auto space-y-4">

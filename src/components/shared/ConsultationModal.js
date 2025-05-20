@@ -10,6 +10,13 @@ function getStatusColor(status) {
   }
 }
 
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  const pad = n => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export default function ConsultationModal({ isOpen, onClose, consultation, onAccept, onDecline }) {
   if (!isOpen || !consultation) return null;
   const statusColors = getStatusColor(consultation.status);
@@ -54,7 +61,7 @@ export default function ConsultationModal({ isOpen, onClose, consultation, onAcc
           <div className="bg-white rounded-lg border p-3 text-xs flex flex-col gap-1 mb-2">
             <div className="font-semibold text-gray-700 mb-1">Appointment</div>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <div><span className="text-gray-500">Date:</span> <span className="font-medium text-gray-900">{consultation.date || 'N/A'}</span></div>
+              <div><span className="text-gray-500">Date:</span> <span className="font-medium text-gray-900">{formatDate(consultation.date)}</span></div>
             </div>
           </div>
           {/* Consultation Details */}

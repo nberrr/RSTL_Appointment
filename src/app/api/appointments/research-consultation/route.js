@@ -4,6 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { sendMail } from '../../../../lib/mail';
 import { requireAuth } from "@/lib/api-auth";
 
+function formatDateLocal(dateString) {
+  const date = new Date(dateString);
+  const pad = (n) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export async function POST(request) {
   try {
     const formData = await request.json();
@@ -39,7 +45,7 @@ export async function POST(request) {
     const serviceId = serviceResult.rows[0].id;
     
     // 3. Insert appointment and get appointment_id
-    const appointmentDate = formData.appointmentDate || new Date(formData.selectedDate);
+    const appointmentDate = formatDateLocal(formData.appointmentDate || formData.selectedDate);
     const appointmentResult = await query(
       `INSERT INTO appointments (customer_id, service_id, appointment_date, status)
        VALUES ($1, $2, $3, $4)

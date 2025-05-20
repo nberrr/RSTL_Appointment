@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireAuth } from "@/lib/api-auth";
 
 // GET /api/services/:id - Get a single service
 export async function GET(request, { params }) {
-  const { session, error } = await requireAuth(request, "admin");
-     if (error) {
-       return NextResponse.json({ success: false, message: error }, { status: error === "Unauthorized" ? 401 : 403 });
-     }
   const { id } = params;
   try {
     const result = await query(

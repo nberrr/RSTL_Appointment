@@ -90,6 +90,11 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
     return date < today;
   };
   
+  const isWeekend = (date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6; // Sunday or Saturday
+  };
+  
   const formatMonth = (date) => {
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
@@ -105,6 +110,8 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
       classes += "text-gray-400 cursor-not-allowed ";
     } else if (isBookedDate(date)) {
       classes += "bg-orange-100 text-orange-700 cursor-not-allowed ";
+    } else if (isWeekend(date)) {
+      classes += "text-red-400 cursor-not-allowed ";
     } else if (isSelectedDate(date)) {
       classes += "bg-blue-600 text-white ";
     } else if (isToday(date)) {
@@ -123,7 +130,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
   const handleDateClick = (dayInfo) => {
     const { date, isCurrentMonth } = dayInfo;
     
-    if (!isCurrentMonth || isPastDate(date) || isBookedDate(date)) {
+    if (!isCurrentMonth || isPastDate(date) || isBookedDate(date) || isWeekend(date)) {
       return;
     }
     
@@ -176,7 +183,7 @@ export default function AppointmentCalendar({ selectedDate, onDateSelect, booked
             <button
               type="button"
               onClick={() => handleDateClick(dayInfo)}
-              disabled={!dayInfo.isCurrentMonth || isPastDate(dayInfo.date) || isBookedDate(dayInfo.date) || disabled}
+              disabled={!dayInfo.isCurrentMonth || isPastDate(dayInfo.date) || isBookedDate(dayInfo.date) || isWeekend(dayInfo.date) || disabled}
               className={getDayClass(dayInfo)}
             >
               {dayInfo.date.getDate()}

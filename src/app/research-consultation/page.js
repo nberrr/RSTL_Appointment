@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
+import { isValidPhilippineMobileNumber, isValidEmailFormat, checkEmailExists } from '@/components/shared/validation';
 
 function ResultModal({ isOpen, onClose, success, message, appointmentId }) {
   if (!isOpen) return null;
@@ -87,14 +88,22 @@ export default function ResearchConsultation() {
         setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
-    const validateForm = () => {
+    const validateForm = async () => {
         const newErrors = {};
 
         // Personal Information validation
         if (!formData.fullName) newErrors.fullName = 'Please enter your full name';
         if (!formData.sex) newErrors.sex = 'Please select your sex';
-        if (!formData.emailAddress) newErrors.emailAddress = 'Please enter your email address';
-        if (!formData.contactNumber) newErrors.contactNumber = 'Please enter your contact number';
+        if (!formData.emailAddress) {
+            newErrors.emailAddress = 'Please enter your email address';
+        } else if (!isValidEmailFormat(formData.emailAddress)) {
+            newErrors.emailAddress = 'Please enter a valid email address';
+        }
+        if (!formData.contactNumber) {
+            newErrors.contactNumber = 'Please enter your contact number';
+        } else if (!isValidPhilippineMobileNumber(formData.contactNumber)) {
+            newErrors.contactNumber = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
+        }
         if (!formData.institution) newErrors.institution = 'Please enter your institution';
         if (!formData.yearLevel) newErrors.yearLevel = 'Please enter your year level/position';
         if (!formData.researchTitle) newErrors.researchTitle = 'Please enter your research title or topic';
@@ -113,77 +122,80 @@ export default function ResearchConsultation() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            setIsSubmitting(true);
-            try {
-                // Upload files first
-                let uploadedFiles = [];
-                if (selectedFiles.length > 0) {
-                    for (const file of selectedFiles) {
-                        const formDataUpload = new FormData();
-                        formDataUpload.append('file', file);
-                        const res = await fetch('/api/uploads/appointment', {
-                            method: 'POST',
-                            body: formDataUpload,
-                        });
-                        const data = await res.json();
-                        if (data.success && data.files && data.files.length > 0) {
-                            uploadedFiles.push(data.files[0]);
-                        } else {
-                            throw new Error(data.message || 'File upload failed');
-                        }
+        setIsSubmitting(true);
+        const isValid = await validateForm();
+        if (!isValid) {
+            setIsSubmitting(false);
+            return;
+        }
+        try {
+            // Upload files first
+            let uploadedFiles = [];
+            if (selectedFiles.length > 0) {
+                for (const file of selectedFiles) {
+                    const formDataUpload = new FormData();
+                    formDataUpload.append('file', file);
+                    const res = await fetch('/api/uploads/appointment', {
+                        method: 'POST',
+                        body: formDataUpload,
+                    });
+                    const data = await res.json();
+                    if (data.success && data.files && data.files.length > 0) {
+                        uploadedFiles.push(data.files[0]);
+                    } else {
+                        throw new Error(data.message || 'File upload failed');
                     }
                 }
-                const formDataToSubmit = {
-                    ...formData,
-                    selectedDate: selectedDate ? selectedDate.toISOString() : null,
-                    uploadedFiles
-                };
-                const response = await fetch('/api/appointments/research-consultation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formDataToSubmit),
-                });
-                const data = await response.json();
-                if (data.success) {
-                    setSubmissionStatus({
-                        success: true,
-                        message: 'Thank you! Your research consultation request has been received. You will receive a confirmation email shortly.',
-                        appointmentId: data.appointmentId
-                    });
-                    setShowResultModal(true);
-                    setFormData({
-                        fullName: '',
-                        sex: '',
-                        emailAddress: '',
-                        contactNumber: '',
-                        institution: '',
-                        typeOfResearch: 'Chemical',
-                        yearLevel: '',
-                        researchTitle: '',
-                        consultationDetails: '',
-                        terms: false
-                    });
-                    setSelectedDate(null);
-                    setSelectedFiles([]);
-                } else {
-                    setSubmissionStatus({
-                        success: false,
-                        message: data.message || 'Sorry, we could not process your request. Please check your details and try again.'
-                    });
-                    setShowResultModal(true);
-                }
-            } catch (error) {
+            }
+            const formDataToSubmit = {
+                ...formData,
+                selectedDate: selectedDate ? selectedDate.toISOString() : null,
+                uploadedFiles
+            };
+            const response = await fetch('/api/appointments/research-consultation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formDataToSubmit),
+            });
+            const data = await response.json();
+            if (data.success) {
                 setSubmissionStatus({
-                    success: false,
-                    message: error.message || 'A network error occurred. Please check your connection and try again.'
+                    success: true,
+                    message: 'Thank you! Your research consultation request has been received. You will receive a confirmation email shortly.',
+                    appointmentId: data.appointmentId
                 });
                 setShowResultModal(true);
-            } finally {
-                setIsSubmitting(false);
+                setFormData({
+                    fullName: '',
+                    sex: '',
+                    emailAddress: '',
+                    contactNumber: '',
+                    institution: '',
+                    typeOfResearch: 'Chemical',
+                    yearLevel: '',
+                    researchTitle: '',
+                    consultationDetails: '',
+                    terms: false
+                });
+                setSelectedDate(null);
+                setSelectedFiles([]);
+            } else {
+                setSubmissionStatus({
+                    success: false,
+                    message: data.message || 'Sorry, we could not process your request. Please check your details and try again.'
+                });
+                setShowResultModal(true);
             }
+        } catch (error) {
+            setSubmissionStatus({
+                success: false,
+                message: error.message || 'A network error occurred. Please check your connection and try again.'
+            });
+            setShowResultModal(true);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -220,17 +232,18 @@ export default function ResearchConsultation() {
             const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
             const isToday = date.toDateString() === new Date().toDateString();
             const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+            const isPast = date < new Date().setHours(0, 0, 0, 0);
 
             days.push(
                 <button
                     key={day}
-                    onClick={() => setSelectedDate(date)}
-                    disabled={isWeekend}
+                    onClick={() => !isWeekend && !isPast && setSelectedDate(date)}
+                    disabled={isWeekend || isPast}
                     className={`h-8 w-8 mx-auto flex items-center justify-center rounded-full transition-colors
                         ${isSelected ? 'bg-blue-600 text-white' : ''}
                         ${isToday && !isSelected ? 'bg-blue-50 text-blue-600' : ''}
-                        ${isWeekend ? 'text-red-300' : 'text-gray-900'}
-                        ${!isSelected && !isToday && !isWeekend ? 'hover:bg-gray-100' : ''}
+                        ${isWeekend || isPast ? 'text-red-300 cursor-not-allowed' : 'text-gray-900'}
+                        ${!isSelected && !isToday && !isWeekend && !isPast ? 'hover:bg-gray-100' : ''}
                     `}
                 >
                     {day}

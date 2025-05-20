@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
+import { isValidPhilippineMobileNumber, isValidEmailFormat, checkEmailExists } from '@/components/shared/validation';
 
 export default function MetrologyAppointment() {
     const [formData, setFormData] = useState({
@@ -99,13 +100,21 @@ export default function MetrologyAppointment() {
         fetchLimit();
     }, [selectedDate]);
 
-    const validateForm = () => {
+    const validateForm = async () => {
         const newErrors = {};
 
         // Contact Information validation
         if (!formData.name) newErrors.name = 'Please enter full name';
-        if (!formData.email) newErrors.email = 'Please enter email address';
-        if (!formData.contactNumber) newErrors.contactNumber = 'Please enter contact number';
+        if (!formData.email) {
+            newErrors.email = 'Please enter email address';
+        } else if (!isValidEmailFormat(formData.email)) {
+            newErrors.email = 'Please enter a valid email address';
+        }
+        if (!formData.contactNumber) {
+            newErrors.contactNumber = 'Please enter contact number';
+        } else if (!isValidPhilippineMobileNumber(formData.contactNumber)) {
+            newErrors.contactNumber = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
+        }
         if (!formData.plateNumber) newErrors.plateNumber = 'Please enter plate number';
         if (!formData.companyName) newErrors.companyName = 'Please enter organization name';
         if (!formData.sex) newErrors.sex = 'Please select sex';
@@ -168,90 +177,93 @@ export default function MetrologyAppointment() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            let companyId = null;
-            let truckId = null;
-            try {
-                setIsSubmitting(true);
-                // 1. Lookup company by name
-                let companyRes = await fetch(`/api/companies?name=${encodeURIComponent(formData.companyName)}`);
-                let companyData = await companyRes.json();
-                if (!(companyData.success && companyData.data && companyData.data.length > 0)) {
-                    setErrorMessage('Company not registered. Please register your company first.');
-                    setShowErrorModal(true);
-                    setIsSubmitting(false);
-                    return;
-                }
-                companyId = companyData.data[0].id;
-                // 2. Lookup truck by plate number and company_id
-                let truckRes = await fetch(`/api/trucks?license_plate=${encodeURIComponent(formData.plateNumber)}&company_id=${companyId}`);
-                let truckData = await truckRes.json();
-                if (!(truckData.success && truckData.data && truckData.data.length > 0)) {
-                    setErrorMessage('Truck not registered under this company. Please register your truck first.');
-                    setShowErrorModal(true);
-                    setIsSubmitting(false);
-                    return;
-                }
-                truckId = truckData.data[0].id;
-                // 3. Submit appointment
-                function formatLocalDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-                const formDataToSubmit = {
-                    ...formData,
-                    selectedDate: selectedDate ? formatLocalDate(selectedDate) : null,
-                    company_id: companyId,
-                    truck_id: truckId,
-                    intakeFileUrl: formData.intakeFileUrl || null
-                };
-                const response = await fetch('/api/appointments/metrology', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formDataToSubmit),
+        setIsSubmitting(true);
+        const isValid = await validateForm();
+        if (!isValid) {
+            setIsSubmitting(false);
+            return;
+        }
+        let companyId = null;
+        let truckId = null;
+        try {
+            // 1. Lookup company by name
+            let companyRes = await fetch(`/api/companies?name=${encodeURIComponent(formData.companyName)}`);
+            let companyData = await companyRes.json();
+            if (!(companyData.success && companyData.data && companyData.data.length > 0)) {
+                setErrorMessage('Company not registered. Please register your company first.');
+                setShowErrorModal(true);
+                setIsSubmitting(false);
+                return;
+            }
+            companyId = companyData.data[0].id;
+            // 2. Lookup truck by plate number and company_id
+            let truckRes = await fetch(`/api/trucks?license_plate=${encodeURIComponent(formData.plateNumber)}&company_id=${companyId}`);
+            let truckData = await truckRes.json();
+            if (!(truckData.success && truckData.data && truckData.data.length > 0)) {
+                setErrorMessage('Truck not registered under this company. Please register your truck first.');
+                setShowErrorModal(true);
+                setIsSubmitting(false);
+                return;
+            }
+            truckId = truckData.data[0].id;
+            // 3. Submit appointment
+            function formatLocalDate(date) {
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            const formDataToSubmit = {
+                ...formData,
+                selectedDate: selectedDate ? formatLocalDate(selectedDate) : null,
+                company_id: companyId,
+                truck_id: truckId,
+                intakeFileUrl: formData.intakeFileUrl || null
+            };
+            const response = await fetch('/api/appointments/metrology', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formDataToSubmit),
+            });
+            const data = await response.json();
+            if (data.success) {
+                setSubmissionStatus({
+                    success: true,
+                    message: 'Your appointment has been scheduled successfully!',
+                    appointmentId: data.appointmentId
                 });
-                const data = await response.json();
-                if (data.success) {
-                    setSubmissionStatus({
-                        success: true,
-                        message: 'Your appointment has been scheduled successfully!',
-                        appointmentId: data.appointmentId
-                    });
-                    setSuccessMessage('Your appointment has been scheduled successfully!');
-                    setShowSuccessModal(true);
-                    setFormData({
-                        name: '',
-                        email: '',
-                        contactNumber: '',
-                        sex: '',
-                        plateNumber: '',
-                        companyName: '',
-                        sampleDescription: '',
-                        numberOfLiters: '',
-                        typeOfTest: 'Volume Standard Test',
-                        nameOfSamples: '',
-                        terms: false,
-                        intakeFileUrl: null
-                    });
-                    setSelectedDate(null);
-                } else {
-                    setSubmissionStatus({
-                        success: false,
-                        message: data.message || 'Failed to schedule appointment. Please try again.'
-                    });
-                }
-            } catch (error) {
+                setSuccessMessage('Your appointment has been scheduled successfully!');
+                setShowSuccessModal(true);
+                setFormData({
+                    name: '',
+                    email: '',
+                    contactNumber: '',
+                    sex: '',
+                    plateNumber: '',
+                    companyName: '',
+                    sampleDescription: '',
+                    numberOfLiters: '',
+                    typeOfTest: 'Volume Standard Test',
+                    nameOfSamples: '',
+                    terms: false,
+                    intakeFileUrl: null
+                });
+                setSelectedDate(null);
+            } else {
                 setSubmissionStatus({
                     success: false,
-                    message: error.message || 'Network error. Please check your connection and try again.'
+                    message: data.message || 'Failed to schedule appointment. Please try again.'
                 });
-            } finally {
-                setIsSubmitting(false);
             }
+        } catch (error) {
+            setSubmissionStatus({
+                success: false,
+                message: error.message || 'Network error. Please check your connection and try again.'
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -291,17 +303,18 @@ export default function MetrologyAppointment() {
         const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
         const isToday = date.toDateString() === new Date().toDateString();
         const isWeekend = date.getDay() === 0 || date.getDay() === 6; // Sunday or Saturday
+        const isPast = date < new Date().setHours(0, 0, 0, 0);
 
         days.push(
             <button
             key={day}
-            onClick={() => !isWeekend && setSelectedDate(date)}
-            disabled={isWeekend}
+            onClick={() => !isWeekend && !isPast && setSelectedDate(date)}
+            disabled={isWeekend || isPast}
             className={`h-8 text-xs sm:text-sm leading-loose rounded-full transition-colors
                 ${isSelected ? 'bg-blue-600 text-white' : ''}
                 ${isToday && !isSelected ? 'bg-blue-100 text-blue-600' : ''}
-                ${isWeekend ? 'text-red-400 cursor-not-allowed' : ''}
-                ${!isSelected && !isToday && !isWeekend ? 'hover:bg-gray-100 text-gray-900' : ''}
+                ${isWeekend || isPast ? 'text-red-400 cursor-not-allowed' : ''}
+                ${!isSelected && !isToday && !isWeekend && !isPast ? 'hover:bg-gray-100 text-gray-900' : ''}
             `}
             >
             {day}

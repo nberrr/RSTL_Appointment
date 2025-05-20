@@ -13,6 +13,7 @@ import ShelfLifeDetails from './ShelfLifeDetails';
 import ReviewSection from './ReviewSection';
 import { SubmissionStatus, DeleteConfirmModal } from './Notifications';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
+import { isValidPhilippineMobileNumber, isValidEmailFormat, checkEmailExists } from '@/components/shared/validation';
 
 const formatDateLocal = (date) => {
   const pad = (n) => n.toString().padStart(2, '0');
@@ -458,7 +459,7 @@ export default function LaboratoryAppointmentForm() {
   };
 
   // Validation functions
-  const validateContactInfo = () => {
+  const validateContactInfo = async () => {
     const newErrors = {};
     const currentAppointment = appointments[0]; // Always validate the first (global) contact info
 
@@ -467,16 +468,17 @@ export default function LaboratoryAppointmentForm() {
     }
     if (!currentAppointment.emailAddress?.trim()) {
       newErrors.emailAddress = 'Email address is required';
-    } else if (!/\S+@\S+\.\S+/.test(currentAppointment.emailAddress)) {
+    } else if (!isValidEmailFormat(currentAppointment.emailAddress)) {
       newErrors.emailAddress = 'Please enter a valid email address';
     }
     if (!currentAppointment.phoneNumber?.trim()) {
       newErrors.phoneNumber = 'Phone number is required';
+    } else if (!isValidPhilippineMobileNumber(currentAppointment.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
     }
     if (!currentAppointment.sex?.trim()) {
       newErrors.sex = 'Please select your sex (gender)';
     }
-    
     // Return validation result object
     return {
       isValid: Object.keys(newErrors).length === 0,
@@ -569,12 +571,11 @@ export default function LaboratoryAppointmentForm() {
   };
 
   // Navigation functions
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     let validationResult = { isValid: false, errors: {} };
-    
     switch (currentStep) {
       case 'contact':
-        validationResult = validateContactInfo();
+        validationResult = await validateContactInfo();
         setErrors(validationResult.errors);
         if (validationResult.isValid) {
           setCurrentStep('sample');
@@ -584,12 +585,10 @@ export default function LaboratoryAppointmentForm() {
         const emptyTabIndex = appointments.findIndex(
           (appointment) => !appointment.sampleName && !appointment.quantity && !appointment.sampleDescription
         );
-
         if (emptyTabIndex !== -1 && appointments.length > 1) {
           setErrors(prev => ({ ...prev, global: `Please fill out Appointment ${emptyTabIndex + 1} or remove it.` }));
           return;
         }
-
         validationResult = validateSampleDetails();
         setErrors(validationResult.errors);
         if (validationResult.isValid) {
@@ -649,11 +648,39 @@ export default function LaboratoryAppointmentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('[DEBUG] handleSubmit called');
-    const isValid = validateForm();
-    console.log('[DEBUG] validateForm result:', isValid);
-    if (!isValid) return;
     setIsSubmitting(true);
+    const contactValidation = await validateContactInfo();
+    if (!contactValidation.isValid) {
+      setErrors(contactValidation.errors);
+      setIsSubmitting(false);
+      return;
+    }
+    let allAppointmentsValid = true;
+    let combinedErrors = {};
+    for (let i = 0; i < appointments.length; i++) {
+      const currentIndex = currentAppointmentIndex;
+      setCurrentAppointmentIndex(i);
+      const sampleValidation = validateSampleDetails();
+      combinedErrors = { ...combinedErrors, ...sampleValidation.errors };
+      if (!sampleValidation.isValid) {
+        allAppointmentsValid = false;
+      }
+      const currentApp = appointments[i];
+      const hasShelfLife = Object.values(currentApp.shelfLifeServices).some(value => value);
+      if (hasShelfLife) {
+        const shelfLifeValidation = validateShelfLifeDetails();
+        combinedErrors = { ...combinedErrors, ...shelfLifeValidation.errors };
+        if (!shelfLifeValidation.isValid) {
+          allAppointmentsValid = false;
+        }
+      }
+      setCurrentAppointmentIndex(currentIndex);
+    }
+    setErrors(combinedErrors);
+    if (!allAppointmentsValid) {
+      setIsSubmitting(false);
+      return;
+    }
     setSubmissionStatus(null);
     try {
       const results = [];

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import LoadingOverlay from '@/components/shared/LoadingOverlay';
+import { isValidPhilippineMobileNumber, isValidEmailFormat, checkEmailExists } from '@/components/shared/validation';
 
 export default function ManagerRegistration() {
   const [formData, setFormData] = useState({
@@ -24,14 +25,22 @@ export default function ManagerRegistration() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateForm = () => {
+  const validateForm = async () => {
     const newErrors = {};
     
     // Company Information validation
     if (!formData.companyName) newErrors.companyName = 'Please enter company name';
     if (!formData.contactPerson) newErrors.contactPerson = 'Please enter contact person name';
-    if (!formData.contactNumber) newErrors.contactNumber = 'Please enter contact number';
-    if (!formData.contactEmail) newErrors.contactEmail = 'Please enter contact email';
+    if (!formData.contactNumber) {
+      newErrors.contactNumber = 'Please enter contact number';
+    } else if (!isValidPhilippineMobileNumber(formData.contactNumber)) {
+      newErrors.contactNumber = 'Please enter a valid Philippine mobile number (09XXXXXXXXX or +639XXXXXXXXX)';
+    }
+    if (!formData.contactEmail) {
+      newErrors.contactEmail = 'Please enter contact email';
+    } else if (!isValidEmailFormat(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid email address';
+    }
     if (!formData.companyAddress) newErrors.companyAddress = 'Please enter company address';
     
     // Business Permit validation
@@ -115,128 +124,131 @@ export default function ManagerRegistration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      setIsSubmitting(true);
-      try {
-        // 1. Check if company exists
-        const checkCompanyRes = await fetch(`/api/companies?name=${encodeURIComponent(formData.companyName)}`);
-        const checkCompanyData = await checkCompanyRes.json();
-        let companyId = null;
-        let isNewCompany = false;
-        if (checkCompanyData.success && checkCompanyData.data && checkCompanyData.data.length > 0) {
-          // Company exists, use its ID
-          companyId = checkCompanyData.data[0].id;
-          // Optionally, check if other fields match and warn if not
-        } else {
-          // 2. Upload files
-          async function uploadFile(file) {
-            const formDataUpload = new FormData();
-            formDataUpload.append('file', file);
-            const res = await fetch('/api/uploads/appointment', {
-              method: 'POST',
-              body: formDataUpload,
-            });
-            const data = await res.json();
-            if (data.success && data.files && data.files.length > 0) {
-              return data.files[0];
-            }
+    setIsSubmitting(true);
+    const isValid = await validateForm();
+    if (!isValid) {
+      setIsSubmitting(false);
+      return;
+    }
+    try {
+      // 1. Check if company exists
+      const checkCompanyRes = await fetch(`/api/companies?name=${encodeURIComponent(formData.companyName)}`);
+      const checkCompanyData = await checkCompanyRes.json();
+      let companyId = null;
+      let isNewCompany = false;
+      if (checkCompanyData.success && checkCompanyData.data && checkCompanyData.data.length > 0) {
+        // Company exists, use its ID
+        companyId = checkCompanyData.data[0].id;
+        // Optionally, check if other fields match and warn if not
+      } else {
+        // 2. Upload files
+        async function uploadFile(file) {
+          const formDataUpload = new FormData();
+          formDataUpload.append('file', file);
+          const res = await fetch('/api/uploads/appointment', {
+            method: 'POST',
+            body: formDataUpload,
+          });
+          const data = await res.json();
+          if (data.success && data.files && data.files.length > 0) {
+            return data.files[0];
+          }
+          throw new Error(data.message || 'File upload failed');
+        }
+        let uploadedBusinessPermitUrl = null;
+        if (formData.businessPermit) {
+          uploadedBusinessPermitUrl = await uploadFile(formData.businessPermit);
+        }
+        // 3. Create company
+        const companyRes = await fetch('/api/companies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.companyName,
+            contact_person: formData.contactPerson,
+            contact_email: formData.contactEmail,
+            contact_phone: formData.contactNumber,
+            business_permit: uploadedBusinessPermitUrl, // use uploaded file URL
+            reg_date: new Date().toISOString(),
+            address: formData.companyAddress,
+          })
+        });
+        const companyData = await companyRes.json();
+        if (!companyData.success || !companyData.data?.id) throw new Error(companyData.message || 'Failed to create company');
+        companyId = companyData.data.id;
+        isNewCompany = true;
+      }
+      // 4. For each truck, check if it exists for this company, if not, create it
+      const uploadedOrCrUrls = {};
+      for (let i = 0; i < licensePlates.length; i++) {
+        if (formData.orCrDocuments[i]) {
+          // Upload OR/CR document
+          const formDataUpload = new FormData();
+          formDataUpload.append('file', formData.orCrDocuments[i]);
+          const res = await fetch('/api/uploads/appointment', {
+            method: 'POST',
+            body: formDataUpload,
+          });
+          const data = await res.json();
+          if (data.success && data.files && data.files.length > 0) {
+            uploadedOrCrUrls[i] = data.files[0];
+          } else {
             throw new Error(data.message || 'File upload failed');
           }
-          let uploadedBusinessPermitUrl = null;
-          if (formData.businessPermit) {
-            uploadedBusinessPermitUrl = await uploadFile(formData.businessPermit);
-          }
-          // 3. Create company
-          const companyRes = await fetch('/api/companies', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: formData.companyName,
-              contact_person: formData.contactPerson,
-              contact_email: formData.contactEmail,
-              contact_phone: formData.contactNumber,
-              business_permit: uploadedBusinessPermitUrl, // use uploaded file URL
-              reg_date: new Date().toISOString(),
-              address: formData.companyAddress,
-            })
-          });
-          const companyData = await companyRes.json();
-          if (!companyData.success || !companyData.data?.id) throw new Error(companyData.message || 'Failed to create company');
-          companyId = companyData.data.id;
-          isNewCompany = true;
         }
-        // 4. For each truck, check if it exists for this company, if not, create it
-        const uploadedOrCrUrls = {};
-        for (let i = 0; i < licensePlates.length; i++) {
-          if (formData.orCrDocuments[i]) {
-            // Upload OR/CR document
-            const formDataUpload = new FormData();
-            formDataUpload.append('file', formData.orCrDocuments[i]);
-            const res = await fetch('/api/uploads/appointment', {
-              method: 'POST',
-              body: formDataUpload,
-            });
-            const data = await res.json();
-            if (data.success && data.files && data.files.length > 0) {
-              uploadedOrCrUrls[i] = data.files[0];
-            } else {
-              throw new Error(data.message || 'File upload failed');
-            }
-          }
-        }
-        let addedTrucks = 0;
-        for (let i = 0; i < licensePlates.length; i++) {
-          const plate = licensePlates[i];
-          // Check if truck exists for this company
-          const checkTruckRes = await fetch(`/api/trucks?license_plate=${encodeURIComponent(plate)}&company_id=${companyId}`);
-          const checkTruckData = await checkTruckRes.json();
-          if (checkTruckData.success && checkTruckData.data && checkTruckData.data.length > 0) {
-            // Truck already exists for this company, skip
-            continue;
-          }
-          // Create truck
-          const orcr = uploadedOrCrUrls[i] || null;
-          const truckRes = await fetch('/api/trucks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              license_plate: plate,
-              company_id: companyId,
-              orcr_document: orcr
-            })
-          });
-          const truckData = await truckRes.json();
-          if (!truckData.success) throw new Error(truckData.message || 'Failed to create truck');
-          addedTrucks++;
-        }
-        if (isNewCompany) {
-          setSuccessMessage('Company and trucks registered successfully!');
-        } else if (addedTrucks > 0) {
-          setSuccessMessage('New trucks added to existing company successfully!');
-        } else {
-          setSuccessMessage('No new trucks were added (all already registered for this company).');
-        }
-        setShowSuccessModal(true);
-        // Reset form
-        setFormData({
-          companyName: '',
-          contactPerson: '',
-          contactNumber: '',
-          contactEmail: '',
-          companyAddress: '',
-          truckLicensePlates: [''],
-          businessPermit: null,
-          orCrDocuments: {},
-          additionalNotes: '',
-          terms: false
-        });
-        setLicensePlates(['']);
-      } catch (error) {
-        setErrorMessage(error.message || 'Registration failed.');
-        setShowErrorModal(true);
-      } finally {
-        setIsSubmitting(false);
       }
+      let addedTrucks = 0;
+      for (let i = 0; i < licensePlates.length; i++) {
+        const plate = licensePlates[i];
+        // Check if truck exists for this company
+        const checkTruckRes = await fetch(`/api/trucks?license_plate=${encodeURIComponent(plate)}&company_id=${companyId}`);
+        const checkTruckData = await checkTruckRes.json();
+        if (checkTruckData.success && checkTruckData.data && checkTruckData.data.length > 0) {
+          // Truck already exists for this company, skip
+          continue;
+        }
+        // Create truck
+        const orcr = uploadedOrCrUrls[i] || null;
+        const truckRes = await fetch('/api/trucks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            license_plate: plate,
+            company_id: companyId,
+            orcr_document: orcr
+          })
+        });
+        const truckData = await truckRes.json();
+        if (!truckData.success) throw new Error(truckData.message || 'Failed to create truck');
+        addedTrucks++;
+      }
+      if (isNewCompany) {
+        setSuccessMessage('Company and trucks registered successfully!');
+      } else if (addedTrucks > 0) {
+        setSuccessMessage('New trucks added to existing company successfully!');
+      } else {
+        setSuccessMessage('No new trucks were added (all already registered for this company).');
+      }
+      setShowSuccessModal(true);
+      // Reset form
+      setFormData({
+        companyName: '',
+        contactPerson: '',
+        contactNumber: '',
+        contactEmail: '',
+        companyAddress: '',
+        truckLicensePlates: [''],
+        businessPermit: null,
+        orCrDocuments: {},
+        additionalNotes: '',
+        terms: false
+      });
+      setLicensePlates(['']);
+    } catch (error) {
+      setErrorMessage(error.message || 'Registration failed.');
+      setShowErrorModal(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
